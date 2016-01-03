@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "facing=down": { "model": "mazetowers:memory_piston_extension", "x": 90 },
+        "facing=up": { "model": "mazetowers:memory_piston_extension", "x": 270 },
+        "facing=north": { "model": "mazetowers:memory_piston_extension" },
+        "facing=south": { "model": "mazetowers:memory_piston_extension", "y": 180 },
+        "facing=west": { "model": "mazetowers:memory_piston_extension", "y": 270 },
+        "facing=east": { "model": "mazetowers:memory_piston_extension", "y": 90 } 
+    }
+}
