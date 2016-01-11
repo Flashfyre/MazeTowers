@@ -9,10 +9,13 @@ import java.util.Random;
 import com.google.common.collect.HashBiMap;
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedISmartBlockModelFactory;
+import com.samuel.mazetowers.entities.*;
+import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedModel;
+import com.samuel.mazetowers.etc.UltravioletFireModel;
 import com.samuel.mazetowers.eventhandlers.ModelBakeEventHandler;
 import com.samuel.mazetowers.render.BlockRenderRegister;
 import com.samuel.mazetowers.render.ItemRenderRegister;
+import com.samuel.mazetowers.render.entities.*;
 import com.samuel.mazetowers.render.tileentities.*;
 import com.samuel.mazetowers.tileentities.*;
 
@@ -56,9 +59,11 @@ public class ClientProxy extends CommonProxy {
 		StateMapperBase ignoreState = new StateMapperBase() {
 			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-				return state.getValue(BlockHiddenPressurePlateWeighted.POWER) == 0 ?
-					HiddenPressurePlateWeightedISmartBlockModelFactory.modelResourceLocationUp :
-					HiddenPressurePlateWeightedISmartBlockModelFactory.modelResourceLocationDown;
+				return state.getBlock() == MazeTowers.BlockHiddenPressurePlateWeighted ?
+					state.getValue(BlockHiddenPressurePlateWeighted.POWER) == 0 ?
+					HiddenPressurePlateWeightedModel.modelResourceLocationUp :
+					HiddenPressurePlateWeightedModel.modelResourceLocationDown :
+					UltravioletFireModel.getModelResourceLocation();
 			}
 	    };
 	    ModelLoader.setCustomStateMapper(MazeTowers.BlockHiddenPressurePlateWeighted,
@@ -73,6 +78,11 @@ public class ClientProxy extends CommonProxy {
 	public void init(FMLInitializationEvent e) {
 		super.init(e);
 		BlockRenderRegister.registerBlockRenderer();
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntitySmallUltravioletFireball.class,
+				new RenderSmallUltravioletFireball(Minecraft.getMinecraft().getRenderManager(), 1.0F));
+		RenderingRegistry.registerEntityRenderingHandler(EntityUltravioletBlaze.class,
+			new RenderUltravioletBlaze(Minecraft.getMinecraft().getRenderManager()));
 	}
 
 	@Override

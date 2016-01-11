@@ -221,7 +221,7 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 
             block.setBlockBoundsBasedOnState(worldIn, pos);
 
-            if (block == MazeTowers.BlockMemoryPiston)
+            if (block instanceof BlockMemoryPistonBase)
             {
                 f = 0.0F;
             }
@@ -294,7 +294,8 @@ public class BlockMemoryPistonMoving extends BlockContainer {
     private TileEntityMemoryPiston getTileEntity(IBlockAccess worldIn, BlockPos pos)
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityMemoryPiston ? (TileEntityMemoryPiston)tileentity : null;
+        return tileentity instanceof TileEntityMemoryPiston ?
+        	(TileEntityMemoryPiston)tileentity : null;
     }
 
     @Override
@@ -310,7 +311,8 @@ public class BlockMemoryPistonMoving extends BlockContainer {
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(FACING, BlockMemoryPistonExtension.getFacing(meta));
+        return this.getDefaultState().withProperty(FACING,
+        	BlockMemoryPistonExtension.getFacing(meta));
     }
 
     @Override
@@ -332,7 +334,8 @@ public class BlockMemoryPistonMoving extends BlockContainer {
     }
 
     @Override
-    public java.util.List<net.minecraft.item.ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    public java.util.List<net.minecraft.item.ItemStack> getDrops(IBlockAccess world,
+    	BlockPos pos, IBlockState state, int fortune)
     {
         TileEntityMemoryPiston tileentitypiston = this.getTileEntity(world, pos);
         if (tileentitypiston != null)

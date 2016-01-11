@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "facing=down,short=false": { "model": "mazetowers:memory_piston_head_off", "x": 90 },
+        "facing=up,short=false": { "model": "mazetowers:memory_piston_head_off", "x": 270 },
+        "facing=north,short=false": { "model": "mazetowers:memory_piston_head_off" },
+        "facing=south,short=false": { "model": "mazetowers:memory_piston_head_off", "y": 180 },
+        "facing=west,short=false": { "model": "mazetowers:memory_piston_head_off", "y": 270 },
+        "facing=east,short=false": { "model": "mazetowers:memory_piston_head_off", "y": 90 },
+        "facing=down,short=true": { "model": "mazetowers:memory_piston_head_off_short", "x": 90 },
+        "facing=up,short=true": { "model": "mazetowers:memory_piston_head_off_short", "x": 270 },
+        "facing=north,short=true": { "model": "mazetowers:memory_piston_head_off_short" },
+        "facing=south,short=true": { "model": "mazetowers:memory_piston_head_off_short", "y": 180 },
+        "facing=west,short=true": { "model": "mazetowers:memory_piston_head_off_short", "y": 270 },
+        "facing=east,short=true": { "model": "mazetowers:memory_piston_head_off_short", "y": 90 }
+    }
+}

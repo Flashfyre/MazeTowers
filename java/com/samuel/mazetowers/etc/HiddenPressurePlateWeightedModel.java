@@ -34,7 +34,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 /**
  * Created from CamouflageISmartBlockModelFactory by TheGreyGhost on 19/04/2015.
  */
-public class HiddenPressurePlateWeightedISmartBlockModelFactory implements ISmartBlockModel {
+public class HiddenPressurePlateWeightedModel implements ISmartBlockModel {
 
   @SuppressWarnings("deprecation")
   
@@ -43,7 +43,7 @@ public class HiddenPressurePlateWeightedISmartBlockModelFactory implements ISmar
   private IBakedModel copyBakedModel = null;
   private Map<IBlockState, IBakedModel> modelCache; 
   
-  public HiddenPressurePlateWeightedISmartBlockModelFactory(IRetexturableModel baseModelIn, IBakedModel baseBakedModelIn)
+  public HiddenPressurePlateWeightedModel(IRetexturableModel baseModelIn, IBakedModel baseBakedModelIn)
   {
 	  baseModel = baseModelIn;
 	  baseBakedModel = baseBakedModelIn;
@@ -80,41 +80,44 @@ public class HiddenPressurePlateWeightedISmartBlockModelFactory implements ISmar
 	        	TextureAtlasSprite texture = copiedBlockModel.getTexture();
 	        	String path = texture.getIconName();
 	        	String newPath;
+	        	
+	        	if (path != "missingno") {
 	
-	        	newPath = path.substring(0, path.indexOf(":") + 1) + "textures/" + path.substring(path.indexOf(":") + 1);
-				try {
-					if (resourceManager.getResource(new ResourceLocation(newPath + "_top.png")) != null)
-						path += "_top";
-				} catch (IOException e) {
-					if (path.indexOf("_") > -1) {
-						try {
-							if (resourceManager.getResource(new ResourceLocation(newPath.substring(0,
-								newPath.lastIndexOf("_") + 1) + "top.png")) != null) {
-								path = path.substring(0, path.lastIndexOf("_") + 1) + "top";
-							}
-						} catch (IOException e_) {
-						}	
+		        	newPath = path.substring(0, path.indexOf(":") + 1) + "textures/" + path.substring(path.indexOf(":") + 1);
+					try {
+						if (resourceManager.getResource(new ResourceLocation(newPath + "_top.png")) != null)
+							path += "_top";
+					} catch (IOException e) {
+						if (path.indexOf("_") > -1) {
+							try {
+								if (resourceManager.getResource(new ResourceLocation(newPath.substring(0,
+									newPath.lastIndexOf("_") + 1) + "top.png")) != null) {
+									path = path.substring(0, path.lastIndexOf("_") + 1) + "top";
+								}
+							} catch (IOException e_) {
+							}	
+						}
 					}
-				}
-	        	Map<String, String> texturesMap = new HashMap<String, String>();
-	        	texturesMap.put("texture", path);
-	        	ImmutableMap<String, String> textures = ImmutableMap.copyOf(texturesMap);
-	        	IModel texturedModel = baseModel.retexture(textures);
-	        	final TextureMap textureMap = mc.getTextureMapBlocks();
-				copyBakedModel = blockModel = texturedModel.bake(texturedModel.getDefaultState(),
-					Attributes.DEFAULT_BAKED_FORMAT,
-				new Function<ResourceLocation, TextureAtlasSprite>()
-				{
-				    @Override
-				    public TextureAtlasSprite apply(ResourceLocation location)
-				    {
-				        if (location == null)
-				            return null;
-				        return textureMap.getAtlasSprite(location.toString());
-				    }
-				});
-	            
-	          }
+		        	Map<String, String> texturesMap = new HashMap<String, String>();
+		        	texturesMap.put("texture", path);
+		        	ImmutableMap<String, String> textures = ImmutableMap.copyOf(texturesMap);
+		        	IModel texturedModel = baseModel.retexture(textures);
+		        	final TextureMap textureMap = mc.getTextureMapBlocks();
+					copyBakedModel = blockModel = texturedModel.bake(texturedModel.getDefaultState(),
+						Attributes.DEFAULT_BAKED_FORMAT,
+						new Function<ResourceLocation, TextureAtlasSprite>()
+						{
+						    @Override
+						    public TextureAtlasSprite apply(ResourceLocation location)
+						    {
+						        if (location == null)
+						            return null;
+						        return textureMap.getAtlasSprite(location.toString());
+						    }
+						});
+		          }
+	        }
+	        	
 	        retval = blockModel;
 	        modelCache.put(copiedBlockIBlockState, retval);
     	  }
@@ -126,7 +129,8 @@ public class HiddenPressurePlateWeightedISmartBlockModelFactory implements ISmar
 
   @Override
   public TextureAtlasSprite getTexture() {
-    return copyBakedModel == null ? baseBakedModel.getTexture() : copyBakedModel.getTexture();
+    return (copyBakedModel == null || copyBakedModel.getTexture().getIconName().equals("missingno")) ?
+    	baseBakedModel.getTexture() : copyBakedModel.getTexture();
   }
 
   @Override

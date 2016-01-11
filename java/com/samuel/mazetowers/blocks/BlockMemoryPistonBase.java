@@ -4,20 +4,24 @@ import java.util.List;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentities.TileEntityMemoryPistonMemory;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonExtension;
 import net.minecraft.block.BlockSnow;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -27,10 +31,14 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockMemoryPistonBase extends Block {
+public class BlockMemoryPistonBase extends Block implements ITileEntityProvider {
 
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool EXTENDED = PropertyBool.create("extended");
@@ -41,7 +49,6 @@ public class BlockMemoryPistonBase extends Block {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(EXTENDED, Boolean.valueOf(false)));
         this.setStepSound(soundTypePiston);
         this.setHardness(0.5F);
-        this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 	
 	@Override
@@ -102,10 +109,16 @@ public class BlockMemoryPistonBase extends Block {
     {
         EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
         boolean flag = this.shouldBeExtended(worldIn, pos, enumfacing);
+        
+        int pushCount = 0;
+    	TileEntity te;
+    	
+    	if ((te = worldIn.getTileEntity(pos)).getTileData().hasKey("pushCount"))
+    		pushCount = te.getTileData().getInteger("pushCount");
 
         if (flag && !((Boolean)state.getValue(EXTENDED)).booleanValue())
         {
-            if ((new BlockMemoryPistonStructureHelper(worldIn, pos, enumfacing, true)).canMove())
+            if ((new BlockMemoryPistonStructureHelper(worldIn, pos, enumfacing, true)).canMove(pushCount))
             {
                 worldIn.addBlockEvent(pos, this, 0, enumfacing.getIndex());
             }
@@ -113,11 +126,12 @@ public class BlockMemoryPistonBase extends Block {
         else if (!flag && ((Boolean)state.getValue(EXTENDED)).booleanValue())
         {
             worldIn.setBlockState(pos, state.withProperty(EXTENDED, Boolean.valueOf(false)), 2);
+            worldIn.getTileEntity(pos).getTileData().setInteger("pushCount", pushCount);
             worldIn.addBlockEvent(pos, this, 1, enumfacing.getIndex());
         }
     }
 
-    private boolean shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
+    protected boolean shouldBeExtended(World worldIn, BlockPos pos, EnumFacing facing)
     {
         for (EnumFacing enumfacing : EnumFacing.values())
         {
@@ -177,8 +191,16 @@ public class BlockMemoryPistonBase extends Block {
             {
                 return false;
             }
-
+            
+            int pushCount = 0;
+            TileEntity te;
+            
+            if ((te = worldIn.getTileEntity(pos)) != null) {
+            	if (te.getTileData().hasKey("pushCount"))
+            		pushCount = te.getTileData().getInteger("pushCount");
+            }
             worldIn.setBlockState(pos, state.withProperty(EXTENDED, Boolean.valueOf(true)), 2);
+            worldIn.getTileEntity(pos).getTileData().setInteger("pushCount", pushCount);
             worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, "tile.piston.out", 0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F);
         }
         else if (eventID == 1)
@@ -189,15 +211,25 @@ public class BlockMemoryPistonBase extends Block {
             {
                 ((TileEntityMemoryPiston)tileentity1).clearPistonTileEntity();
             }
+            
+            int pushCount = 0;
+            boolean isOff = this instanceof BlockMemoryPistonBaseOff;
+            tileentity1 = worldIn.getTileEntity(pos);
+            if (tileentity1.getTileData().hasKey("pushCount"))
+            	pushCount = tileentity1.getTileData().getInteger("pushCount");
+            tileentity1 = BlockMemoryPistonMoving.newTileEntity(this.getStateFromMeta(eventParam), enumfacing, false, true);
+            tileentity1.getTileData().setInteger("pushCount", pushCount);
 
-            worldIn.setBlockState(pos, MazeTowers.BlockMemoryPistonExtension.getDefaultState().withProperty(BlockMemoryPistonMoving.FACING, enumfacing), 3);
-            worldIn.setTileEntity(pos, BlockMemoryPistonMoving.newTileEntity(this.getStateFromMeta(eventParam), enumfacing, false, true));
+            worldIn.setBlockState(pos, (isOff ? MazeTowers.BlockMemoryPistonExtensionOff :
+            	MazeTowers.BlockMemoryPistonExtension).getDefaultState()
+            	.withProperty(BlockMemoryPistonMoving.FACING, enumfacing), 3);
+            worldIn.setTileEntity(pos, tileentity1);
             
             BlockPos blockpos = pos.add(enumfacing.getFrontOffsetX() * 2, enumfacing.getFrontOffsetY() * 2, enumfacing.getFrontOffsetZ() * 2);
             Block block = worldIn.getBlockState(blockpos).getBlock();
             boolean flag1 = false;
 
-            if (block == MazeTowers.BlockMemoryPistonExtension)
+            if (block instanceof BlockMemoryPistonExtension)
             {
                 TileEntity tileentity = worldIn.getTileEntity(blockpos);
 
@@ -213,13 +245,16 @@ public class BlockMemoryPistonBase extends Block {
                 }
             }
 
-            if (!flag1 && !block.isAir(worldIn, blockpos) && canPush(block, worldIn, blockpos, enumfacing.getOpposite(), false) &&
-            	(block.getMobilityFlag() == 0 || block == MazeTowers.BlockMemoryPiston))
+            if (!flag1 && !block.isAir(worldIn, blockpos) &&
+            	((canPush(block, worldIn, blockpos, enumfacing.getOpposite(), false))) &&
+            	(block.getMobilityFlag() == 0 || block instanceof BlockMemoryPistonBase))
             {
                 this.doMove(worldIn, pos, enumfacing, false);
             }
             
-             worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, "tile.piston.in", 0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F);
+             worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D,
+            	(double)pos.getZ() + 0.5D, "tile.piston.in", 0.5F,
+            	worldIn.rand.nextFloat() * 0.15F + 0.6F);
         }
 
         return true;
@@ -329,11 +364,7 @@ public class BlockMemoryPistonBase extends Block {
 
     public static boolean canPush(Block blockIn, World worldIn, BlockPos pos, EnumFacing direction, boolean allowDestroy)
     {
-        if (blockIn == Blocks.obsidian)
-        {
-            return false;
-        }
-        else if (!worldIn.getWorldBorder().contains(pos))
+    	if (!worldIn.getWorldBorder().contains(pos))
         {
             return false;
         }
@@ -341,9 +372,10 @@ public class BlockMemoryPistonBase extends Block {
         {
             if (pos.getY() <= worldIn.getHeight() - 1 && (direction != EnumFacing.UP || pos.getY() != worldIn.getHeight() - 1))
             {
-                if (blockIn != Blocks.piston && blockIn != Blocks.sticky_piston)
+                if (!(blockIn instanceof BlockMemoryPistonBase) &&
+                	blockIn != Blocks.piston && blockIn != Blocks.sticky_piston)
                 {
-                    if (blockIn.getBlockHardness(worldIn, pos) == -1.0F)
+                    if (blockIn.getBlockHardness(worldIn, pos) == -1.0F && (pos.getY() < 2 || blockIn != Blocks.bedrock))
                     {
                         return false;
                     }
@@ -366,7 +398,8 @@ public class BlockMemoryPistonBase extends Block {
                 else if (((Boolean)worldIn.getBlockState(pos).getValue(EXTENDED)).booleanValue())
                 {
                     return false;
-                }
+                } else
+                	return true;
 
                 return !(blockIn.hasTileEntity(worldIn.getBlockState(pos)));
             }
@@ -381,19 +414,28 @@ public class BlockMemoryPistonBase extends Block {
         }
     }
     
-	private boolean doMove(World worldIn, BlockPos pos, EnumFacing direction, boolean extending)
+	protected boolean doMove(World worldIn, BlockPos pos, EnumFacing direction, boolean extending)
     {
         if (!extending)
         {
             worldIn.setBlockToAir(pos.offset(direction));
         }
 
+        int pushCount = 0;
+        boolean isOff = this instanceof BlockMemoryPistonBaseOff;
         BlockMemoryPistonStructureHelper blockpistonstructurehelper =
         	new BlockMemoryPistonStructureHelper(worldIn, pos, direction, extending);
+        TileEntity te;
         List<BlockPos> list = blockpistonstructurehelper.getBlocksToMove();
         List<BlockPos> list1 = blockpistonstructurehelper.getBlocksToDestroy();
+        if ((te = worldIn.getTileEntity(pos)) != null) {
+        	if (te.getTileData().hasKey("pushCount"))
+        		pushCount = te.getTileData().getInteger("pushCount");
+        }
+        if (!list.isEmpty())
+        	list = list.subList(0, pushCount);
 
-        if (!blockpistonstructurehelper.canMove())
+        if (!blockpistonstructurehelper.canMove(pushCount))
         {
             return false;
         }
@@ -409,7 +451,8 @@ public class BlockMemoryPistonBase extends Block {
                 Block block = worldIn.getBlockState(blockpos).getBlock();
                 //With our change to how snowballs are dropped this needs to disallow to mimic vanilla behavior.
                 float chance = block instanceof BlockSnow ? -1.0f : 1.0f;
-                block.dropBlockAsItemWithChance(worldIn, blockpos, worldIn.getBlockState(blockpos), chance, 0);
+                block.dropBlockAsItemWithChance(worldIn, blockpos,
+                	worldIn.getBlockState(blockpos), chance, 0);
                 worldIn.setBlockToAir(blockpos);
                 --i;
                 ablock[i] = block;
@@ -423,8 +466,11 @@ public class BlockMemoryPistonBase extends Block {
                 block1.getMetaFromState(iblockstate);
                 worldIn.setBlockToAir(blockpos2);
                 blockpos2 = blockpos2.offset(enumfacing);
-                worldIn.setBlockState(blockpos2, MazeTowers.BlockMemoryPistonExtension.getDefaultState().withProperty(FACING, direction), 4);
-                worldIn.setTileEntity(blockpos2, BlockMemoryPistonMoving.newTileEntity(iblockstate, direction, extending, false));
+                te = (TileEntityMemoryPiston)
+                	BlockMemoryPistonMoving.newTileEntity(iblockstate, direction, extending, false);
+                worldIn.setBlockState(blockpos2, (isOff ? MazeTowers.BlockMemoryPistonExtensionOff :
+                	MazeTowers.BlockMemoryPistonExtension).getDefaultState().withProperty(FACING, direction), 4);
+                worldIn.setTileEntity(blockpos2, te);
                 --i;
                 ablock[i] = block1;
             }
@@ -433,10 +479,18 @@ public class BlockMemoryPistonBase extends Block {
 
             if (extending)
             {
-                IBlockState iblockstate1 = MazeTowers.BlockMemoryPistonHead.getDefaultState().withProperty(BlockMemoryPistonExtension.FACING, direction);
-                IBlockState iblockstate2 = MazeTowers.BlockMemoryPistonExtension.getDefaultState().withProperty(BlockMemoryPistonMoving.FACING, direction);
+                IBlockState iblockstate1 = isOff ? MazeTowers.BlockMemoryPistonHeadOff.getDefaultState()
+                	.withProperty(BlockMemoryPistonExtension.FACING, direction) : MazeTowers.BlockMemoryPistonHead
+                	.getDefaultState().withProperty(BlockMemoryPistonExtension.FACING, direction);
+                IBlockState iblockstate2 = isOff ? MazeTowers.BlockMemoryPistonExtensionOff.getDefaultState()
+                	.withProperty(BlockMemoryPistonMoving.FACING, direction) : MazeTowers.BlockMemoryPistonExtension
+                	.getDefaultState().withProperty(BlockMemoryPistonMoving.FACING, direction);
+                worldIn.getTileEntity(pos).getTileData().setInteger("pushCount", list.size());
+                te =  (TileEntityMemoryPiston) BlockMemoryPistonMoving
+                	.newTileEntity(iblockstate1, direction, true, false);
                 worldIn.setBlockState(blockpos1, iblockstate2, 4);
-                worldIn.setTileEntity(blockpos1, BlockMemoryPistonMoving.newTileEntity(iblockstate1, direction, true, false));
+                te.getTileData().setInteger("pushCount", list.size());
+                worldIn.setTileEntity(blockpos1, te);
             }
 
             for (int l = list1.size() - 1; l >= 0; --l)
@@ -451,7 +505,8 @@ public class BlockMemoryPistonBase extends Block {
 
             if (extending)
             {
-                worldIn.notifyNeighborsOfStateChange(blockpos1, MazeTowers.BlockMemoryPistonHead);
+                worldIn.notifyNeighborsOfStateChange(blockpos1, isOff ? MazeTowers.BlockMemoryPistonHeadOff :
+                	MazeTowers.BlockMemoryPistonHead);
                 worldIn.notifyNeighborsOfStateChange(pos, this);
             }
 
@@ -499,5 +554,40 @@ public class BlockMemoryPistonBase extends Block {
     protected BlockState createBlockState()
     {
         return new BlockState(this, new IProperty[] {FACING, EXTENDED});
+    }
+
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileEntityMemoryPistonMemory();
+	}
+	
+	@Override
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+		boolean isExtended;
+		EnumFacing facing;
+		IBlockState offState = MazeTowers.BlockMemoryPistonOff.getDefaultState()
+			.withProperty(BlockMemoryPistonBase.FACING,
+			facing = state.getValue(BlockMemoryPistonBase.FACING))
+			.withProperty(BlockMemoryPistonBase.EXTENDED,
+			isExtended = state.getValue(BlockMemoryPistonBase.EXTENDED));
+		if (!isExtended) {
+			worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D,
+				(double)pos.getZ() + 0.5D, "random.click", 0.3F, 0.5F);
+			worldIn.setBlockState(pos, offState);
+		}
+		/*if (isExtended) {
+			BlockPos headPos = pos.offset(facing);
+			IBlockState offStateHead = worldIn.getBlockState(headPos);
+			if (offStateHead.getBlock() == MazeTowers.BlockMemoryPistonHead) {
+				offStateHead = MazeTowers.BlockMemoryPistonHeadOff.getDefaultState()
+					.withProperty(BlockMemoryPistonExtension.FACING,
+					offStateHead.getValue(BlockMemoryPistonExtension.FACING))
+					.withProperty(BlockMemoryPistonExtension.SHORT,
+					offStateHead.getValue(BlockMemoryPistonExtension.SHORT));
+				worldIn.setBlockState(headPos, offStateHead, 0);
+			}
+		}*/
+		return !isExtended;
     }
 }

@@ -51,7 +51,7 @@ public class BlockMemoryPistonExtension extends Block {
                 BlockPos blockpos1 = pos.offset(enumfacing.getOpposite());
                 Block block = worldIn.getBlockState(blockpos1).getBlock();
 
-                if (block == MazeTowers.BlockMemoryPiston)
+                if (block instanceof BlockMemoryPistonBase)
                 {
                     worldIn.setBlockToAir(blockpos1);
                 }
@@ -69,7 +69,7 @@ public class BlockMemoryPistonExtension extends Block {
         pos = pos.offset(enumfacing);
         IBlockState iblockstate1 = worldIn.getBlockState(pos);
 
-        if (iblockstate1.getBlock() == MazeTowers.BlockMemoryPiston &&
+        if (iblockstate1.getBlock() instanceof BlockMemoryPistonBase &&
         	((Boolean)iblockstate1.getValue(BlockMemoryPistonBase.EXTENDED)).booleanValue())
         {
             iblockstate1.getBlock().dropBlockAsItem(worldIn, pos, iblockstate1, 0);
@@ -166,7 +166,7 @@ public class BlockMemoryPistonExtension extends Block {
 
     public void applyHeadBounds(IBlockState state)
     {
-        float f = 0.25F;
+        /*float f = 0.25F;
         EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
 
         if (enumfacing != null)
@@ -191,7 +191,8 @@ public class BlockMemoryPistonExtension extends Block {
                 case EAST:
                     this.setBlockBounds(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
             }
-        }
+        }*/
+        this.setBlockBounds(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
     }
 	
 	@Override
@@ -204,7 +205,7 @@ public class BlockMemoryPistonExtension extends Block {
         BlockPos blockpos1 = pos.offset(enumfacing.getOpposite());
         IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
 
-        if (iblockstate1.getBlock() != MazeTowers.BlockMemoryPiston)
+        if (!(iblockstate1.getBlock() instanceof BlockMemoryPistonBase))
         {
             worldIn.setBlockToAir(pos);
         }
@@ -231,7 +232,7 @@ public class BlockMemoryPistonExtension extends Block {
 	@SideOnly(Side.CLIENT)
     public Item getItem(World worldIn, BlockPos pos)
     {
-        return Item.getItemFromBlock(MazeTowers.BlockMemoryPiston);
+        return MazeTowers.BlockMemoryPistonOff.getItem(worldIn, pos);
     }
 	
 	@Override

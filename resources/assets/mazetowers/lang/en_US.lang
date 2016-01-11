@@ -1,3 +1,15 @@
+tile.hidden_heavy_pressure_plate.name=Hidden Weighted Pressure Plate (Heavy)
+tile.item_scanner.name=Item Scanner
+tile.item_scanner_gold.name=Gold Item Scanner
+tile.memory_piston.name=Memory Piston (Activated)
+tile.memory_piston_off.name=Memory Piston (Deactivated)
+tile.memory_piston_head.name=Memory Piston Head (Activated)
+tile.memory_piston_head_off.name=Memory Piston Head (Deactivated)
 tile.quartz_button.name=Quartz Button
-tile.memory_piston.name=Memory Piston
-tile.memory_piston_head.name=Memory Piston Head
+tile.end_stone_door.name=End Stone Door
+tile.obsidian_door.name=Obsidian Door
+tile.bedrock_door.name=Bedrock Door
+item.end_stone_door_item.name=End Stone Door
+item.obsidian_door_item.name=Obsidian Door
+item.bedrock_door_item.name=Bedrock Door
+entity.ultraviolet_blaze.name=Ultraviolet Blaze

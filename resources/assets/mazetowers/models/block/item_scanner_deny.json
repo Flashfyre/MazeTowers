@@ -1,0 +1,8 @@
+{
+    "parent": "mazetowers:block/item_scanner",
+    "textures": {
+        "texture": "mazetowers:blocks/item_scanner_deny",
+		"side": "mazetowers:blocks/item_scanner_sides",
+		"back": "mazetowers:blocks/item_scanner_back"
+    }
+}

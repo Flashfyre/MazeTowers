@@ -21,7 +21,6 @@ public class CommandMazeTowers implements ICommand, Comparable<ICommand> {
 	public CommandMazeTowers()
 	{
 		this.aliases = new ArrayList();
-		this.aliases.add("mt");
 		this.aliases.add("mazetowers");
 		this.aliases.add("MazeTowers");
 		this.aliases.add("mazeTowers");

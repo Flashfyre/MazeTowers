@@ -1,3 +1,15 @@
+tile.hidden_heavy_pressure_plate.name=Hidden Weighted Pressure Plate (Heavy)
+tile.item_scanner.name=アイテムスキャナー
+tile.item_scanner_gold.name=金のアイテムスキャナー
 tile.quartz_button.name=ネザー水晶のボタン
-tile.memory_piston.name=メモリーピストン
-tile.memory_piston_head.name=メモリーピストン伸張部
+tile.memory_piston.name=メモリーピストン　（活性）
+tile.memory_piston_off.name=メモリーピストン　（不活性）
+tile.memory_piston_head.name=メモリーピストン伸張部 （活性）
+tile.memory_piston_head_off.name=メモリーピストン伸張部 （不活性）
+tile.end_stone_door.name=End Stone Door
+tile.obsidian_door.name=Obsidian Door
+tile.bedrock_door.name=Bedrock Door
+item.end_stone_door_item.name=End Stone Door
+item.obsidian_door_item.name=Obsidian Door
+item.bedrock_door_item.name=Bedrock Door
+entity.ultraviolet_blaze.name=紫外ブレーズ

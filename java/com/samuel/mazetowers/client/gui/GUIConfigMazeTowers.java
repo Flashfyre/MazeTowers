@@ -1,4 +1,4 @@
-package com.samuel.mazetowers.etc;
+package com.samuel.mazetowers.client.gui;
 
 import com.samuel.mazetowers.MazeTowers;
 

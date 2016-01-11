@@ -163,7 +163,7 @@ public class TileEntityMemoryPiston extends TileEntity implements ITickable {
             this.worldObj.removeTileEntity(this.pos);
             this.invalidate();
 
-            if (this.worldObj.getBlockState(this.pos).getBlock() == MazeTowers.BlockMemoryPistonExtension)
+            if (this.worldObj.getBlockState(this.pos).getBlock() instanceof BlockMemoryPistonMoving)
             {
                 this.worldObj.setBlockState(this.pos, this.pistonState, 3);
                 if(!net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(worldObj, pos, worldObj.getBlockState(pos), java.util.EnumSet.noneOf(EnumFacing.class)).isCanceled())
@@ -186,7 +186,7 @@ public class TileEntityMemoryPiston extends TileEntity implements ITickable {
             this.worldObj.removeTileEntity(this.pos);
             this.invalidate();
 
-            if (this.worldObj.getBlockState(this.pos).getBlock() == MazeTowers.BlockMemoryPistonExtension)
+            if (this.worldObj.getBlockState(this.pos).getBlock() instanceof BlockMemoryPistonMoving)
             {
                 this.worldObj.setBlockState(this.pos, this.pistonState, 3);
                 if(!net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(worldObj, pos, worldObj.getBlockState(pos), java.util.EnumSet.noneOf(EnumFacing.class)).isCanceled())

@@ -1,11 +1,11 @@
 {
     "textures": {
-		"platform": "mazetowers:blocks/memory_piston_top",
-        "side": "mazetowers:blocks/memory_piston_side",
+		"platform": "mazetowers:blocks/memory_piston_top_on",
+        "side": "mazetowers:blocks/memory_piston_side_on",
 		"inside": "blocks/piston_inner",
-		"bottom": "blocks/piston_bottom"
+		"bottom": "blocks/piston_bottom",
+		"particle": "mazetowers:blocks/memory_piston_side_on"
     },
-	"particle": "#side",
     "elements": [
         {   "from": [ 0, 0, 4 ],
             "to": [ 16, 16, 16 ],

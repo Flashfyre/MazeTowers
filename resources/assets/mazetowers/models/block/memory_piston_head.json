@@ -1,9 +1,9 @@
 {
     "textures": {
-        "platform": "mazetowers:blocks/memory_piston_top",
-        "side": "mazetowers:blocks/memory_piston_side"
+        "platform": "mazetowers:blocks/memory_piston_top_on",
+        "side": "mazetowers:blocks/memory_piston_side_on",
+		"particle": "mazetowers:blocks/memory_piston_top_on"
     },
-	"particle": "#platform",
     "elements": [
         {   "from": [ 0, 0, 0 ],
             "to": [ 16, 16, 4 ],

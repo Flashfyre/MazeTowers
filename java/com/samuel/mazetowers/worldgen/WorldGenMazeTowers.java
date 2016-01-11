@@ -16,13 +16,19 @@ import java.util.Stack;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.blocks.BlockItemScanner;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonBase;
 import com.samuel.mazetowers.etc.MazeTowersData;
 import com.samuel.mazetowers.etc.MTUtils;
 import com.samuel.mazetowers.init.ModBlocks;
+import com.samuel.mazetowers.init.ModChestGen;
 import com.samuel.mazetowers.tileentities.TileEntityCircuitBreaker;
+import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentities.TileEntityWebSpiderSpawner;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockButton;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockLadder;
@@ -33,7 +39,9 @@ import net.minecraft.block.BlockLever;
 import net.minecraft.block.BlockLever.EnumOrientation;
 import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.BlockTorch;
+import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,6 +49,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -48,10 +57,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityDispenser;
+import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.world.LockCode;
@@ -73,8 +86,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			.create();
 	private List<BlockPos> specialChoices = new ArrayList<BlockPos>();
 	private List<MazeTower> towers;
-	private int genCount = 1;
+	private int genCount = 256;
 	private int chunksGenerated = 0;
+	private int spawnPosLoadedCount = 0;
 	private int[] chunkDistanceX = new int[genCount];
 	private int[] blockDistanceY = new int[genCount];
 	private int[] chunkDistanceZ = new int[genCount];
@@ -84,10 +98,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 	private boolean[] generated = new boolean[genCount];
 	private Map<BlockPos, IBlockState>[] data = new Map[genCount];
 	private MazeTowersData MazeTowerData;
-	private ChestGenHooks info = ChestGenHooks.getInfo("MazeTowerChest");
-	private ChestGenHooks info_high = ChestGenHooks.getInfo("MazeTowerChest+");
+	private ChestGenHooks[] chestInfo;
 
 	public WorldGenMazeTowers() {
+		chestInfo = new ChestGenHooks[11];
+		for (int i = 1; i <= 11; i++)
+			chestInfo[i - 1] = ChestGenHooks.getInfo("MazeTowerChest" + i);
 	}
 
 	@Override
@@ -172,9 +188,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 		blockDistanceY[index] = 70;
 		spawnPos[index] = new BlockPos(
-				(((world.getSpawnPoint().getX() >> 4) + (chunkDistanceX[index] + 1)) * 16),
-				blockDistanceY[index],
-				(((world.getSpawnPoint().getZ() >> 4) + (chunkDistanceZ[index] + 1)) * 16));
+			(((world.getSpawnPoint().getX() >> 4) + (chunkDistanceX[index] + 1)) * 16),
+			blockDistanceY[index],
+			(((world.getSpawnPoint().getZ() >> 4) + (chunkDistanceZ[index] + 1)) * 16));
 		MazeTowerData.setSpawnPoint(spawnPos[index].getX(),
 				spawnPos[index].getY(), spawnPos[index].getZ(), index);
 	}
@@ -189,9 +205,27 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			 */
 		}
 	}
-
+	
 	public int getGenCount() {
 		return genCount;
+	}
+
+	public int getGenCount(World worldIn) {
+		loadOrCreateData(worldIn, 0);
+		return genCount;
+	}
+	
+	public int getChunksGenerated() {
+		return chunksGenerated;
+	}
+	
+	public int getChunksGenerated(World worldIn) {
+		loadOrCreateData(worldIn, 0);
+		return chunksGenerated;
+	}
+	
+	public int getSpawnPosLoadedCount() {
+		return spawnPosLoadedCount;
 	}
 
 	public boolean getGenerated(World worldIn, int index) {
@@ -207,26 +241,44 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 	public List<MazeTower> getTowers() {
 		return towers;
 	}
+	
+	public MazeTowersData getData() {
+		return MazeTowerData;
+	}
+	
+	public void setSpawnPos(World worldIn, int chunkIndex, BlockPos pos) {
+		loadOrCreateData(worldIn, chunkIndex);
+		spawnPos[chunkIndex] = pos;
+		MazeTowerData.setSpawnPoint(pos.getX(),
+			pos.getY(), pos.getZ(), chunkIndex);
+		spawnPosLoaded[chunkIndex] = true;
+		spawnPosLoadedCount++;
+	}
 
 	protected final void loadOrCreateData(World world, int index) {
-		if (this.MazeTowerData == null
-				|| curWorld == null
-				|| (world.getWorldInfo().getSeed() != 0 && curWorld
-						.getWorldInfo().getSeed() != world.getWorldInfo()
-						.getSeed())) {
+		boolean dataIsNull = this.MazeTowerData == null;
+		if (dataIsNull || curWorld == null
+			|| (world.getWorldInfo().getSeed() != 0 && curWorld
+			.getWorldInfo().getSeed() != world.getWorldInfo()
+			.getSeed())) {
 			curWorld = world;
-			this.MazeTowerData = (MazeTowersData) world.loadItemData(
+			if (dataIsNull)
+				this.MazeTowerData = (MazeTowersData) world.loadItemData(
 					MazeTowersData.class, "MazeTowers");
+			int g = 0;
 			if (this.MazeTowerData == null) {
-				this.MazeTowerData = new MazeTowersData("MazeTowers");
+				this.MazeTowerData = new MazeTowersData(world, "MazeTowers");
 				world.setItemData("MazeTowers", MazeTowerData);
-				this.generated[index] = false;
-				this.spawnPosLoaded[index] = false;
+				for (; g < genCount; g++) {
+					this.generated[g] = false;
+					this.spawnPosLoaded[g] = false;
+					this.chunkDistanceX[g] = 0;
+					this.blockDistanceY[g] = 0;
+					this.chunkDistanceZ[g] = 0;
+					this.spawnPos[g] = new BlockPos(-1, -1, -1);
+				}
 				this.chunksGenerated = 0;
-				this.chunkDistanceX[index] = 0;
-				this.blockDistanceY[index] = 0;
-				this.chunkDistanceZ[index] = 0;
-				this.spawnPos[index] = new BlockPos(-1, 1, -1);
+				this.spawnPosLoadedCount = 0;
 				this.towers = new ArrayList<MazeTower>();
 			} else {
 				this.generated[index] = MazeTowerData.getIsGenerated(index);
@@ -242,8 +294,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				 * ArrayList<BlockPos>(); this.specialBlocks =
 				 * ArrayListMultimap.create(); } else {
 				 */
-				chunksGenerated++;
-				this.spawnPosLoaded[index] = true;
+				if (this.generated[index])
+					chunksGenerated++;
+				/*if (this.spawnPos[index].getY() > 0) {
+					this.spawnPosLoaded[index] = true;
+					this.spawnPosLoadedCount++;
+				}*/
 				// }
 			}
 		}
@@ -254,38 +310,44 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		((MazeTower) towers.get(index)).build(worldIn);
 	}
 
-	public MazeTowersData getData() {
-		return this.MazeTowerData;
-	}
-
 	public void spawn(World world, int ix, int iy, int iz, int chunk) {
 	}
 
-	public void addTower(World worldIn, int x, int z, boolean build) {
+	public boolean addTower(World worldIn, int x, int z, boolean build) {
 		loadOrCreateData(worldIn, towers.size());
 		int px = (x << 4) + 8;
 		int pz = (z << 4) + 8;
 		int py = MTUtils.getSurfaceY(worldIn, px, pz, 3) - 1;
 		int difficulty;
-		BiomeGenBase biome = worldIn.getBiomeGenForCoords(new BlockPos(px, py, pz));
+		int dimId = worldIn.provider.getDimensionId();
+		String towerTypeName;
+		BlockPos pos = new BlockPos(px, py, pz);
+		BiomeGenBase biome = worldIn.getBiomeGenForCoords(pos);
 		String biomeName = biome.biomeName;
+		Block doorBlock = Blocks.iron_door;
 		IBlockState ceilBlock = null, wallBlock = null,
 			wallBlock_external = null, floorBlock = null;
 		IBlockState[] stairsBlock = new IBlockState[4];
-		Block doorBlock = Blocks.iron_door;
-		if (biomeName == "Ocean" || biomeName == "Deep Ocean" ||
+		/*if (dimId == 0 && (biomeName == "Ocean" || biomeName == "Deep Ocean" ||
 			biomeName == "Beach" || biomeName == "Cold Beach" ||
 			biomeName == "Stone Beach" || biomeName == "River" ||
-			biomeName == "Mushroom Island Shore")
-			return;
-		else {
-			int typeChance = rand.nextInt(36);//rand.nextInt(128);
-			if (typeChance < 36) {
-				if (typeChance < 18) {
+			biomeName == "Mushroom Island Shore"))
+			return false;
+		else {*/
+			int typeChance = rand.nextInt(128);
+			if (dimId == -1)
+				typeChance = (typeChance % 6) + 90;
+			else if (dimId == 1)
+				typeChance = (typeChance % 6) + 58;
+			if (typeChance < 32) {
+				if (dimId == -1)
+					typeChance = (typeChance % 6) + 18;
+				else if (dimId == 1)
+					typeChance = (typeChance % 6) + 30;
+				if (typeChance < 16) {
 					ceilBlock = Blocks.stonebrick.getStateFromMeta(3);
 					wallBlock = Blocks.stonebrick.getDefaultState();
 					floorBlock = Blocks.stonebrick.getStateFromMeta(3);
-					doorBlock = Blocks.iron_door;
 					stairsBlock = new IBlockState[] {
 							Blocks.stone_brick_stairs.getStateFromMeta(0),
 							Blocks.stone_brick_stairs.getStateFromMeta(2),
@@ -293,7 +355,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 							Blocks.stone_brick_stairs.getDefaultState()
 					};
 					difficulty = 4;
-				} else if (typeChance < 30) {
+					towerTypeName = "Stone Brick";
+				} else if (typeChance < 27) {
 					ceilBlock = Blocks.quartz_block.getDefaultState();
 					wallBlock = Blocks.quartz_block.getStateFromMeta(2);
 					floorBlock = Blocks.quartz_block.getStateFromMeta(1);
@@ -304,7 +367,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						Blocks.quartz_stairs.getDefaultState()
 					};
 					difficulty = 5;
-				} else if (typeChance < 34) {
+					towerTypeName = "Quartz";
+				} else if (typeChance < 31) {
 					ceilBlock = Blocks.obsidian.getDefaultState();
 					wallBlock = Blocks.obsidian.getDefaultState();
 					floorBlock = Blocks.obsidian.getDefaultState();
@@ -315,6 +379,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						Blocks.nether_brick_stairs.getDefaultState()
 					};
 					difficulty = 6;
+					towerTypeName = "Obsidian";
 				} else {
 					ceilBlock = Blocks.bedrock.getDefaultState();
 					wallBlock = Blocks.bedrock.getDefaultState();
@@ -326,139 +391,177 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						Blocks.nether_brick_stairs.getDefaultState()
 					};
 					difficulty = 7;
+					towerTypeName = "Bedrock";
 				}
 			} else {
-				if (biomeName.indexOf("Taiga") > -1 ||
-					biomeName.startsWith("Extreme")) {
-					ceilBlock = Blocks.planks.getStateFromMeta(1);
-					wallBlock = Blocks.log.getStateFromMeta(1);
-					floorBlock = Blocks.planks.getStateFromMeta(1);
-					doorBlock = Blocks.spruce_door;
+				if (dimId == 0) {
+					if (biomeName.indexOf("Taiga") > -1 ||
+						biomeName.startsWith("Extreme")) {
+						ceilBlock = Blocks.planks.getStateFromMeta(1);
+						wallBlock = Blocks.log.getStateFromMeta(1);
+						floorBlock = Blocks.planks.getStateFromMeta(1);
+						doorBlock = Blocks.spruce_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.spruce_stairs.getStateFromMeta(0),
+							Blocks.spruce_stairs.getStateFromMeta(2),
+							Blocks.spruce_stairs.getStateFromMeta(1),
+							Blocks.spruce_stairs.getDefaultState() };
+						difficulty = 2;
+						towerTypeName = "Spruce";
+					} else if (((biomeName == "Forest" || biomeName == "Flower Forest" &&
+						rand.nextBoolean())) || biomeName.startsWith("Swampland") ||
+						biomeName.indexOf("Plains") > -1) {
+						ceilBlock = Blocks.planks.getDefaultState();
+						wallBlock = Blocks.log.getDefaultState();
+						floorBlock = Blocks.planks.getDefaultState();
+						doorBlock = Blocks.oak_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.oak_stairs.getStateFromMeta(0),
+							Blocks.oak_stairs.getStateFromMeta(2),
+							Blocks.oak_stairs.getStateFromMeta(1),
+							Blocks.oak_stairs.getDefaultState()
+						};
+						difficulty = 1;
+						towerTypeName = "Oak";
+					} else if (biomeName.startsWith("Birch")) {
+						ceilBlock = Blocks.planks.getStateFromMeta(2);
+						wallBlock = Blocks.log.getStateFromMeta(2);
+						floorBlock = Blocks.planks.getStateFromMeta(2);
+						doorBlock = Blocks.birch_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.birch_stairs.getStateFromMeta(0),
+							Blocks.birch_stairs.getStateFromMeta(2),
+							Blocks.birch_stairs.getStateFromMeta(1),
+							Blocks.birch_stairs.getDefaultState()
+						};
+						difficulty = 2;
+						towerTypeName = "Birch";
+					} else if (biomeName.startsWith("Jungle")) {
+						ceilBlock = Blocks.planks.getStateFromMeta(3);
+						wallBlock = Blocks.log.getStateFromMeta(3);
+						floorBlock = Blocks.planks.getStateFromMeta(3);
+						doorBlock = Blocks.jungle_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.jungle_stairs.getStateFromMeta(0),
+							Blocks.jungle_stairs.getStateFromMeta(2),
+							Blocks.jungle_stairs.getStateFromMeta(1),
+							Blocks.jungle_stairs.getDefaultState()
+						};
+						difficulty = 2;
+						towerTypeName = "Jungle";
+					} else if (biomeName.startsWith("Savanna")) {
+						ceilBlock = Blocks.planks.getStateFromMeta(4);
+						wallBlock = Blocks.log.getStateFromMeta(4);
+						floorBlock = Blocks.planks.getStateFromMeta(4);
+						doorBlock = Blocks.acacia_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.acacia_stairs.getStateFromMeta(0),
+							Blocks.acacia_stairs.getStateFromMeta(2),
+							Blocks.acacia_stairs.getStateFromMeta(1),
+							Blocks.acacia_stairs.getDefaultState()
+						};
+						difficulty = 2;
+						towerTypeName = "Acacia";
+					} else if (biomeName.startsWith("Roofed")) {
+						ceilBlock = Blocks.planks.getStateFromMeta(5);
+						wallBlock = Blocks.log.getStateFromMeta(5);
+						floorBlock = Blocks.planks.getStateFromMeta(5);
+						doorBlock = Blocks.dark_oak_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.dark_oak_stairs.getStateFromMeta(0),
+							Blocks.dark_oak_stairs.getStateFromMeta(2),
+							Blocks.dark_oak_stairs.getStateFromMeta(1),
+							Blocks.dark_oak_stairs.getDefaultState()
+						};
+						difficulty = 3;
+						towerTypeName = "Dark Oak";
+					} else if (biomeName.startsWith("Desert")) {
+						ceilBlock = Blocks.sandstone.getDefaultState();
+						wallBlock = Blocks.sand.getDefaultState();
+						wallBlock_external = Blocks.sandstone.getDefaultState();
+						floorBlock = Blocks.sandstone.getDefaultState();
+						doorBlock = Blocks.iron_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.sandstone_stairs.getStateFromMeta(0),
+							Blocks.sandstone_stairs.getStateFromMeta(2),
+							Blocks.sandstone_stairs.getStateFromMeta(1),
+							Blocks.sandstone_stairs.getDefaultState()
+						};
+						difficulty = 3;
+						towerTypeName = "Desert";
+					} else if (biomeName.startsWith("Mesa")) {
+						ceilBlock = Blocks.red_sandstone.getDefaultState();
+						wallBlock = Blocks.sand.getStateFromMeta(1);
+						wallBlock_external = Blocks.red_sandstone.getDefaultState();
+						floorBlock = Blocks.red_sandstone.getDefaultState();
+						doorBlock = Blocks.iron_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.red_sandstone_stairs.getStateFromMeta(0),
+							Blocks.red_sandstone_stairs.getStateFromMeta(2),
+							Blocks.red_sandstone_stairs.getStateFromMeta(1),
+							Blocks.red_sandstone_stairs.getDefaultState()
+						};
+						difficulty = 3;
+						towerTypeName = "Mesa";
+					} else if (biomeName.startsWith("Ice")) {
+						ceilBlock = Blocks.packed_ice.getDefaultState();
+						wallBlock = Blocks.ice.getDefaultState();
+						wallBlock_external = Blocks.packed_ice.getDefaultState();
+						floorBlock = Blocks.packed_ice.getDefaultState();
+						doorBlock = Blocks.iron_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.stone_brick_stairs.getStateFromMeta(0),
+							Blocks.stone_brick_stairs.getStateFromMeta(2),
+							Blocks.stone_brick_stairs.getStateFromMeta(1),
+							Blocks.stone_brick_stairs.getDefaultState()
+						};
+						difficulty = 3;
+						towerTypeName = "Ice";
+					} else if (biomeName == "Mushroom Island") {
+						ceilBlock = Blocks.mycelium.getDefaultState();
+						wallBlock = rand.nextBoolean() ?
+							Blocks.red_mushroom_block.getDefaultState() :
+							Blocks.brown_mushroom_block.getDefaultState();
+						floorBlock = Blocks.mycelium.getDefaultState();
+						doorBlock = Blocks.iron_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.stone_brick_stairs.getStateFromMeta(0),
+							Blocks.stone_brick_stairs.getStateFromMeta(2),
+							Blocks.stone_brick_stairs.getStateFromMeta(1),
+							Blocks.stone_brick_stairs.getDefaultState()
+						};
+						difficulty = 4;
+						towerTypeName = "Mushroom";
+					} else {
+						ceilBlock = Blocks.stonebrick.getStateFromMeta(3);
+						wallBlock = Blocks.stonebrick.getDefaultState();
+						floorBlock = Blocks.stonebrick.getStateFromMeta(3);
+						doorBlock = Blocks.iron_door;
+						stairsBlock = new IBlockState[] {
+							Blocks.stone_brick_stairs.getStateFromMeta(0),
+							Blocks.stone_brick_stairs.getStateFromMeta(2),
+							Blocks.stone_brick_stairs.getStateFromMeta(1),
+							Blocks.stone_brick_stairs.getDefaultState()
+						};
+						difficulty = 4;
+						towerTypeName = "Stone Brick";
+					}
+				} else if (dimId == -1) {
+					ceilBlock = Blocks.nether_brick.getDefaultState();
+					wallBlock = Blocks.nether_brick.getDefaultState();
+					floorBlock = Blocks.netherrack.getDefaultState();
 					stairsBlock = new IBlockState[] {
-						Blocks.spruce_stairs.getStateFromMeta(0),
-						Blocks.spruce_stairs.getStateFromMeta(2),
-						Blocks.spruce_stairs.getStateFromMeta(1),
-						Blocks.spruce_stairs.getDefaultState() };
-					difficulty = 2;
-				} else if (((biomeName == "Forest" || biomeName == "Flower Forest" &&
-					rand.nextBoolean())) || biomeName.startsWith("Swampland") ||
-					biomeName.indexOf("Plains") > -1) {
-					ceilBlock = Blocks.planks.getDefaultState();
-					wallBlock = Blocks.log.getDefaultState();
-					floorBlock = Blocks.planks.getDefaultState();
-					doorBlock = Blocks.oak_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.oak_stairs.getStateFromMeta(0),
-						Blocks.oak_stairs.getStateFromMeta(2),
-						Blocks.oak_stairs.getStateFromMeta(1),
-						Blocks.oak_stairs.getDefaultState()
-					};
-					difficulty = 1;
-				} else if (biomeName.startsWith("Birch")) {
-					ceilBlock = Blocks.planks.getStateFromMeta(2);
-					wallBlock = Blocks.log.getStateFromMeta(2);
-					floorBlock = Blocks.planks.getStateFromMeta(2);
-					doorBlock = Blocks.birch_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.birch_stairs.getStateFromMeta(0),
-						Blocks.birch_stairs.getStateFromMeta(2),
-						Blocks.birch_stairs.getStateFromMeta(1),
-						Blocks.birch_stairs.getDefaultState()
-					};
-					difficulty = 2;
-				} else if (biomeName.startsWith("Jungle")) {
-					ceilBlock = Blocks.planks.getStateFromMeta(3);
-					wallBlock = Blocks.log.getStateFromMeta(3);
-					floorBlock = Blocks.planks.getStateFromMeta(3);
-					doorBlock = Blocks.jungle_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.jungle_stairs.getStateFromMeta(0),
-						Blocks.jungle_stairs.getStateFromMeta(2),
-						Blocks.jungle_stairs.getStateFromMeta(1),
-						Blocks.jungle_stairs.getDefaultState()
-					};
-					difficulty = 2;
-				} else if (biomeName.startsWith("Savanna")) {
-					ceilBlock = Blocks.planks.getStateFromMeta(4);
-					wallBlock = Blocks.log.getStateFromMeta(4);
-					floorBlock = Blocks.planks.getStateFromMeta(4);
-					doorBlock = Blocks.acacia_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.acacia_stairs.getStateFromMeta(0),
-						Blocks.acacia_stairs.getStateFromMeta(2),
-						Blocks.acacia_stairs.getStateFromMeta(1),
-						Blocks.acacia_stairs.getDefaultState()
-					};
-					difficulty = 2;
-				} else if (biomeName.startsWith("Roofed")) {
-					ceilBlock = Blocks.planks.getStateFromMeta(5);
-					wallBlock = Blocks.log.getStateFromMeta(5);
-					floorBlock = Blocks.planks.getStateFromMeta(5);
-					doorBlock = Blocks.dark_oak_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.dark_oak_stairs.getStateFromMeta(0),
-						Blocks.dark_oak_stairs.getStateFromMeta(2),
-						Blocks.dark_oak_stairs.getStateFromMeta(1),
-						Blocks.dark_oak_stairs.getDefaultState()
-					};
-					difficulty = 3;
-				} else if (biomeName.startsWith("Desert")) {
-					ceilBlock = Blocks.sandstone.getDefaultState();
-					wallBlock = Blocks.sand.getDefaultState();
-					wallBlock_external = Blocks.sandstone.getDefaultState();
-					floorBlock = Blocks.sandstone.getDefaultState();
-					doorBlock = Blocks.iron_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.sandstone_stairs.getStateFromMeta(0),
-						Blocks.sandstone_stairs.getStateFromMeta(2),
-						Blocks.sandstone_stairs.getStateFromMeta(1),
-						Blocks.sandstone_stairs.getDefaultState()
-					};
-					difficulty = 3;
-				} else if (biomeName.startsWith("Mesa")) {
-					ceilBlock = Blocks.red_sandstone.getDefaultState();
-					wallBlock = Blocks.sand.getStateFromMeta(1);
-					wallBlock_external = Blocks.red_sandstone.getDefaultState();
-					floorBlock = Blocks.red_sandstone.getDefaultState();
-					doorBlock = Blocks.iron_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.red_sandstone_stairs.getStateFromMeta(0),
-						Blocks.red_sandstone_stairs.getStateFromMeta(2),
-						Blocks.red_sandstone_stairs.getStateFromMeta(1),
-						Blocks.red_sandstone_stairs.getDefaultState()
-					};
-					difficulty = 3;
-				} else if (biomeName.startsWith("Ice")) {
-					ceilBlock = Blocks.packed_ice.getDefaultState();
-					wallBlock = Blocks.ice.getDefaultState();
-					wallBlock_external = Blocks.packed_ice.getDefaultState();
-					floorBlock = Blocks.packed_ice.getDefaultState();
-					doorBlock = Blocks.iron_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.stone_brick_stairs.getStateFromMeta(0),
-						Blocks.stone_brick_stairs.getStateFromMeta(2),
-						Blocks.stone_brick_stairs.getStateFromMeta(1),
-						Blocks.stone_brick_stairs.getDefaultState()
-					};
-					difficulty = 3;
-				} else if (biomeName == "Mushroom Island") {
-					ceilBlock = Blocks.mycelium.getDefaultState();
-					wallBlock = rand.nextBoolean() ?
-						Blocks.red_mushroom_block.getDefaultState() :
-						Blocks.brown_mushroom_block.getDefaultState();
-					floorBlock = Blocks.mycelium.getDefaultState();
-					doorBlock = Blocks.iron_door;
-					stairsBlock = new IBlockState[] {
-						Blocks.stone_brick_stairs.getStateFromMeta(0),
-						Blocks.stone_brick_stairs.getStateFromMeta(2),
-						Blocks.stone_brick_stairs.getStateFromMeta(1),
-						Blocks.stone_brick_stairs.getDefaultState()
+						Blocks.nether_brick_stairs.getStateFromMeta(0),
+						Blocks.nether_brick_stairs.getStateFromMeta(2),
+						Blocks.nether_brick_stairs.getStateFromMeta(1),
+						Blocks.nether_brick_stairs.getDefaultState()
 					};
 					difficulty = 4;
+					towerTypeName = "Nether";
 				} else {
-					ceilBlock = Blocks.stonebrick.getStateFromMeta(3);
-					wallBlock = Blocks.stonebrick.getDefaultState();
-					floorBlock = Blocks.stonebrick.getStateFromMeta(3);
+					ceilBlock = Blocks.end_stone.getDefaultState();
+					wallBlock = Blocks.end_stone.getDefaultState();
+					floorBlock = Blocks.end_stone.getDefaultState();
 					doorBlock = Blocks.iron_door;
 					stairsBlock = new IBlockState[] {
 						Blocks.stone_brick_stairs.getStateFromMeta(0),
@@ -466,60 +569,53 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						Blocks.stone_brick_stairs.getStateFromMeta(1),
 						Blocks.stone_brick_stairs.getDefaultState()
 					};
-					difficulty = 4;
+					difficulty = 5;
+					towerTypeName = "End";
 				}
-			}
+			//}
 			
 			if (wallBlock_external == null)
 				wallBlock_external = wallBlock;
 		}
 		MazeTower newTower = new MazeTower(x, py, z, ceilBlock, wallBlock,
-			wallBlock_external, floorBlock, stairsBlock, doorBlock, difficulty);
-		spawnPos[towers.size()] = new BlockPos(newTower.chunkX << 4,
-				newTower.baseY + 1, newTower.chunkZ << 4);
+			wallBlock_external, floorBlock, stairsBlock, doorBlock, difficulty,
+			towerTypeName);
+		spawnPos[towers.size()] = pos;
+		newTower.addChests();
 		newTower.fillGaps();
 		towers.add(newTower);
-		if (build)
+		if (build) {
 			newTower.build(worldIn);
+			generated[towers.size() - 1] = true;
+			chunksGenerated++;
+		}
+		
+		return true;
 	}
 
 	public void recreate(World worldIn, boolean build) {
 		loadOrCreateData(worldIn, towers.size());
+		
 		for (int t = 0; t < towers.size(); t++) {
 			MazeTower tower = towers.get(t);
 			final int x = tower.chunkX;
 			final int y = tower.baseY;
 			final int z = tower.chunkZ;
+			
 			towers.set(t, (tower = new MazeTower(x, y, z, tower.ceilBlock,
 				tower.wallBlock, tower.wallBlock_external, tower.floorBlock,
-				tower.stairsBlock, tower.doorBlock, tower.difficulty)));
+				tower.stairsBlock, tower.doorBlock, tower.difficulty, 
+				tower.towerTypeName)));
+			
+			ModChestGen.initChestGen();
+			tower.addChests();
 			//tower.fillGaps();
-			if (build)
+			if (build) {
+				if (tower.signPos != null)
+					worldIn.setBlockToAir(tower.signPos);
 				tower.build(worldIn);
+			}
 		}
-	}
-
-	public void initChest(World world, BlockPos pos, boolean isHighChest,
-			int index) {
-		/*
-		 * if (!isHighChest) { TileEntityChest chestTE = (TileEntityChest)
-		 * world.getTileEntity(pos); boolean isDoubleChest =
-		 * chestTE.adjacentChestXNeg != null || chestTE.adjacentChestXPos !=
-		 * null || chestTE.adjacentChestZNeg != null ||
-		 * chestTE.adjacentChestZPos != null;
-		 * WeightedRandomChestContent.generateChestContents(world.rand,
-		 * info.getItems(world.rand), chestTE, info.getCount(world.rand) *
-		 * ((!isDoubleChest) ? 1 : 2)); world.setTileEntity(pos, chestTE); }
-		 * else { TileEntityChaosChest chestTEC = (TileEntityChaosChest)
-		 * world.getTileEntity(pos); boolean isDoubleChaosChest =
-		 * chestTEC.adjacentChestXNeg != null || chestTEC.adjacentChestXPos !=
-		 * null || chestTEC.adjacentChestZNeg != null ||
-		 * chestTEC.adjacentChestZPos != null;
-		 * WeightedRandomChestContent.generateChestContents(world.rand,
-		 * info_high.getItems(world.rand), chestTEC,
-		 * info_high.getCount(world.rand) * ((!isDoubleChaosChest) ? 1 : 2));
-		 * world.setTileEntity(pos, chestTEC); }
-		 */
 	}
 
 	public class MazeTower {
@@ -534,14 +630,20 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private final boolean hasXEntrance;
 		private final boolean hasOddX;
 		private final boolean hasOddZ;
+		private final String towerTypeName;
 		private final IBlockState[] stairsBlock;
-		private IBlockState[][][] blockData;
-		private Path[] floorExitPaths;
-		private List<Path> paths;
 		private int[][][] pathMap;
 		private int[][][] dataMap;
 		private int[][][] roomMap;
 		private int[] floorHighestDepthLevel;
+		private int[] floorHighestMazeDepthLevel;
+		private EnumFacing exitDir;
+		private BlockPos signPos;
+		private IBlockState[][][] blockData;
+		private Path[] floorExitPaths;
+		private List<ItemStack>[] floorChestItems;
+		private List<Path> paths;
+		private List<Path>[] floorDeadEndPaths;
 		private List<Room> rooms;
 		public final IBlockState ceilBlock;
 		public final IBlockState wallBlock;
@@ -551,14 +653,18 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 		private MazeTower(int x, int y, int z, IBlockState ceilBlock,
 			IBlockState wallBlock, IBlockState wallBlock_external, IBlockState floorBlock,
-			IBlockState[] stairsBlocks, Block doorBlock, int difficulty) {
+			IBlockState[] stairsBlocks, Block doorBlock, int difficulty,
+			String towerTypeName) {
 			chunkX = x;
 			chunkZ = z;
 			baseY = y;
 			floors = 5;//rand.nextInt(5) + 2;
+			floorChestItems = new ArrayList[floors + 1];
 			floorExitPaths = new Path[floors];
 			floorHighestDepthLevel = new int[floors];
+			floorHighestMazeDepthLevel = new int[floors];
 			this.difficulty = difficulty;
+			this.towerTypeName = towerTypeName;
 			this.ceilBlock = ceilBlock;
 			this.wallBlock = wallBlock;
 			this.wallBlock_external = wallBlock_external;
@@ -598,6 +704,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 			// Room entrance;
 			// entrance = addRoom(new Room(this, 1, null));
+			floorDeadEndPaths = new List[floors];
 			Path entrance = new Path(this, null, new ArrayList<Path>(),
 					entranceMinX, 0, entranceMinZ, entranceDir);
 			for (int f = 1; f <= floors; f++) {
@@ -610,13 +717,14 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 		public void removeItemEntities(World worldIn) {
 			if (!worldIn.isRemote) {
-				float posX = (chunkX >> 4) - 32, posY = baseY, posZ = (chunkZ >> 4) - 16;
-				List list = worldIn.getEntitiesWithinAABB(EntityItem.class,
+				float posX = (chunkX << 4) - 32, posY = baseY, posZ = (chunkZ << 4) - 16;
+				List list = worldIn.getEntitiesWithinAABB(Entity.class,
 					AxisAlignedBB.fromBounds(posX, posY, posZ,
 						posX + 32, posY + (floors * 6) + 6, posZ + 16));
 				for (int i = 0; i < list.size(); i++) {
-					EntityItem item = (EntityItem) list.get(i);
-					item.setDead();
+					Entity entity = (Entity) list.get(i);
+					if (!(entity instanceof EntityPlayer))
+						entity.setDead();
 				}
 			}
 		}
@@ -675,11 +783,17 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			return path;
 		}
 		
-		private void checkPathDepth(Path path, int floor, int depth) {
-			if (depth > floorHighestDepthLevel[floor - 1] ||
-				(depth == floorHighestDepthLevel[floor - 1] && rand.nextBoolean())) {
-				floorExitPaths[floor - 1] = path;
-				floorHighestDepthLevel[floor - 1] = depth;
+		private void checkPathDepth(Path path, int floorIndex, int depth, int mazeDepth) {
+			if (depth > floorHighestDepthLevel[floorIndex] ||
+				(depth == floorHighestDepthLevel[floorIndex] && rand.nextBoolean())) {
+				floorExitPaths[floorIndex] = path;
+				floorHighestDepthLevel[floorIndex] = depth;
+			}
+			
+			if (mazeDepth > floorHighestMazeDepthLevel[floorIndex] ||
+				(mazeDepth == floorHighestMazeDepthLevel[floorIndex] &&
+				rand.nextBoolean())) {
+				floorHighestMazeDepthLevel[floorIndex] = mazeDepth;
 			}
 		}
 
@@ -738,16 +852,24 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			final IBlockState glass = getGlassState();
 			final IBlockState downButton = ModBlocks.quartzButton.getDefaultState()
 				.withProperty(BlockButton.FACING, EnumFacing.DOWN);
+			ArrayList<BlockPos> floorScannerPos = null;
 			boolean addCircuitBreaker = false;
+			String asdf = MTUtils.getEncodedItemName("Bottle o' Enchanting", rand);
 			removeItemEntities(worldIn);
 			for (int a = 0; a < 2; a++) {//
+				int floor = 0;
 				for (int y = 0; y <= yLimit + 6; y++) {
+					if (y % 6 == 0 && y < yLimit) {
+						floor++;
+						floorChestItems[floor - 1] = new ArrayList<ItemStack>();
+						floorScannerPos = new ArrayList<BlockPos>();
+					}
 					for (int z = 0; z < 16; z++) {
 						for (int x = 0; x < 16; x++) {
 							final BlockPos pos = new BlockPos(ix + x + (-16 * a), baseY + y, iz + z);
 							IBlockState state = y <= yLimit ? blockData[y][z][x] : null;
+							boolean isEdge = x == 0 || x == 15 || z == 0 || z == 15;
 							if (a == 0) {//
-								boolean isEdge = x == 0 || x == 15 || z == 0 || z == 15;
 								boolean isEdgeCorner = isEdge && ((x == 0 || x == 15) && (z == 0 || z == 15));
 								if (y <= yLimit) {
 									if ((state == null || (state.getBlock() != Blocks.ladder &&
@@ -755,69 +877,255 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 										state == stone) state = isEdge ? wallBlock_external :
 										y != yLimit ? wallBlock : floorBlock;
 								} else {
+									boolean isChestPos = y == yLimit + 1 && (x == 6 || x == 9) &&
+										(z == 6 || z == 9);
 									state = (!isEdge && y != yLimit + 6) ||
-										(isEdge && ((y < yLimit + 2 || y > yLimit + 4) || isEdgeCorner)) ?
-										isEdge ? wallBlock_external : air : glass;
+										(isEdge && ((y != yLimit + 2 && y != yLimit + 4) || isEdgeCorner)) ?
+										isEdge ? wallBlock_external : !isChestPos ? air :
+										Blocks.chest.getDefaultState()
+										.withProperty(BlockChest.FACING, exitDir) : glass;
 								}
 								
 							}//
 							else {//
+								Block block = state == null ? null : state.getBlock();
 								if ((state == air && y % 6 != 5) || (state != null &&
-									state.getBlock() == Blocks.torch))//
+									block == Blocks.torch))//
 									state = wallBlock;//
 								else if (state == null
-									|| (state.getBlock() == wallBlock.getBlock() &&
-									y % 6 != 0))//
+									|| block == Blocks.mob_spawner ||
+									block == Blocks.lava ||
+									(block == wallBlock.getBlock() &&
+									(y % 6 != 0 || y == yLimit)))//
 									state = air;//
 							}
-							if (state.getBlock() != doorBlock) {
-								if (state.getBlock() == Blocks.melon_block) {
-									addCircuitBreaker = true;
-									state = MTPuzzle.redstone;
-								}
+							if (state != null) {
+								if (state.getBlock() != doorBlock) {
+									if (state.getBlock() == Blocks.melon_block) {
+										addCircuitBreaker = true;
+										state = MTPuzzle.redstone;
+									}
 									
-								worldIn.setBlockState(pos, state);
-								if (a == 0 && state.getBlock() == Blocks.dispenser)
-									addDispenserArrows(worldIn, pos);
-								else if (state == downButton)
-									worldIn.setBlockState(pos.up(), wallBlock);
-								else if (a == 0 && addCircuitBreaker) {
-									worldIn.setTileEntity(pos, new TileEntityCircuitBreaker());
-									addCircuitBreaker = false;
+									boolean isChest = false;
+										
+									worldIn.setBlockState(pos, state);
+									if (a == 0 && state.getBlock() == Blocks.dispenser)
+										addDispenserArrows(worldIn, pos);
+									else if (a == 0 && ((isChest =
+										state.getBlock() == Blocks.chest) ||
+										state.getBlock() == Blocks.trapped_chest)) {
+										if (isChest)
+											floorChestItems[floor - 1].addAll(
+												initChest(worldIn, pos, Path.getPathAt(this, null, x, y, z)));
+									} else if (a == 0 && state.getBlock() == Blocks.mob_spawner) {
+										TileEntityMobSpawner spawner =
+											(TileEntityMobSpawner)worldIn.getTileEntity(pos);
+										spawner.getSpawnerBaseLogic().setEntityName("Skeleton");
+									} else if (a == 0 && state.getBlock() == Blocks.web)
+										worldIn.setTileEntity(pos,
+											new TileEntityWebSpiderSpawner(difficulty));
+									else if (state == downButton)
+										worldIn.setBlockState(pos.up(), wallBlock);
+									else if (a == 0 && addCircuitBreaker) {
+										worldIn.setTileEntity(pos, new TileEntityCircuitBreaker());
+										addCircuitBreaker = false;
+									} else if (a == 0 && state.getBlock()
+										instanceof BlockItemScanner) {
+										floorScannerPos.add(pos);
+									}
+								} else {
+									if (state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER)
+										ItemDoor.placeDoor(worldIn, pos,
+											state.getValue(BlockDoor.FACING),
+											doorBlock);
 								}
-							} else {
-								if (state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER)
-									ItemDoor.placeDoor(worldIn, pos,
-										state.getValue(BlockDoor.FACING),
-										doorBlock);
-								// worldIn.setBlockState(pos, state, 0);
 							}
 							final int groundY;
 							if (y == 0
 								&& (groundY = MTUtils.getGroundY(worldIn,
 								ix + x + (-16 * a), baseY, iz + z, 1) + 1) < baseY) {
 								for (int y2 = 0; y2 <= baseY - groundY; y2++)
-									worldIn.setBlockState(pos.down(y2), floorBlock);
+									worldIn.setBlockState(pos.down(y2), !isEdge ?
+										floorBlock : wallBlock_external);
 							}
+						}
+					}
+					
+					if (y % 6 == 5 && y < yLimit &&
+						!floorScannerPos.isEmpty() && !floorChestItems
+						[(int) Math.floor(y / 6)].isEmpty()) {
+						Iterator iterator = floorScannerPos.iterator();
+						try {
+						while (iterator.hasNext()) {
+							BlockPos pos;
+							TileEntityItemScanner te;
+							(te = (TileEntityItemScanner) worldIn
+								.getTileEntity(pos = ((BlockPos) iterator.next())))
+								.generateRandomKeyStackFromList(floorChestItems
+								[(int) Math.floor(y / 6)]);
+							if (te.getKeyStack() != null && worldIn.getBlockState(pos = pos.up()).getBlock() == Blocks.wall_sign) {
+								String keyStackDisplayName = te.getKeyStack().getDisplayName();
+								((TileEntitySign) worldIn
+									.getTileEntity(pos)).signText[1] = new ChatComponentText(
+									difficulty < 4 ? keyStackDisplayName :
+									MTUtils.getEncodedItemName(keyStackDisplayName, rand)
+								);
+							}
+						}
+						} catch (Exception e) {
+							e = null;
 						}
 					}
 				}
 			}//
+			Path entrancePath = paths.get(0);
+			IBlockState signState = Blocks.wall_sign.getDefaultState()
+				.withProperty(BlockWallSign.FACING, entrancePath.getDir().getOpposite());
+			TileEntitySign te;
+			String difficultyString = "";
+			BlockPos signPos = new BlockPos(
+				ix + (entrancePath.ix), baseY + 3, iz + (entrancePath.iz))
+				.offset(entrancePath.getDir().getOpposite());
+			this.signPos = signPos;
+			for (int d = 0; d < difficulty; d++)
+				difficultyString += "✪";
+			worldIn.setBlockState(signPos, signState);
+			te = (TileEntitySign) worldIn.getTileEntity(signPos);
+			te.signText[0] = new ChatComponentText(towerTypeName);
+			te.signText[1] = new ChatComponentText("Maze Tower");
+			te.signText[3] = new ChatComponentText(difficultyString);
+			te.setEditable(false);
+			worldIn.setTileEntity(signPos, te);
 		}
 		
 		private void addDispenserArrows(World worldIn, BlockPos pos) {
 			TileEntity te;
-			int numArrows = dataMap[pos.getY() - baseY][pos.getZ() - (chunkZ << 4)][pos.getX() - (chunkX << 4)];
-			if ((te = worldIn.getTileEntity(pos)) != null &&
-				te instanceof TileEntityDispenser) {
-				 TileEntityDispenser ted = (TileEntityDispenser) te;
-				 te = null;
-				 LockCode code = new LockCode("free arrows");
-				 ted.setLockCode(code);
-				 ted.setInventorySlotContents(0, new ItemStack(Items.arrow, numArrows));
-				 worldIn.setTileEntity(pos, ted);
+			int amount = dataMap[pos.getY() - baseY][pos.getZ() - (chunkZ << 4)][pos.getX() - (chunkX << 4)];
+				if ((te = worldIn.getTileEntity(pos)) != null &&
+					te instanceof TileEntityDispenser) {
+					TileEntityDispenser ted = (TileEntityDispenser) te;
+					LockCode code = new LockCode("fhqwhgads");
+					ItemStack[] projectiles;
+					int stackCount = 1;
+					int projectileChance = rand.nextInt(10) + 1;
+					te = null;
+					if (difficulty < 4 || (difficulty < 7 &&
+						projectileChance < (difficulty - 3) * 3))
+						projectiles = new ItemStack[] { new ItemStack(Items.arrow, amount) };
+					else {
+						stackCount = Math.min(amount, 9);
+						List<Integer> projectileIndexes = new ArrayList<Integer>();
+						ItemStack[] projectileList = new ItemStack[] {
+							new ItemStack(Items.potionitem, 1, 16394), //Slowness I (short)
+							new ItemStack(Items.potionitem, 1, 16392), //Weakness I (short)
+							new ItemStack(Items.potionitem, 1, 16388), //Poison I (short)
+							new ItemStack(Items.potionitem, 1, 16396), //Harming I
+							new ItemStack(Items.potionitem, 1, 16458), //Slowness I (long)
+							new ItemStack(Items.potionitem, 1, 16456), //Weakness I (long)
+							new ItemStack(Items.potionitem, 1, 16452), //Poison I (long)
+							new ItemStack(Items.potionitem, 1, 16420), //Poison II (short)
+							new ItemStack(Items.potionitem, 1, 16484), //Poison II (long)
+							new ItemStack(Items.potionitem, 1, 16428) //Harming II
+						};
+	
+						projectiles = new ItemStack[stackCount];
+						
+						for (int p = 0; p < stackCount; p++) {
+							if (p == 0 || difficulty >= 10 || p < (difficulty - 6)) {
+								int subtractFromRange = Math.max(difficulty - 8, 0);
+								projectileChance = rand.nextInt(4 - subtractFromRange) +
+									(difficulty - subtractFromRange);
+								projectileIndexes.add(projectileChance);
+							} else
+								projectileChance =
+								projectileIndexes.get(rand.nextInt(projectileIndexes.size()));
+							projectiles[p] = projectileList[projectileChance];
+						}
+					}
+					//ted.setLockCode(code);
+					for (int c = 0; c < stackCount; c++)
+						ted.setInventorySlotContents(c, projectiles[c]);
+					worldIn.setTileEntity(pos, ted);
+				}
+			
+		}
+		
+		public void addChests() {
+			int chestCount;
+			int floorCount;
+			Iterator pathIterator;
+			for (int f = 0; f < floors; f++) {
+				int highestDepth = floorHighestDepthLevel[f];
+				int highestMazeDepth = floorHighestMazeDepthLevel[f];
+				pathIterator = floorDeadEndPaths[f].iterator();	
+				chestCount = 0;
+				while (pathIterator.hasNext()) {
+					Path path = (Path) pathIterator.next();
+					if (path.getStateAt(this, path.fx, path.fy + 1, path.fz) == air) {
+						boolean randBool = true;
+						boolean usePath = false;
+						if (path.mazeDepth == highestMazeDepth && ((randBool = rand.nextBoolean()) || difficulty > 6))
+							usePath = true;
+						else if (path.depth == highestDepth && ((randBool = rand.nextBoolean()) || difficulty > 5))
+							usePath = true;
+						else {
+							int depthDiff = Math.min(highestDepth - path.depth, 5);
+							usePath = true;
+							for (int c = 0; c < depthDiff; c++) {
+								if (rand.nextBoolean()) {
+									usePath = false;
+									break;
+								}
+							}
+						}
+						if (usePath) {
+							IBlockState chestState = randBool ? Blocks.chest.getDefaultState() :
+								Blocks.trapped_chest.getDefaultState();
+							IBlockState[] chestStates = new IBlockState[] {
+								chestState.withProperty(BlockChest.FACING, EnumFacing.NORTH),
+								chestState.withProperty(BlockChest.FACING, EnumFacing.SOUTH),
+								chestState.withProperty(BlockChest.FACING, EnumFacing.WEST),
+								chestState.withProperty(BlockChest.FACING, EnumFacing.EAST)
+							};
+							path.setStateAt(path.fx, path.fy + 1, path.fz,
+								chestStates[path.getDir().getOpposite().getIndex() - 2]);
+							if (!randBool) {
+								path.setStateAt(path.fx, path.fy, path.fz,
+									Blocks.tnt.getDefaultState());
+								if (path.floor != 1 &&
+									path.getStateAt(this, path.fx, path.fy - 1, path.fz) == air)
+									path.setStateAt(path.fx, path.fy, path.fz,
+										floorBlock);
+							}
+							chestCount++;
+						}
+					}
+				}
+			}
+		}
+		
+		public List<ItemStack> initChest(World world, BlockPos pos, Path path) {
+			if (path != null) {
+				TileEntityChest chestTEC = (TileEntityChest) world.getTileEntity(pos);
+				int difficulty = this.difficulty + (int) (Math.floor(path.floor / 6));
+						/*(int) Math.max((this.difficulty +
+					(Math.floor(path.floor / 6))) * rand.nextGaussian(), 11);*/
+				if (chestTEC != null) {
+					ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+					WeightedRandomChestContent.generateChestContents(world.rand,
+						chestInfo[difficulty - 1].getItems(world.rand), chestTEC,
+						chestInfo[difficulty - 1].getCount(world.rand));
+					for (int i = 0; i < chestTEC.getSizeInventory(); i++) {
+						ItemStack curStack;
+						if ((curStack = chestTEC.getStackInSlot(i)) != null)
+							items.add(curStack);
+					}
+					world.setTileEntity(pos, chestTEC);
+					return items;
+				}
 			}
 			
+			return new ArrayList<ItemStack>();
 		}
 
 		private IBlockState getGlassState() {
@@ -870,13 +1178,68 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				}
 			}
 		}
+
+		public void addMobSpawners(int floor) {
+			int spawnCount = 0;
+			final int addToDifficulty = (int) Math.floor(floor / 6);
+			final int spawnY = (floor * 6) - 1;
+			final IBlockState spawnerState = Blocks.mob_spawner.getDefaultState();
+			List<int[]> spawnerCoordsList = new ArrayList<int[]>();
+			spawnerCoordsList.add(new int[] { spawnY, 4, 4 });
+			spawnerCoordsList.add(new int[] { spawnY, 4, 11 });
+			spawnerCoordsList.add(new int[] { spawnY, 11, 4 });
+			spawnerCoordsList.add(new int[] { spawnY, 11, 11 });
+			spawnerCoordsList.add(new int[] { spawnY, rand.nextBoolean() ? 7 : 8,
+				rand.nextBoolean() ? 7 : 8 });
+			
+			switch (difficulty + addToDifficulty) {
+				case 1:
+					spawnCount = rand.nextInt(2);
+					break;
+				case 2:
+					spawnCount = rand.nextInt(3);
+					break;
+				case 3:
+					spawnCount = 1 + rand.nextInt(2);
+					break;
+				case 4:
+					spawnCount = 1 + rand.nextInt(3);
+					break;
+				case 5:
+					spawnCount = 2 + rand.nextInt(2);
+					break;
+				case 6:
+					spawnCount = 2 + rand.nextInt(3);
+					break;
+				case 7:
+					spawnCount = 3 + rand.nextInt(2);
+					break;
+				case 8:
+					spawnCount = 3 + rand.nextInt(3);
+					break;
+				case 9:
+					spawnCount = 4 + rand.nextInt(2);
+					break;
+				default:
+					spawnCount = 5;
+			}
+			
+			for (int s = 0; s < spawnCount; s++) {
+				final int randIndex = rand.nextInt(spawnerCoordsList.size());
+				final int[] coords = spawnerCoordsList.get(randIndex);
+				if (Path.getStateAt(this, coords) == air)
+					blockData[coords[0]][coords[1]][coords[2]] = spawnerState;
+				spawnerCoordsList.remove(randIndex);
+			}
+		}
 	}
 
 	private static class Path {
 
 		private final MazeTower tower;
 		private final EnumFacing dir;
-		private final boolean isEntrance;
+		private final boolean isFloorEntrance;
+		private final boolean isTowerEntrance;
 		private final int ix;
 		private final int iy;
 		private final int iz;
@@ -884,6 +1247,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private final int fy;
 		private final int fz;
 		private final int floor;
+		private final int dirIndex;
 		private final int dirSign;
 		private final int pathIndex;
 		private final BlockPos pos;
@@ -904,26 +1268,27 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			this.tower = tower;
 			this.parent = parentPath;
 			this.chain = pathChain;
-			isEntrance = parentPath == null;
-			isDeadEnd = true;
-			depth = !isEntrance ? parent.depth + 1 : 1;
-			mazeDepth = !isEntrance ? parent.mazeDepth : 1;
+			floor = (int) Math.floor(iy / 6) + 1;
+			isTowerEntrance = parentPath == null;
+			isFloorEntrance = isTowerEntrance || parentPath.floor == floor - 1;
+			isDeadEnd = !isFloorEntrance;
+			depth = !isTowerEntrance ? parent.depth + 1 : 1;
+			mazeDepth = !isTowerEntrance ? parent.mazeDepth : 1;
 			this.chain.add(this);
 			this.ix = ix;
 			this.iy = iy;
 			this.iz = iz;
-			floor = (int) Math.floor(iy / 6) + 1;
-			pathIndex = !isEntrance ? tower.paths.get(tower.paths.size() - 1).pathIndex + 1
-					: 1;
+			pathIndex = !isTowerEntrance ?
+				tower.paths.get(tower.paths.size() - 1).pathIndex + 1 : 1;
 			pos = new BlockPos(ix, iy, iz);
 			children = new ArrayList<Path>();
 			reservedDirs = new Stack<EnumFacing>();
-			hasMtp = !isEntrance && parent.hasMtp;
+			hasMtp = !isFloorEntrance && parent.hasMtp;
 
 			if (facing == null)
 				dir = getDir();
 			else {
-				if (isEntrance)
+				if (isFloorEntrance)
 					dir = facing;
 				else
 					dir = ((maxDistance = getMaxDistance(tower, facing, 14,
@@ -931,14 +1296,15 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			}
 
 			if (dir != null) {
-				dirAxis = (int) Math.floor(dir.getIndex() * 0.5);
-				dirSign = dir.getIndex() % 2 == 0 ? -1 : 1;
+				dirIndex = dir.getIndex();
+				dirAxis = (int) Math.floor(dirIndex * 0.5);
+				dirSign = dirIndex % 2 == 0 ? -1 : 1;
 				/*
 				 * distance = !isEntrance ? Math.max((int)
 				 * Math.floor((Math.min(rand.nextInt(maxDistance) + 1,
 				 * rand.nextInt(3) + 3)) * 0.5) * 2, !hasMtp ? 2 : 4) : 3;
 				 */
-				distance = !isEntrance ? Math.max((int) Math
+				distance = !isTowerEntrance ? Math.max((int) Math
 					.floor((rand.nextInt(maxDistance) + 1) * 0.5) * 2,
 					!hasMtp ? 2 : 4) : 3;
 				int[] fcoords = getRelCoordsWithOffset(dir, distance);
@@ -948,10 +1314,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 				tower.addPath(this);
 				
-				if (!isEntrance && !parent.isDeadEnd)
+				if (!isTowerEntrance && !parent.isDeadEnd)
 					parent.isDeadEnd = false;
-				
-				tower.checkPathDepth(this, floor, depth);
 
 				if (hasMtp) {
 					mtp = new ArrayList<MTPuzzle>();
@@ -961,13 +1325,11 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						MTPuzzle newMtp = getMtp();
 						if (newMtp != null) {
 							mtp.add(newMtp);
-						}/*
-						 * else if (p == 0) hasMtp = false;
-						 */
+							mazeDepth += newMtp.getMazeDepthValue();
+						}
 					}
 					hasMtp = false;
-					mazeDepth++;
-				} else if (!isEntrance) {
+				} else if (!isFloorEntrance) {
 					if (rand.nextInt(7) < 2) {
 						this.hasMtp = true;
 					}
@@ -977,7 +1339,16 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					for (int d = 0; d <= distance; d++)
 						setPathWithOffset(d, y);
 				}
+				
+				if ((isDeadEnd = children.size() == 0)) {
+					if (tower.floorDeadEndPaths[floor - 1] == null)
+						tower.floorDeadEndPaths[floor - 1] = new ArrayList<Path>();
+					tower.floorDeadEndPaths[floor - 1].add(this);
+				}
+				
+				tower.checkPathDepth(this, floor - 1, depth, mazeDepth);
 			} else {
+				dirIndex = 0;
 				dirAxis = -1;
 				dirSign = 0;
 				distance = 0;
@@ -993,20 +1364,15 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			IBlockState ladder = Blocks.ladder.getDefaultState()
 				.withProperty(BlockLadder.FACING, ladderDir = getLadderDir());
 			boolean isLastFloor = floor == tower.floors;
+			if (isLastFloor)
+				tower.exitDir = ladderDir.getOpposite();
 			for (int y = 1; y < (!isLastFloor ? 9 : 6); y++) {
 				int[] coords = getRelCoordsWithOffset(dir, distance);
 				/*if (isPosValid(coords[2], coords[0], coords[1]))
 					setStateWithOffset(distance + 1, y, 0, tower.wallBlock);*/
 				if (y == 5) {
-					setStateAt(coords[2] + 1, fy + 5, coords[1], tower.wallBlock);
-					setStateAt(coords[2] - 1, fy + 5, coords[1], tower.wallBlock);
-					setStateAt(coords[2] + 1, fy + 5, coords[1] + 1, tower.wallBlock);
-					setStateAt(coords[2] - 1, fy + 5, coords[1] + 1, tower.wallBlock);
-					setStateAt(coords[2] + 1, fy + 5, coords[1] - 1, tower.wallBlock);
-					setStateAt(coords[2] - 1, fy + 5, coords[1] - 1, tower.wallBlock);
-					setStateAt(coords[2], fy + 5, coords[1] + 1, tower.wallBlock);
-					setStateAt(coords[2], fy + 5, coords[1] - 1, tower.wallBlock);
-					setStateAt(coords[2], fy + 5, coords[1], tower.wallBlock);
+					addFloorMedianAccess(coords[2], coords[1], false);
+					tower.addMobSpawners(floor);
 				}
 				setStateWithOffset(distance, y, 0, ladder);
 			}
@@ -1014,6 +1380,44 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			if (isLastFloor)
 				setStateWithOffset(distance, 6, 0, ladder);
 			return !isLastFloor ? new Path(tower, this, chain, fx, fy + 6, fz, null) : null;
+		}
+		
+		private void addFallTrapHole(int x, int z, boolean isFatal) {
+			int floor = this.floor - 1;
+			int y = (floor * 6) - 1;
+			addFloorMedianAccess(x, z, true);
+			
+			if (isFatal) {
+				setStateAt(x, y - 1, z, Blocks.lava.getDefaultState());
+				setStateAt(x, y - 2, z, air);
+				setStateAt(x, y - 3, z, air);
+				setStateAt(x, y - 4, z, air);
+			}
+		}
+		
+		private void addFloorMedianAccess(int x, int z, boolean isFallTrap) {
+			int floor = this.floor - (isFallTrap ? 1 : 0);
+			int y = (floor * 6) - 1;
+			addFloorMedianAccess(x, y, z, isFallTrap);
+		}
+		
+		private void addFloorMedianAccess(int x, int y, int z, boolean isFallTrap) {
+			//if (getStateAt(tower, x + 1, y, z) == air)
+				setStateAt(x + 1, y, z, tower.wallBlock);
+			//if (getStateAt(tower, x - 1, y, z) == air)
+				setStateAt(x - 1, y, z, tower.wallBlock);
+			//if (getStateAt(tower, x + 1, y, z + 1) == air)
+				setStateAt(x + 1, y, z + 1, tower.wallBlock);
+			//if (getStateAt(tower, x - 1, y, z + 1) == air)
+				setStateAt(x - 1, y, z + 1, tower.wallBlock);
+			//if (getStateAt(tower, x + 1, y, z - 1) == air)
+				setStateAt(x + 1, y, z - 1, tower.wallBlock);
+			//if (getStateAt(tower, x - 1, y, z - 1) == air)
+				setStateAt(x - 1, y, z - 1, tower.wallBlock);
+			//if (getStateAt(tower, x, y, z + 1) == air)
+				setStateAt(x, y, z + 1, tower.wallBlock);
+			//if (getStateAt(tower, x, y, z - 1) == air)
+				setStateAt(x, y, z - 1, tower.wallBlock);
 		}
 
 		private EnumFacing getDir() {
@@ -1107,6 +1511,13 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			// y, z));
 			return Math.min(dist - 2, limit);
 		}
+		
+		private boolean isPosAccessible(int x, int y, int z) {
+			return (getStateAt(tower, x + 1, y, z) != null ||
+				getStateAt(tower, x - 1, y, z) != null ||
+				getStateAt(tower, x, y, z + 1) != null ||
+				getStateAt(tower, x, y, z - 1) != null);
+		}
 
 		private IBlockState getStateWithOffset(MazeTower tower, EnumFacing facing, int dist) {
 			return getStateWithOffset(tower, facing, dist, ix, iy, iz);
@@ -1151,7 +1562,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			Path path = null;
 
 			if (isPosValid(x, y, z)) {
-				int index = tower.pathMap[y][z][x] - 1;
+				int index = 0;
+				try {
+					index = tower.pathMap[y][z][x] - 1;
+				} catch (ArrayIndexOutOfBoundsException e) {
+					e = null;
+				}
 				if (index != -1) {
 					if (index != tower.paths.size())
 						path = tower.paths.get(index);
@@ -1234,7 +1650,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				// if (numPaths != 1) {
 				for (int p = 0; p < numPaths; p++) {
 					Path newPath = new Path(tower, this, chain, x, y - addY, z, null);
-					if (newPath != null)
+					if (newPath != null && newPath.dir != null)
 						children.add(newPath);
 				}
 				// } else {
@@ -1245,16 +1661,19 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		
 		private void setStateAt(int x, int y, int z, IBlockState state) {
 			IBlockState curState = tower.blockData[y][z][x];
+			Block curBlock;
 			if (curState == null ||
-				(curState.getBlock() != Blocks.lever && curState.getBlock() != MazeTowers.BlockQuartzButton))//
+				((curBlock = curState.getBlock()) != Blocks.lever &&
+				curBlock != MazeTowers.BlockQuartzButton && curBlock != Blocks.redstone_wire))//
 				tower.blockData[y][z][x] = state;
 		}
 
 		private void setPathWithOffset(int dist, int addY) {
 			IBlockState torch = Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, dir.rotateYCCW());
 			// for (int s = -1; s < 2; s++)
-			setStateWithOffset(dist, addY, 0,
-				addY != 2 ? air : torch);
+			if (!isTowerEntrance || dist > 0 || addY != 3)
+				setStateWithOffset(dist, addY, 0,
+					addY != 2 ? air : torch);
 		}
 
 		private MTPuzzle getMtp() {
@@ -1318,7 +1737,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				Path toPath, EnumFacing dir, int distance, int x, int y, int z, int failCount) {
 			MTPuzzle mtp = null;
 			//dir = fromPath.dir;
-			int mtpChance = rand.nextInt(3);//rand.nextInt(5);
+			int mtpChance = rand.nextInt(6);//5
 			switch (mtpChance) {
 				case 0:
 					EnumFacing subDir = getFreeSpaceDir(x, y, z);
@@ -1326,19 +1745,42 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						mtp = new MTPWindow(tower, fromPath, toPath, subDir, distance, x,
 							y, z);
 					break;
-				case 4:
-					mtp = new MTPPiston(tower, fromPath, toPath, toPath.dir, distance, x,
-						y, z);
-					break;
 				case 1:
 					mtp = new MTPArrow(tower, fromPath, toPath, toPath.dir, distance, x,
 						y, z);
 					break;
 				case 2:
-					mtp = new MTPArrowGauntlet(tower, fromPath, toPath, toPath.dir, distance, x,
-						y, z);
+					mtp = new MTPArrowGauntlet(tower, fromPath, toPath, toPath.dir,
+						distance, x, y, z);
 					break;
 				case 3:
+					if (floor != 1 && getStateAt(tower, x, y - 2, z) == air)
+						mtp = new MTPBounceTrap(tower, fromPath, toPath, toPath.dir,
+							distance, x, y, z);
+					break;
+				case 4:
+					boolean isNonFatal;
+					EnumFacing pathDir = toPath.dir;
+					int offsetX = pathDir.getAxis() == Axis.X ?
+						pathDir.getAxisDirection() == AxisDirection.POSITIVE ? 1 : -1 : 0;
+					int offsetZ = pathDir.getAxis() == Axis.Z ?
+						pathDir.getAxisDirection() == AxisDirection.POSITIVE ? 1 : -1 : 0;
+					if (floor != 1 && getStateAt(tower, x + offsetX, y - 2,
+						z + offsetZ) == air && ((isNonFatal = getStateAt(tower, x + offsetX,
+						y - 6, z + offsetZ) == air) || !(isNonFatal =
+						isPosAccessible(x + offsetX, y - 6, z + offsetZ))))
+						mtp = new MTPFallTrap(tower, fromPath, toPath, toPath.dir,
+							distance, x, y, z, isNonFatal);
+					break;
+				case 5:
+					mtp = new MTPItem(tower, fromPath, toPath, toPath.dir, distance, x,
+							y, z);
+					break;
+				case 6:
+					mtp = new MTPPiston(tower, fromPath, toPath, toPath.dir, distance, x,
+							y, z);
+					break;
+				case 7:
 					break;
 				default:
 					//mtp = new MTPArrowGauntlet(tower, fromPath, toPath, toPath.dir, distance, x,
@@ -1440,19 +1882,19 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private MTPDoor(MazeTower tower, Path fromPath, Path toPath,
 				EnumFacing dir, int distance, int x, int y, int z) {
 
-			super(tower, fromPath, toPath, dir, distance, x, y, z, 0, 0,
+			super(tower, fromPath, toPath, dir, distance, x, y, z, 0, 0, 1,
 					Blocks.red_sandstone.getDefaultState(), tower.wallBlock,
 					Blocks.lapis_block.getDefaultState(), true);
 		}
 
 	}
 
-	public static class MTPWindow extends MTPuzzle {
+	private static class MTPWindow extends MTPuzzle {
 
 		private MTPWindow(MazeTower tower, Path fromPath, Path toPath,
 				EnumFacing dir, int distance, int x, int y, int z) {
 			super(tower, fromPath, toPath, dir, distance, x, y, z,
-				xOffset = 2, zOffset = 2, null, null, null, false);
+				xOffset = 2, zOffset = 2, 1, null, null, null, false);
 			IBlockState stone = Blocks.stone.getDefaultState();
 			IBlockState lever = Blocks.lever.getDefaultState()
 				.withProperty(BlockLever.FACING, (dir.getAxis() == Axis.Z ? EnumOrientation.DOWN_X : EnumOrientation.DOWN_Z));
@@ -1504,11 +1946,11 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 	}
 	
-	public static class MTPPiston extends MTPuzzle {
+	private static class MTPPiston extends MTPuzzle {
 		private MTPPiston(MazeTower tower, Path fromPath, Path toPath,
 			EnumFacing dir, int distance, int x, int y, int z) {
 			super(tower, fromPath, toPath, dir, distance, x, y, z,
-				xOffset = 0, zOffset = 1, null, null, null, false);
+				xOffset = 0, zOffset = 1, 2, null, null, null, false);
 			int[] backCoords;
 			boolean canAccessBack = true;/*Path.getStateWithOffset(tower, dir.rotateY(), 2,
 				(backCoords = new int[] { x + xOffset, y + 2, z + zOffset + 1 })) == air*/
@@ -1528,8 +1970,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					{ stone, piston, null },
 					{ null, null, null }
 				}, {
-					{ stone, stone, canAccessBack ? (rand.nextBoolean() ? button : lever) : null },
-					{ null, !canAccessBack ? (rand.nextBoolean() ? button : lever) : null, null }
+					{ stone, stone, canAccessBack ? lever : null },
+					{ null, !canAccessBack ? lever : null, null }
 				}
 			}, EnumFacing.SOUTH, dir, true);
 			
@@ -1557,7 +1999,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private MTPArrow(MazeTower tower, Path fromPath, Path toPath,
 			EnumFacing dir, int distance, int x, int y, int z) {
 			super(tower, fromPath, toPath, dir, distance, x, y, z,
-				xOffset = -1, zOffset = 1, null, null, null, false);
+				xOffset = -1, zOffset = 1, 1, null, null, null, false);
 			dirSign = (dirIndex % 2 == 0 ? -1 : 1);
 			boolean isLeft = rand.nextBoolean();
 			IBlockState dispenser = Blocks.dispenser.getDefaultState()
@@ -1576,7 +2018,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private MTPArrowGauntlet(MazeTower tower, Path fromPath, Path toPath,
 			EnumFacing dir, int distance, int x, int y, int z) {
 			super(tower, fromPath, toPath, dir, distance, x, y, z,
-				xOffset = 0, zOffset = 0, null, null, null, false);
+				xOffset = 0, zOffset = 0, 2, null, null, null, false);
 			IBlockState stone = Blocks.stone.getDefaultState();
 			IBlockState dispenser = Blocks.dispenser.getDefaultState()
 				.withProperty(BlockDispenser.FACING, EnumFacing.DOWN);
@@ -1589,7 +2031,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.withProperty(Blocks.unpowered_repeater.FACING, dir)
 					.withProperty(Blocks.unpowered_repeater.DELAY, 3);
 			IBlockState repeaterC = Blocks.unpowered_repeater.getDefaultState()
-				.withProperty(Blocks.unpowered_repeater.FACING, dir.rotateYCCW())
+				.withProperty(Blocks.unpowered_repeater.FACING,
+				dirAxis == 2 ? dir.rotateYCCW() : dir.rotateY())
 				.withProperty(Blocks.unpowered_repeater.DELAY, 3);
 			dirSign = dirIndex % 2 == 0 ? -1 : 1;
 			//if (dir != EnumFacing.EAST && dir != EnumFacing.NORTH)
@@ -1638,6 +2081,124 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 	}
 	
+	private static class MTPFallTrap extends MTPuzzle {
+		
+		protected boolean isFatal;
+		
+		private MTPFallTrap(MazeTower tower, Path fromPath, Path toPath,
+			EnumFacing dir, int distance, int x, int y, int z, boolean isNonFatal) {
+			super(tower, fromPath, toPath, dir, distance, x, y - (isNonFatal ? 3 : 1), z,
+				xOffset = -1, zOffset = 1, 1, null, null, null, false);
+			dirSign = (dirIndex % 2 == 0 ? -1 : 1);
+			boolean isLeft = rand.nextBoolean();
+			IBlockState pistonA = MazeTowers.BlockMemoryPiston.getDefaultState()
+				.withProperty(BlockMemoryPistonBase.FACING,
+				(isLeft ? dir.rotateYCCW() : dir.rotateY()));
+			IBlockState pistonB = /*(tower.difficulty < 6 ?
+				MazeTowers.BlockMemoryPiston : */MazeTowers.BlockMemoryPistonOff//)
+				.getDefaultState().withProperty(BlockMemoryPistonBase.FACING,
+				(isLeft ? dir.rotateY() : dir.rotateYCCW()));
+			IBlockState pressurePlate =
+				MazeTowers.BlockHiddenPressurePlateWeighted.getDefaultState();
+			isFatal = !isNonFatal;
+			stateMap = getRotatedStateMap(isNonFatal ? new IBlockState[][][] {
+				{
+					{ isLeft ? pistonA : air, tower.ceilBlock, isLeft ? air : pistonA }
+				},
+				{
+					{ null, pressurePlate, null }
+				},
+				{
+					{ isLeft ? air : pistonB, null, isLeft ? pistonB : air }
+				},
+				{
+					{ null, pressurePlate, null }
+				}
+			} : new IBlockState[][][] {
+				{
+					{ isLeft ? air : pistonB, null, isLeft ? pistonB : air }
+				},
+				{
+					{ null, pressurePlate, null }
+				}
+			}, EnumFacing.SOUTH, dir, true);
+			validateStateMap(stateMap, false);
+		}
+	}
+	
+	private static class MTPBounceTrap extends MTPuzzle {
+		
+		private MTPBounceTrap(MazeTower tower, Path fromPath, Path toPath,
+			EnumFacing dir, int distance, int x, int y, int z) {
+			super(tower, fromPath, toPath, dir, distance, x, y - 2, z,
+				xOffset = 0, zOffset = 1, 1, null, null, null, false);
+			dirSign = (dirIndex % 2 == 0 ? -2 : 1);
+			IBlockState piston = MazeTowers.BlockMemoryPiston.getDefaultState()
+				.withProperty(BlockMemoryPistonBase.FACING,
+				EnumFacing.UP);
+			IBlockState pressurePlate = MazeTowers.BlockHiddenPressurePlateWeighted.getDefaultState();
+			IBlockState web = Blocks.web.getDefaultState();
+			stateMap = getRotatedStateMap(new IBlockState[][][] {
+				{
+					{ piston }
+				},
+				{
+					{ null }
+				},
+				{
+					{ pressurePlate }
+				},
+				{
+					{ null }
+				},
+				{
+					{ (rand.nextInt(10) + 1) < tower.difficulty  ? web : null }
+				}
+			}, EnumFacing.SOUTH, dir, true);
+			validateStateMap(stateMap, false);
+		}
+	}
+	
+	public static class MTPItem extends MTPuzzle {
+
+		private MTPItem(MazeTower tower, Path fromPath, Path toPath,
+				EnumFacing dir, int distance, int x, int y, int z) {
+			super(tower, fromPath, toPath, dir, distance, x, y, z,
+				xOffset = -1, zOffset = 0, 3, null, null, null, false);
+			IBlockState stone = Blocks.stone.getDefaultState();
+			IBlockState scannerA = MazeTowers.BlockItemScanner.getDefaultState()
+					.withProperty(BlockItemScanner.FACING, toPath.getDir().getOpposite());
+			IBlockState signA = Blocks.wall_sign.getDefaultState()
+				.withProperty(BlockWallSign.FACING, toPath.getDir().getOpposite());
+			IBlockState scannerB = MazeTowers.BlockItemScanner.getDefaultState()
+					.withProperty(BlockItemScanner.FACING, toPath.getDir().rotateY());
+			IBlockState signB = Blocks.wall_sign.getDefaultState()
+					.withProperty(BlockWallSign.FACING, toPath.getDir().rotateY());
+			boolean isLeft = rand.nextBoolean();
+			
+			stateMap = new IBlockState[][][] {
+				{
+					{ null, null, null },
+					{ null, doorStates[toPath.getDir().getOpposite().getIndex() % 4],
+						null },
+					{ null, null, null }
+				}, {
+					{ null, null, null },
+					{ isLeft ? null : scannerA, doorStates[(toPath.getDir()
+						.getIndex() % 2) == -1 ? 4 : 5], isLeft ? scannerA : null },
+					{ null,	scannerB, null }
+				}, {
+					{ null, stone, null },
+					{ isLeft ? null : signA, air, isLeft ? signA : null },
+					{ null, stone, null }
+				}
+			};
+			stateMap = getRotatedStateMap(stateMap, EnumFacing.SOUTH, toPath.getDir(), true);
+			validateStateMap(stateMap, false);
+		}
+
+	}
+	
 	private static class MTPuzzle {
 		private final MazeTower tower;
 		private final Path fromPath;
@@ -1649,30 +2210,33 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private final int mz;
 		private final int ox;
 		private final int oz;
+		private final int mazeDepthValue;
 		protected final int dirIndex;
 		protected final int dirAxis;
 		protected final Path oPath;
 		protected final IBlockState[] leverStates;
 		protected final IBlockState[] doorStates;
-		protected static final IBlockState redstone = Blocks.redstone_wire.getDefaultState();
+		protected int dirSign;
+		protected EnumFacing dir;
+		protected IBlockState[][][] stateMap;
 		protected static int xOffset;
 		protected static int zOffset;
+		protected static final IBlockState redstone = Blocks.redstone_wire.getDefaultState();
 		private IBlockState obstacleState;
 		private IBlockState medianState;
 		private IBlockState triggerState;
 		private int distance;
 		private boolean hasRedstone = false;
-		protected int dirSign;
-		protected EnumFacing dir;
-		protected IBlockState[][][] stateMap;
 
 		private MTPuzzle(MazeTower tower, Path fromPath, Path toPath,
 			EnumFacing facing, int distance, int x, int y, int z, int xOffset, int zOffset,
-			IBlockState obstacle, IBlockState median, IBlockState trigger, boolean hasRedstone) {
+			int mazeDepthValue, IBlockState obstacle, IBlockState median,
+			IBlockState trigger, boolean hasRedstone) {
 			dir = facing;
 			dirIndex = dir.getIndex();
 			dirAxis = (int) Math.floor(dirIndex * 0.5);
 			dirSign = (dirIndex % 2 == 0 ? -1 : 1);
+			this.mazeDepthValue = mazeDepthValue;
 			Block lever = Blocks.lever;
 			Block door = tower.doorBlock;
 			leverStates = new IBlockState[] {
@@ -1772,6 +2336,10 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			return dir;
 		}
 		
+		protected int getMazeDepthValue() {
+			return mazeDepthValue;
+		}
+		
 		protected void setDir(EnumFacing dir) {
 			this.dir = dir;
 		}
@@ -1848,19 +2416,25 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 								/*if (state.getBlock() == Blocks.lever)
 									state = getLeverState(x2, y2, z2);
 								else {*/
-									if (state.getBlock() == Blocks.dispenser) {
-										if (Path.isPosValid(xCoord, yCoord, zCoord))
-											tower.dataMap[yCoord][zCoord][xCoord] = (randInt != -1) ?
-												randInt : (randInt = (rand.nextInt(9) + 2));
-									}
-									fromPath.setStateAt(xCoord, yCoord, zCoord, state);
+								if (state.getBlock() == Blocks.dispenser) {
+									if (Path.isPosValid(xCoord, yCoord, zCoord))
+										tower.dataMap[yCoord][zCoord][xCoord] = (randInt != -1) ? randInt :
+											(randInt = (rand.nextInt(9) + 1 + (Math.max(tower.difficulty - 4, 0))));
+								} else if (state.getBlock() ==
+									MazeTowers.BlockHiddenPressurePlateWeighted &&
+									this instanceof MTPFallTrap) {
+									boolean isFatal = ((MTPFallTrap) this).isFatal;
+									if ((isFatal && y2 == 1) || (!isFatal && y2 == 3))
+										fromPath.addFallTrapHole(xCoord, zCoord, isFatal);
+								}
+								fromPath.setStateAt(xCoord, yCoord, zCoord, state);
 								//}
 							}
 						}
 					}
 				}
-				fromPath.setStateAt(x, y + 2, z, Blocks.emerald_block.getDefaultState());
-				fromPath.setStateAt(x + xOffset, y + 2, z + zOffset, Blocks.lapis_block.getDefaultState());
+				//fromPath.setStateAt(x, y + 2, z, Blocks.emerald_block.getDefaultState());
+				//fromPath.setStateAt(x + xOffset, y + 2, z + zOffset, Blocks.lapis_block.getDefaultState());
 				fromPath.setStateAt(fromPath.fx, fromPath.fy + 4, fromPath.fz, Blocks.gold_block.getDefaultState());
 				fromPath.setStateAt(toPath.fx, toPath.iy + 4, toPath.fz, Blocks.diamond_block.getDefaultState());
 			} catch (ArrayIndexOutOfBoundsException e) {
@@ -1895,46 +2469,4 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			return state;
 		}
 	}
-	
-	/*private static class MTTrap {
-		
-		private final MazeTower tower;
-		private final Path path;
-		private final int dirIndex;
-		private final int dirAxis;
-		private final int dirSign;
-		private final int x;
-		private final int y;
-		private final int z;
-		protected EnumFacing dir;
-		protected IBlockState[][][] stateMap;
-		private int distance;
-		private int xOffset;
-		private int zOffset;
-		
-		private MTTrap(MazeTower tower, Path path, EnumFacing dir, int x, int y, int z,
-			int xOffset, int zOffset) {
-			this.tower = tower;
-			this.path = path;
-			this.dir = dir;
-			dirIndex = dir.getIndex();
-			dirAxis = (int) Math.floor(dirIndex * 0.5);
-			dirSign = (dir.getIndex() % 2 == 0) ? -1 : 1;
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.xOffset = xOffset;
-			this.zOffset = zOffset;
-		}
-	}
-	
-	private class MTTArrow extends MTTrap {
-		 
-		private MTTArrow(MazeTower tower, Path path, EnumFacing dir, int x, int y, int z) {
-			super(tower, path, dir, x, y, z, 0, 0);
-				
-			}
-		
-		}
-	}*/
 }

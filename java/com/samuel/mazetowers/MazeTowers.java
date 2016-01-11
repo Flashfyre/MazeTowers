@@ -8,12 +8,18 @@ import java.util.Random;
 
 import io.netty.buffer.ByteBuf;
 
+import com.samuel.mazetowers.etc.CommandItemScanner;
 import com.samuel.mazetowers.etc.CommandMazeTowers;
 import com.samuel.mazetowers.eventhandlers.MazeTowersChunkEventHandler;
+import com.samuel.mazetowers.eventhandlers.MazeTowersGeneralEventHandler;
+import com.samuel.mazetowers.init.ModEntities;
+import com.samuel.mazetowers.packets.*;
 import com.samuel.mazetowers.proxy.CommonProxy;
 import com.samuel.mazetowers.tileentities.*;
 import com.samuel.mazetowers.worldgen.WorldGenMazeTowers;
 import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTower;
+import com.samuel.mazetowers.worldgen.biomes.BiomeGenMazeTowerLv1;
+import com.samuel.mazetowers.worldgen.biomes.BiomeGenMazeTowerLv7;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyInteger;
@@ -30,6 +36,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityWitherSkull;
 import net.minecraft.init.Blocks;
@@ -63,8 +70,6 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.terraingen.ChunkProviderEvent;
-import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -95,35 +100,53 @@ guiFactory = "com.samuel." + MazeTowers.MODID + ".GUIFactoryMazeTowers")
 public class MazeTowers {
     public static final String MODNAME = "mazetowers";
     public static final String MODID = "mazetowers";
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.2.0";
     
     @Mod.Instance
 	public static MazeTowers instance = new MazeTowers();
     public static WorldGenMazeTowers mazeTowers = null;
-    public static TileEntityMazeTowerThreshold tileEntityMazeTowerThreshold;
-    public static TileEntityMemoryPiston tileEntityMemoryPiston;
-    public static TileEntityCircuitBreaker tileEntityCircuitBreaker;
+    public static TileEntityCircuitBreaker TileEntityCircuitBreaker;
+    public static TileEntityItemScanner TileEntityItemScanner;
+    public static TileEntityMazeTowerThreshold TileEntityMazeTowerThreshold;
+    public static TileEntityMemoryPiston TileEntityMemoryPiston;
+    public static TileEntityMemoryPistonMemory TileEntityMemoryPistonMemory;
+    public static TileEntityWebSpiderSpawner TileEntityWebSpiderSpawner;
+    public static Block BlockHiddenPressurePlateWeighted;
+    public static Block BlockItemScanner;
+    public static Block BlockItemScannerGold;
+    public static Block BlockMemoryPiston;
+    public static Block BlockMemoryPistonOff;
+    public static Block BlockMemoryPistonHead;
+    public static Block BlockMemoryPistonHeadOff;
+	public static Block BlockMemoryPistonExtension;
+	public static Block BlockMemoryPistonExtensionOff;
+	public static Block BlockQuartzButton;
+	public static Block BlockEndStoneDoor;
+	public static Block BlockObsidianDoor;
+	public static Block BlockBedrockDoor;
+	public static Item ItemEndStoneDoor;
+	public static Item ItemObsidianDoor;
+	public static Item ItemBedrockDoor;
+	public static BiomeGenMazeTowerLv1 biomeGenMazeTowerLv1;
+	public static BiomeGenMazeTowerLv7 biomeGenMazeTowerLv7;
     public static boolean enableMazeTowers = true;
-    public static SimpleNetworkWrapper network;
-    public static Configuration config;
 
 	@SidedProxy(clientSide="com.samuel.mazetowers.proxy.ClientProxy", serverSide="com.samuel.mazeTowers.proxy.ServerProxy")
 	public static CommonProxy proxy;
-	public static Block BlockHiddenPressurePlateWeighted;
-	public static Block BlockMemoryPiston;
-	public static Block BlockMemoryPistonHead;
-	public static Block BlockMemoryPistonExtension;
-	public static Block BlockQuartzButton;
+	public static SimpleNetworkWrapper network;
+	public static Configuration config;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		network = NetworkRegistry.INSTANCE.newSimpleChannel("MazeTowers");
 		//network.registerMessage(PacketBGMClient.Handler.class, PacketBGMClient.class, 0, Side.CLIENT);
-		//network.registerMessage(PacketBGMServer.Handler.class, PacketBGMServer.class, 1, Side.SERVER);
+		network.registerMessage(PacketActivateItemScanner.Handler.class,
+			PacketActivateItemScanner.class, 0, Side.SERVER);
 		config = new Configuration(e.getSuggestedConfigurationFile());
 	    config.load();
 	    saveConfig();
 	    MinecraftForge.EVENT_BUS.register(new MazeTowersChunkEventHandler());
+	    MinecraftForge.EVENT_BUS.register(new MazeTowersGeneralEventHandler());
 		//MinecraftForge.EVENT_BUS.register(new ChaosLabyrinthBGMEventHandler());
 	    proxy.preInit(e);
 	}
@@ -131,7 +154,7 @@ public class MazeTowers {
 	@EventHandler
 	public void init(FMLInitializationEvent e) {
 		proxy.init(e);
-		//ModEntities.initEntities(this);
+		ModEntities.initEntities(this);
 	}
 
 	@EventHandler
@@ -142,6 +165,7 @@ public class MazeTowers {
 	@EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new CommandMazeTowers());
+		//event.registerServerCommand(new CommandItemScanner());
 	}
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
@@ -291,32 +315,6 @@ public class MazeTowers {
 				}
 			}
 		}*/
-	}
-	
-	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
-	public void onBreakBlock(BlockEvent.BreakEvent e) {
-		if (!e.getPlayer().capabilities.isCreativeMode) {
-			World world = e.getPlayer().getEntityWorld();
-			BlockPos pos = e.pos;
-			List<MazeTower> towers = mazeTowers.getTowers();
-			Iterator towerIterator = towers.iterator();
-			while (towerIterator.hasNext()) {
-				MazeTower tower = (MazeTower) towerIterator.next();
-				if (e.getPlayer().worldObj.getChunkFromBlockCoords(pos)
-						.equals(tower.getChunk(world))) {
-					int y = pos.getY();
-					int baseY = tower.baseY;
-					IBlockState state;
-					Block block;
-					if (y >= baseY &&  y < baseY + (tower.floors * 6) &&
-						((state = tower.getBlockData()[pos.getY() - baseY][(pos.getZ() % 16) + (pos.getZ() > -1 ? 0 : 16)]
-						[pos.getX() % 16 + (pos.getX() > -1 ? 0 : 16)]) == null ||
-						(state != Blocks.air && (block = state.getBlock()) != Blocks.torch)))
-						e.setCanceled(true);
-					break;
-				}
-			}
-		}
 	}
 	
 	private static Field findObfuscatedField(Class<?> clazz, String... names) {

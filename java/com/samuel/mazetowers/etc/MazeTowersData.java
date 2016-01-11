@@ -16,18 +16,25 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MazeTowersData extends WorldSavedData {
-	public int genCount = MazeTowers.mazeTowers.getGenCount();
-	public BlockPos[] spawnPos = new BlockPos[genCount];
-	public boolean[] isGenerated = new boolean[genCount];
+	
+	private World world;
+	public BlockPos[] spawnPos;
+	public boolean[] isGenerated;
+	public int genCount;
 
-	public MazeTowersData(String tagName) {
+	public MazeTowersData(World worldIn, String tagName) {
 		super(tagName);
+		genCount = MazeTowers.mazeTowers.getGenCount();
+		spawnPos = new BlockPos[genCount];
+		isGenerated = new boolean[genCount];
+		world = worldIn;
 	}
 
 	@Override
@@ -42,11 +49,21 @@ public class MazeTowersData extends WorldSavedData {
 	public void writeToNBT(NBTTagCompound compound) {
 		NBTTagList spawnPosSublist = new NBTTagList();
 		NBTTagList isGeneratedSublist = new NBTTagList();
-		for (int g = 0; g < Math.min(genCount, MazeTowers.mazeTowers.getGenCount()); g++) {
-			NBTTagLong spawnPosTag = new NBTTagLong((long) spawnPos[g].toLong());
-			NBTTagInt isGeneratedTag = new NBTTagInt((int) (isGenerated[g] ? 1 : 0));
-			spawnPosSublist.appendTag(spawnPosTag);
-			isGeneratedSublist.appendTag(isGeneratedTag);
+		for (int g = 0; g < Math.min(genCount, MazeTowers.mazeTowers.getGenCount(world)); g++) {
+			NBTTagLong spawnPosTag;
+			NBTTagInt isGeneratedTag;
+			try {
+				spawnPosTag = new NBTTagLong((long) spawnPos[g].toLong());
+				spawnPosSublist.appendTag(spawnPosTag);
+			} catch (NullPointerException eSpawn) {
+				
+			}
+			try {
+				isGeneratedTag = new NBTTagInt((int) (isGenerated[g] ? 1 : 0));
+				isGeneratedSublist.appendTag(isGeneratedTag);
+			} catch (NullPointerException eSpawn) {
+				
+			}
 		}
 	}
 	

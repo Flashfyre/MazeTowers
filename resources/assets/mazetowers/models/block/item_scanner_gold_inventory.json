@@ -1,0 +1,20 @@
+{
+    "textures": {
+        "texture": "mazetowers:blocks/item_scanner_gold",
+		"side": "mazetowers:blocks/item_scanner_gold_sides",
+		"back": "mazetowers:blocks/item_scanner_gold_back"
+    },
+	"elements": [
+        {   "from": [ 2, 1, 6 ],
+            "to": [ 14, 15, 10 ],
+            "faces": {
+                "down":  { "uv": [ 4, 4, 16, 8 ], "texture": "#side" },
+                "up":    { "uv": [ 4, 4, 16, 8 ], "texture": "#side" },
+                "north": { "uv": [ 2, 1, 14, 15 ], "texture": "#texture" },
+                "south": { "uv": [ 2, 1, 14, 15 ], "texture": "#back" },
+                "west":  { "uv": [ 0, 1, 4, 15 ], "texture": "#side" },
+                "east":  { "uv": [ 0, 1, 4, 15 ], "texture": "#side" }
+            }
+        }
+    ]
+}

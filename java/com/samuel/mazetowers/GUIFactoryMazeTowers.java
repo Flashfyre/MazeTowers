@@ -2,7 +2,7 @@ package com.samuel.mazetowers;
 
 import java.util.Set;
 
-import com.samuel.mazetowers.etc.GUIConfigMazeTowers;
+import com.samuel.mazetowers.client.gui.GUIConfigMazeTowers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

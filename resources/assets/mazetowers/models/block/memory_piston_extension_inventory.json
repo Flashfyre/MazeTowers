@@ -2,7 +2,7 @@
     "parent": "block/cube_bottom_top",
     "textures": {
         "bottom": "blocks/piston_bottom",
-        "side": "mazetowers:blocks/memory_piston_side",
-        "top": "mazetowers:blocks/memory_piston_top"
+        "side": "mazetowers:blocks/memory_piston_side_on",
+        "top": "mazetowers:blocks/memory_piston_top_on"
     }
 }

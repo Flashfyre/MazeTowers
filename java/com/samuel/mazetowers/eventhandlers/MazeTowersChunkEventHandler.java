@@ -36,23 +36,49 @@ public class MazeTowersChunkEventHandler {
 
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
     public void onPopulateChunkEvent(PopulateChunkEvent.Post e) {
-		if (e.world.provider.getDimensionId() == 0) {
+		if (e.world.provider.getDimensionId() == 0 && !e.world.isRemote &&
+			MazeTowers.mazeTowers.getChunksGenerated(e.world) <
+			MazeTowers.mazeTowers.getGenCount()) {
 			for (int t = 0; t < MazeTowers.mazeTowers.getGenCount(); t++) {
 				BlockPos spawnPos = MazeTowers.mazeTowers.getSpawnPos(e.world, t);
+				boolean usePos = false;
 				
-				if (spawnPos.getY() > 0 && 
-					(e.chunkX == spawnPos.getX() >> 4 &&
-					e.chunkZ == spawnPos.getZ() >> 4)) {
-					//e.setResult(null);
-					//MazeTowers.mazeTowers.spawn(e.world, x, spawnPos.getY(), z, chunkIndex);
-					MazeTowers.mazeTowers.addTower(e.world, e.chunkX, e.chunkZ, true);
+				if (e.chunkX == spawnPos.getX() >> 4 &&
+					e.chunkZ == spawnPos.getZ() >> 4) {
+					if (spawnPos.getY() > 0)
+						usePos = MazeTowers.mazeTowers.addTower(e.world,
+							e.chunkX, e.chunkZ, true);
+					else
+						usePos = false;
+						
+					if (!usePos) {
+						usePos = false;
+					}
 				}
 			}
 		}
 	}
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
-    public void onChunkProviderEvent(ChunkEvent e) {
+    public void onChunkProviderEvent(ChunkEvent.Load e) {
+		if (e.world.provider.getDimensionId() == 0 && !e.world.isRemote) {
+			if (e.world.rand.nextInt(32) == 0) {
+				int chunkIndex;
+				if ((chunkIndex = MazeTowers.mazeTowers.getSpawnPosLoadedCount()) <
+					MazeTowers.mazeTowers.getGenCount(e.world)) {
+					Chunk chunk = e.getChunk();
+					BlockPos spawnPos = new BlockPos(chunk.xPosition << 4, 49,
+						chunk.zPosition << 4);
+					MazeTowers.mazeTowers.setSpawnPos(e.world, chunkIndex, spawnPos);
+					byte[] biomeArray = e.getChunk().getBiomeArray();
+					for (int i = 49; i < 256; i++) {
+						biomeArray[i] = (byte) 219;
+					}
+					e.getChunk().setBiomeArray(biomeArray);
+				}
+			}
+		}
+		
 		//BlockPos spawnPos = ChaosBlock.chaosLabyrinth.getSpawnPos(e.world);
 		//Chunk chunk = e.getChunk();
 		/*if (e.world.provider.getDimensionId() == 0 && !spawnPos.equals(new BlockPos(-1, 1, -1)) && spawnPos.getY() > 0 && 

@@ -1,4 +1,4 @@
-package com.samuel.mazetowers.etc;
+package com.samuel.mazetowers.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

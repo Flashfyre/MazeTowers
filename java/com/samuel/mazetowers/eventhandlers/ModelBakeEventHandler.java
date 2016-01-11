@@ -2,7 +2,7 @@ package com.samuel.mazetowers.eventhandlers;
 
 import java.io.IOException;
 
-import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedISmartBlockModelFactory;
+import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedModel;
 
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -25,10 +25,7 @@ public class ModelBakeEventHandler {
   @SubscribeEvent
   public void onModelBakeEvent(ModelBakeEvent event)
   {
-    // Find the existing mapping for CamouflageISmartBlockModelFactory - it will have been added automatically because
-    //  we registered a custom BlockStateMapper for it (using ModelLoader.setCustomStateMapper)
-    // Replace the mapping with our ISmartBlockModel.
-    Object object = event.modelRegistry.getObject(HiddenPressurePlateWeightedISmartBlockModelFactory.modelResourceLocationUp);
+    Object object = event.modelRegistry.getObject(HiddenPressurePlateWeightedModel.modelResourceLocationUp);
     if (object instanceof IBakedModel) {
       IBakedModel existingModel = (IBakedModel)object;
       IRetexturableModel modelUp = null;
@@ -39,10 +36,10 @@ public class ModelBakeEventHandler {
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-      HiddenPressurePlateWeightedISmartBlockModelFactory customModel = new HiddenPressurePlateWeightedISmartBlockModelFactory(modelUp, existingModel);
-      event.modelRegistry.putObject(HiddenPressurePlateWeightedISmartBlockModelFactory.modelResourceLocationUp, customModel);
-      customModel = new HiddenPressurePlateWeightedISmartBlockModelFactory(modelDown, existingModel);
-      event.modelRegistry.putObject(HiddenPressurePlateWeightedISmartBlockModelFactory.modelResourceLocationDown, customModel);
+      HiddenPressurePlateWeightedModel customModel = new HiddenPressurePlateWeightedModel(modelUp, existingModel);
+      event.modelRegistry.putObject(HiddenPressurePlateWeightedModel.modelResourceLocationUp, customModel);
+      customModel = new HiddenPressurePlateWeightedModel(modelDown, existingModel);
+      event.modelRegistry.putObject(HiddenPressurePlateWeightedModel.modelResourceLocationDown, customModel);
     }
   }
 }

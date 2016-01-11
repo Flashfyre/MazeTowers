@@ -1,5 +1,5 @@
 {
     "variants": {
-		"normal": { "model": "mazetowers:hidden_heavy_pressure_plate_down" }
+		"normal": { "model": "heavy_pressure_plate_down" }
     }
 }
