@@ -12,6 +12,7 @@ public class BlockRenderRegister {
 	public static String modid = MazeTowers.MODID;
 	
 	public static void registerBlockRenderer() {
+		reg(ModBlocks.hiddenButton, 0);
 		reg(ModBlocks.hiddenPressurePlateWeighted, 0);
 		reg(ModBlocks.itemScanner, 0);
 		reg(ModBlocks.itemScannerGold, 0);
@@ -21,8 +22,11 @@ public class BlockRenderRegister {
 		reg(ModBlocks.memoryPistonHeadOff, 0);
 		reg(ModBlocks.memoryPistonExtension, 0);
 		reg(ModBlocks.memoryPistonExtensionOff, 0);
-		reg(ModBlocks.quartzButton, 0);
+		reg(ModBlocks.mineralChestIron, 0);
+		reg(ModBlocks.mineralChestGold, 0);
+		reg(ModBlocks.mineralChestDiamond, 0);
 		reg(ModBlocks.resistantDoorEndStone, 0);
+		reg(ModBlocks.resistantDoorQuartz, 0);
 		reg(ModBlocks.resistantDoorObsidian, 0);
 		reg(ModBlocks.resistantDoorBedrock, 0);
 	}

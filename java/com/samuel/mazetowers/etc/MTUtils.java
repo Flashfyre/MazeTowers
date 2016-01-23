@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTower;
+
 import scala.Char;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -18,9 +21,11 @@ import net.minecraft.world.World;
 public class MTUtils {
 	
 	private static IBlockState air = Blocks.air.getDefaultState();
-	private static final int minY = 49;
+	private static final int minYSurface = 49;
+	private static final int minYWater = 30;
 	
-	public static int getSurfaceY(World world, int x, int z, int range) {
+	public static int getSurfaceY(World world, int x, int z, int range, boolean isUnderwater) {
+		int minY = !isUnderwater ? minYSurface : minYWater;
 		int cy = minY;
 		boolean nextY = true;
 		
@@ -32,7 +37,8 @@ public class MTUtils {
 					Block cBlock = null;
 					IBlockState cstate = world.getBlockState(cpos);
 					if (cstate != air && (cBlock = cstate.getBlock()) != Blocks.leaves && 
-						cBlock != Blocks.leaves2 && cBlock != Blocks.log) {
+						cBlock != Blocks.leaves2 && cBlock != Blocks.log &&
+						((cBlock != Blocks.water && isUnderwater) || !isUnderwater)) {
 						nextY = true;
 						break;
 					}
@@ -49,9 +55,11 @@ public class MTUtils {
 		return cy;
 	}
 	
-	public static int getGroundY(World world, int x, int y, int z, int range) {
+	public static int getGroundY(World world, int x, int y, int z, int range, boolean isUnderwater) {
+		int minY = !isUnderwater ? minYSurface : minYWater;
 		int cy = y - 1;
-		boolean nextY = true;
+		boolean nextY = cy > 0;
+		
 		for (; cy >= minY; cy--) {
 			nextY = false;
 			for (int cz = z - range; cz <= z + range; cz++) {
@@ -61,7 +69,7 @@ public class MTUtils {
 					IBlockState cstate = world.getBlockState(cpos);
 					if (cstate == air || (cBlock = cstate.getBlock()) == Blocks.leaves ||
 						cBlock == Blocks.leaves2 || cBlock == Blocks.log ||
-						cBlock == Blocks.water) {
+						(cBlock == Blocks.water && !isUnderwater)) {
 						nextY = true;
 						break;
 					}
@@ -76,6 +84,20 @@ public class MTUtils {
 		}
 		
 		return cy;
+	}
+	
+	public static boolean getIsMazeTowerPos(BlockPos pos) {
+		int chunkX = pos.getX() >> 4;
+		int chunkZ = pos.getZ() >> 4;
+		int y = pos.getY();
+		
+		for (MazeTower t : MazeTowers.mazeTowers.getTowers()) {
+			if (chunkX == t.chunkX && chunkZ == t.chunkZ &&
+				y >= t.baseY && y <= t.baseY + ((t.floors + 1) * 6))
+				return true;
+		}
+		
+		return false;
 	}
 
 	public static ItemStack getEnchantmentBookById(int index, int level) {

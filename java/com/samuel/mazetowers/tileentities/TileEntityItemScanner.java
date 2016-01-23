@@ -348,11 +348,12 @@ public class TileEntityItemScanner extends TileEntity implements IInventory {
 
 	@Override
 	public IChatComponent getDisplayName() {
-		
-		return new ChatComponentText(StatCollector.translateToLocal(blockType.getUnlocalizedName() + ".name"));
+		String name = StatCollector.translateToLocal((blockType != null ? blockType.getUnlocalizedName() :
+			"tile.item_scanner") + ".name");
+		return new ChatComponentText(name);
 	}
 
-	@Override	
+	@Override
 	public int getField(int id)
     {
         return 0;

@@ -8,8 +8,10 @@ import java.util.Random;
 
 import com.google.common.collect.HashBiMap;
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.blocks.BlockHiddenButton;
 import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
 import com.samuel.mazetowers.entities.*;
+import com.samuel.mazetowers.etc.HiddenButtonModel;
 import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedModel;
 import com.samuel.mazetowers.etc.UltravioletFireModel;
 import com.samuel.mazetowers.eventhandlers.ModelBakeEventHandler;
@@ -19,6 +21,7 @@ import com.samuel.mazetowers.render.entities.*;
 import com.samuel.mazetowers.render.tileentities.*;
 import com.samuel.mazetowers.tileentities.*;
 
+import net.minecraft.block.BlockButton;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -59,16 +62,59 @@ public class ClientProxy extends CommonProxy {
 		StateMapperBase ignoreState = new StateMapperBase() {
 			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-				return state.getBlock() == MazeTowers.BlockHiddenPressurePlateWeighted ?
-					state.getValue(BlockHiddenPressurePlateWeighted.POWER) == 0 ?
+				ModelResourceLocation mrl;
+				if (state.getBlock() == MazeTowers.BlockHiddenPressurePlateWeighted) {
+					return state.getValue(BlockHiddenPressurePlateWeighted.POWER) == 0 ?
 					HiddenPressurePlateWeightedModel.modelResourceLocationUp :
-					HiddenPressurePlateWeightedModel.modelResourceLocationDown :
-					UltravioletFireModel.getModelResourceLocation();
+					HiddenPressurePlateWeightedModel.modelResourceLocationDown;
+				} else {
+					ModelResourceLocation mlr;
+					switch (state.getBlock().getMetaFromState(state)) {
+						case 0:
+							mlr = HiddenButtonModel.modelResourceLocationU;
+							break;
+						case 1:
+							mlr = HiddenButtonModel.modelResourceLocationD;
+							break;
+						case 2:
+							mlr = HiddenButtonModel.modelResourceLocationE;
+							break;
+						case 3:
+							mlr = HiddenButtonModel.modelResourceLocationW;
+							break;
+						case 4:
+							mlr = HiddenButtonModel.modelResourceLocationS;
+							break;
+						case 5:
+							mlr = HiddenButtonModel.modelResourceLocationN;
+							break;
+						case 6:
+							mlr = HiddenButtonModel.modelResourceLocationUPressed;
+							break;
+						case 7:
+							mlr = HiddenButtonModel.modelResourceLocationDPressed;
+							break;
+						case 8:
+							mlr = HiddenButtonModel.modelResourceLocationEPressed;
+							break;
+						case 9:
+							mlr = HiddenButtonModel.modelResourceLocationWPressed;
+							break;
+						case 10:
+							mlr = HiddenButtonModel.modelResourceLocationSPressed;
+							break;
+						default:
+							mlr = HiddenButtonModel.modelResourceLocationNPressed;
+					}
+					return mlr;
+				}
 			}
 	    };
 	    ModelLoader.setCustomStateMapper(MazeTowers.BlockHiddenPressurePlateWeighted,
 	    	ignoreState);
-	    
+	    ModelLoader.setCustomStateMapper(MazeTowers.BlockHiddenButton,
+		    ignoreState);
+		    
 		ItemRenderRegister.registerItemRenderer();
 		
 		MinecraftForge.EVENT_BUS.register(ModelBakeEventHandler.instance);
@@ -83,6 +129,8 @@ public class ClientProxy extends CommonProxy {
 				new RenderSmallUltravioletFireball(Minecraft.getMinecraft().getRenderManager(), 1.0F));
 		RenderingRegistry.registerEntityRenderingHandler(EntityUltravioletBlaze.class,
 			new RenderUltravioletBlaze(Minecraft.getMinecraft().getRenderManager()));
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityMineralChest.class,
+			new TileEntityMineralChestRenderer());
 	}
 
 	@Override

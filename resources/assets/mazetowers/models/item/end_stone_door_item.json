@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "mazetowers:items/end_stone_door"
+        "layer0": "mazetowers:items/door_end_stone"
     },
     "display": {
         "thirdperson": {

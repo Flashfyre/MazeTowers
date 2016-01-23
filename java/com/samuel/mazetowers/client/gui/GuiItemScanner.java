@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockItemScanner;
+import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 import com.samuel.mazetowers.etc.ContainerItemScanner;
 import com.samuel.mazetowers.packets.PacketActivateItemScanner;
 import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
@@ -34,8 +35,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiItemScanner extends GuiContainer
 {
     /** The ResourceLocation containing the chest GUI texture. */
-    private static final ResourceLocation GUI_TEXTURE = new ResourceLocation("mazetowers:textures/gui/container/item_scanner.png");
-    private IInventory playerInv;
+	private static final ResourceLocation GUI_TEXTURE_NORMAL =
+	    	new ResourceLocation("mazetowers:textures/gui/container/item_scanner.png");
+	private static final ResourceLocation GUI_TEXTURE_GOLD =
+	    	new ResourceLocation("mazetowers:textures/gui/container/item_scanner_gold.png");
+    private final boolean isGold;
+	private IInventory playerInv;
     private IInventory scannerInv;
     /** window height is calculated with these values; the more rows, the higher */
     private int inventoryRows;
@@ -52,6 +57,9 @@ public class GuiItemScanner extends GuiContainer
         this.inventoryRows = scannerInv.getSizeInventory() / 9;
         this.xSize += 32;
         this.ySize = j + this.inventoryRows * 18;
+        TileEntityItemScanner te = (TileEntityItemScanner) itemScanner;
+        isGold = (te.getWorld().getBlockState(te.getPos()).getBlock()
+        	instanceof BlockItemScannerGold);
     }
     
     @Override
@@ -83,7 +91,7 @@ public class GuiItemScanner extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(GUI_TEXTURE);
+        this.mc.getTextureManager().bindTexture(!isGold ? GUI_TEXTURE_NORMAL : GUI_TEXTURE_GOLD);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.inventoryRows * 18 + 17);

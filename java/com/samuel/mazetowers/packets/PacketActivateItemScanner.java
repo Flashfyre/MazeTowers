@@ -1,6 +1,7 @@
 package com.samuel.mazetowers.packets;
 
 import com.samuel.mazetowers.blocks.BlockItemScanner;
+import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 import com.samuel.mazetowers.MazeTowers;
 
 import io.netty.buffer.ByteBuf;
@@ -44,8 +45,11 @@ public class PacketActivateItemScanner implements IMessage {
                 	EntityPlayer player = ctx.getServerHandler().playerEntity;
                 	World world = player.worldObj;
                 	BlockPos pos = BlockPos.fromLong(Long.parseLong(message.text));
-                	((BlockItemScanner) MazeTowers.BlockItemScanner)
-                		.setStateBasedOnMatchResult(world, pos, world.getBlockState(pos), true);
+                	boolean isGold = (world.getBlockState(pos).getBlock()
+                		instanceof BlockItemScannerGold);
+                	((BlockItemScanner) (!isGold ? MazeTowers.BlockItemScanner :
+                		MazeTowers.BlockItemScannerGold)).setStateBasedOnMatchResult(
+                			world, pos, world.getBlockState(pos), true);
                 }
             });
             return null;

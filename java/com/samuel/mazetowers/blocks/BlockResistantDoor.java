@@ -69,13 +69,15 @@ public class BlockResistantDoor extends BlockDoor {
     public Item getItem(World worldIn, BlockPos pos)
     {
         return (this.type == 0) ? MazeTowers.ItemEndStoneDoor :
-        	this.type == 1 ? MazeTowers.ItemObsidianDoor :
+        	this.type == 1 ? MazeTowers.ItemQuartzDoor :
+        	this.type == 2 ? MazeTowers.ItemObsidianDoor :
         	MazeTowers.ItemBedrockDoor;
     }
     
     private Item getItem() {
     	return (this.type == 0) ? MazeTowers.ItemEndStoneDoor :
-        	this.type == 1 ? MazeTowers.ItemObsidianDoor :
+        	this.type == 1 ? MazeTowers.ItemQuartzDoor :
+        	this.type == 2 ? MazeTowers.ItemObsidianDoor :
         	MazeTowers.ItemBedrockDoor;
     }
     
@@ -84,32 +86,9 @@ public class BlockResistantDoor extends BlockDoor {
     	if (worldIn.isRemote)
     		return false;
     	
-    	/*boolean holdingKey = (playerIn.getHeldItem() != null &&
-    		playerIn.getHeldItem().getItem() == ChaosBlock.itemChaosKey ||
-    		playerIn.getHeldItem().getItem() == ChaosBlock.itemChaosBattleKey);
-    	int keyDamage = (holdingKey) ? playerIn.getHeldItem().getItemDamage() : -1;
-    	boolean canBeUnlocked = (holdingKey) ? this.type <= keyDamage : false;
-    	boolean powered = false;
-    	
-    	BlockPos blockpos1 = state.getValue(HALF) == BlockDoor.EnumDoorHalf.LOWER ? pos : pos.down();
-        IBlockState iblockstate1 = pos.equals(blockpos1) ? state : worldIn.getBlockState(blockpos1);
-    	
-    	if (canBeUnlocked) {
-            if (iblockstate1.getBlock() != this)
-            {
-                return false;
-            }
-            else
-          {
-            	powered = (((Boolean) state.getValue(POWERED)).booleanValue());
-                if (!(((Boolean) state.getValue(OPEN)).booleanValue()) || !powered) {
-	            	
-                }
-            }
-    	} else if (!((Boolean) state.getValue(OPEN)).booleanValue())  */
     	worldIn.playSoundAtEntity(playerIn, "mazetowers:door_locked", 1.0F, 1.0F);
     	
-    	return false;//canBeUnlocked && !powered;
+    	return false;
     }
     
     public void activateDoor(World worldIn, BlockPos pos, IBlockState state,
@@ -179,41 +158,92 @@ public class BlockResistantDoor extends BlockDoor {
             }
             else
             {
-                boolean flag = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(blockpos1);
-                boolean hasScanner =
-                	getHasScanner(worldIn, pos, state.getValue(BlockResistantDoor.FACING), true);
-                if (((!flag || (!hasScanner || neighborBlock instanceof BlockItemScanner) &&
-                	neighborBlock.canProvidePower())) && neighborBlock != this &&
-                	flag != ((Boolean)iblockstate1.getValue(POWERED)).booleanValue())
-                {
-                    worldIn.setBlockState(blockpos1, iblockstate1.withProperty(POWERED, Boolean.valueOf(flag)), 2);
+                boolean flag = worldIn.isBlockPowered(pos) ||
+                	worldIn.isBlockPowered(blockpos1);
+                IBlockState scannerFrontState = getScannerFrontState(worldIn, pos,
+                    	state.getValue(BlockResistantDoor.FACING), true);
+                IBlockState scannerBackState = getScannerBackState(worldIn, pos,
+                    	state.getValue(BlockResistantDoor.FACING), true);
+                EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
+                boolean hasScannerFront = scannerFrontState.getBlock() instanceof BlockItemScanner;
+                boolean hasScannerBack = scannerBackState.getBlock() instanceof BlockItemScanner;
+                int scannerFrontStateId = hasScannerFront ? scannerFrontState.getValue(BlockItemScanner.STATE) : -1;
+                int scannerBackStateId = hasScannerBack ? scannerBackState.getValue(BlockItemScanner.STATE) : -1;
+                boolean isScannerPowered = scannerFrontStateId == 3 || scannerBackStateId == 3;
+                boolean useScanner = false;
+                if (((!flag || ((useScanner = neighborBlock instanceof BlockItemScanner) ||
+                	!hasScannerFront || !hasScannerBack) &&
+                    neighborBlock.canProvidePower())) && neighborBlock != this) {
+                	boolean isBackPowered = getIsPowered(worldIn, pos, enumfacing,
+                		hasScannerBack, scannerBackStateId == 3, true);
+                	boolean isFrontPowered = getIsPowered(worldIn, pos, enumfacing
+                		.getOpposite(), hasScannerFront, scannerFrontStateId == 3, true);
+                	boolean isPowered = isFrontPowered || isBackPowered;
+                	boolean isOpen = ((Boolean)state.getValue(OPEN)).booleanValue();
+                	
+                    worldIn.setBlockState(blockpos1, iblockstate1.withProperty(POWERED,
+                    	(isFrontPowered || isBackPowered) && flag), 2);
 
-                    if (flag != ((Boolean)state.getValue(OPEN)).booleanValue())
-                    {
-                        worldIn.setBlockState(pos, state.withProperty(OPEN, Boolean.valueOf(flag)), 2);
+                    if (((isOpen && (!flag || !isPowered)) || (!isOpen && (isScannerPowered ||
+                    	(isFrontPowered && !hasScannerFront) || (isBackPowered && !hasScannerBack)) && flag))) {
+                        worldIn.setBlockState(pos, state.withProperty(OPEN,
+                        	Boolean.valueOf((isScannerPowered || isPowered) && flag)), 2);
                         worldIn.markBlockRangeForRenderUpdate(pos, pos);
-                        worldIn.playAuxSFXAtEntity((EntityPlayer)null, flag ? 1003 : 1006, pos, 0);
+                        worldIn.playAuxSFXAtEntity((EntityPlayer)null, isScannerPowered || isFrontPowered || isBackPowered ? 1003 : 1006, pos, 0);
                     }
                 }
             }
         }
     }
-
-	private boolean getHasScanner(World worldIn, BlockPos pos, EnumFacing facing, boolean isBottom) {
-		BlockPos frontPos = pos.offset(facing.getOpposite());
+    
+    private boolean getIsPowered(World worldIn, BlockPos bottomPos, EnumFacing facing,
+    	boolean hasScanner, boolean scannerActivated, boolean isBack) {
+    	boolean isPowered = false;
+    	BlockPos pos;
+    	for (int c = 0; c < (isBack ? 2 : 1) && !isPowered; c++) {
+    		pos = bottomPos.offset(facing, c);
+	    	isPowered = (worldIn.getRedstonePower(pos, facing) != 0 ||
+				worldIn.getRedstonePower(pos.down(), facing) != 0 ||
+				worldIn.getRedstonePower(pos.offset(facing.rotateY()), facing) != 0 ||
+				worldIn.getRedstonePower(pos.offset(facing.rotateYCCW()), facing) != 0 ||
+				worldIn.getRedstonePower(pos = pos.up(), facing) != 0 ||
+				worldIn.getRedstonePower(pos.up(), facing) != 0 ||
+				worldIn.getRedstonePower(pos.offset(facing.rotateY()), facing) != 0 ||
+				worldIn.getRedstonePower(pos.offset(facing.rotateYCCW()), facing) != 0)
+				&& (!hasScanner || scannerActivated) ? true : false;
+    	}
+    	return isPowered;
+    }
+    
+    private IBlockState getScannerBackState(World worldIn, BlockPos pos, EnumFacing facing, boolean isBottom) {
 		BlockPos backPos = pos.offset(facing);
-		boolean hasScanner = (worldIn.getBlockState(frontPos).getBlock() instanceof BlockItemScanner ||
-			worldIn.getBlockState(backPos).getBlock() instanceof BlockItemScanner ||
-			worldIn.getBlockState(frontPos.offset(facing.rotateY())).getBlock() instanceof
-			BlockItemScanner || worldIn.getBlockState(frontPos.offset(facing.rotateYCCW()))
+		IBlockState state;
+		boolean hasScanner = (state = worldIn.getBlockState(backPos)).getBlock() instanceof BlockItemScanner ||
+			(state = worldIn.getBlockState(backPos)).getBlock() instanceof BlockItemScanner ||
+			(state = worldIn.getBlockState(backPos.offset(facing.rotateY()))).getBlock() instanceof
+			BlockItemScanner || (state = worldIn.getBlockState(backPos.offset(facing.rotateYCCW())))
 			.getBlock() instanceof BlockItemScanner ||
-			worldIn.getBlockState(backPos.offset(facing.rotateY())).getBlock() instanceof
-			BlockItemScanner || worldIn.getBlockState(backPos.offset(facing.rotateYCCW()))
+			(state = worldIn.getBlockState(backPos.offset(isBottom ? EnumFacing.DOWN : EnumFacing.UP)))
 			.getBlock() instanceof BlockItemScanner ||
-			worldIn.getBlockState(pos.offset(facing.rotateY())).getBlock() instanceof
-			BlockItemScanner || worldIn.getBlockState(pos.offset(facing.rotateYCCW()))
-			.getBlock() instanceof BlockItemScanner);
-		return !hasScanner && isBottom ? getHasScanner(worldIn, pos.up(), facing, false) : hasScanner;
+			(state = worldIn.getBlockState(pos.offset(facing.rotateY()).offset(isBottom ? EnumFacing.DOWN : EnumFacing.UP)))
+			.getBlock() instanceof BlockItemScanner || (state = worldIn.getBlockState(pos.offset(facing.rotateYCCW())
+			.offset(isBottom ? EnumFacing.DOWN : EnumFacing.UP))).getBlock() instanceof BlockItemScanner ||
+			(state = worldIn.getBlockState(pos.offset(facing.rotateY()))).getBlock() instanceof
+			BlockItemScanner || (state = worldIn.getBlockState(pos.offset(facing.rotateYCCW())))
+			.getBlock() instanceof BlockItemScanner;
+		return !hasScanner && isBottom ? getScannerBackState(worldIn, pos.up(), facing, false) : state;
+	}
+
+	private IBlockState getScannerFrontState(World worldIn, BlockPos pos, EnumFacing facing, boolean isBottom) {
+		BlockPos frontPos = pos.offset(facing.getOpposite());
+		IBlockState state;
+		boolean hasScanner = ((state = worldIn.getBlockState(frontPos)).getBlock() instanceof BlockItemScanner ||
+			(state = worldIn.getBlockState(frontPos)).getBlock() instanceof BlockItemScanner ||
+			(state = worldIn.getBlockState(frontPos.offset(facing.rotateY()))).getBlock() instanceof
+			BlockItemScanner || (state = worldIn.getBlockState(frontPos.offset(facing.rotateYCCW())))
+			.getBlock() instanceof BlockItemScanner || (state = worldIn.getBlockState(frontPos.offset(isBottom ?
+			EnumFacing.DOWN : EnumFacing.UP))).getBlock() instanceof BlockItemScanner);
+		return !hasScanner && isBottom ? getScannerFrontState(worldIn, pos.up(), facing, false) : state;
 	}
     
 }

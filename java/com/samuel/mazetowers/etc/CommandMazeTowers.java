@@ -68,9 +68,14 @@ public class CommandMazeTowers implements ICommand, Comparable<ICommand> {
 			return;
 		} else {
 			if (astring[0].equals("build") || astring[0].equals("spawn")) {
-				MazeTowers.mazeTowers.rebuild(sender.getEntityWorld(), 0);
-				sender.addChatMessage(new ChatComponentText("Tower built at " +
-					MazeTowers.mazeTowers.getSpawnPos(sender.getEntityWorld(), 0).toString()));
+				for (int g = 0; g < MazeTowers.mazeTowers.getGenCount(); g++) {
+					BlockPos spawnPos = MazeTowers.mazeTowers.getSpawnPos(g);
+					if (sender.getEntityWorld().isBlockLoaded(spawnPos)) {
+						MazeTowers.mazeTowers.rebuild(sender.getEntityWorld(), g);
+						sender.addChatMessage(new ChatComponentText("Tower #" + g +
+							" built at " + spawnPos.toString()));
+					}
+				}
 			} else if (astring[0].equals("recreate") || astring[0].equals("rebuild") || astring[0].equals("respawn")) {
 				MazeTowers.mazeTowers.recreate(sender.getEntityWorld(), true);
 				sender.addChatMessage(new ChatComponentText("Towers have been recreated and rebuilt"));

@@ -1,8 +1,13 @@
 package com.samuel.mazetowers.blocks;
 
+import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
+import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -19,9 +24,8 @@ public class BlockItemScannerGold extends BlockItemScanner {
      */
     public int tickRate(World worldIn)
     {
-        return 60;
+        return 40;
     }
-    
 	
 	@Override
 	public void setStateBasedOnMatchResult(World worldIn, BlockPos pos,

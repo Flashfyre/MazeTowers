@@ -162,5 +162,4 @@ public class HiddenPressurePlateWeightedModel implements ISmartBlockModel {
   public ItemCameraTransforms getItemCameraTransforms() {
     throw new UnsupportedOperationException();
   }
-
 }

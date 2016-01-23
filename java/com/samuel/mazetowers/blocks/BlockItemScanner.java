@@ -9,7 +9,6 @@ import com.samuel.mazetowers.client.gui.GuiItemScanner;
 import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -63,7 +62,7 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
      */
     public int tickRate(World worldIn)
     {
-        return 40;
+        return 50;
     }
 
     @Override
@@ -209,11 +208,14 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 				.getOwnerName().equals(playerIn.getDisplayNameString())) {
 				(te = (TileEntityItemScanner) worldIn.getTileEntity(pos))
 					.setEntityId(playerIn.getEntityId());
-				worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D,
-					(double)pos.getZ() + 0.5D, "random.click", 0.3F, 0.5F);
-				worldIn.setBlockState(pos, scanState);
-				worldIn.markBlockRangeForRenderUpdate(pos, pos);
-				worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+				if (te.getKeyStack() != null) {
+					worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D,
+						(double)pos.getZ() + 0.5D, "random.click", 0.3F, 0.5F);
+					worldIn.setBlockState(pos, scanState);
+					worldIn.markBlockRangeForRenderUpdate(pos, pos);
+					worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+				} else if (!worldIn.isRemote)
+					setStateBasedOnMatchResult(worldIn, pos, state, true);
 			} else {
 				//((TileEntityItemScanner) worldIn.getTileEntity(pos)).openInventory(playerIn);
 				 playerIn.openGui(MazeTowers.instance, GuiHandlerItemScanner

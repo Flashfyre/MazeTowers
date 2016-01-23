@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockItemScanner;
+import com.samuel.mazetowers.etc.MTUtils;
 import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
 import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTower;
 import com.samuel.mazetowers.worldgen.biomes.BiomeGenMazeTowerLv7;
@@ -43,15 +44,19 @@ public class MazeTowersGeneralEventHandler {
 					int baseY = tower.baseY;
 					IBlockState state;
 					Block block;
+					try {
 					if (y >= baseY && y <= baseY + ((tower.floors + 1) * 6) &&
 						((y > (baseY + (tower.floors * 6)) || (state = tower.getBlockData()[pos.getY() - baseY]
 						[(pos.getZ() % 16) + (pos.getZ() > -1 ? 0 : 16)]
-						[pos.getX() % 16 + (pos.getX() > -1 ? 0 : 16)]) == null) ||
+						[(pos.getX() % 16) + (pos.getX() > -1 ? 0 : 16)]) == null) ||
 						(state != Blocks.air && (block = state.getBlock()) != Blocks.torch) &&
 						block != Blocks.glass &&
 						block != Blocks.web && block != Blocks.chest &&
 						block != Blocks.trapped_chest && block != Blocks.mob_spawner))
 						e.setCanceled(true);
+					} catch (ArrayIndexOutOfBoundsException e_) {
+						e_ = null;
+					}
 					break;
 				}
 			}
@@ -69,12 +74,20 @@ public class MazeTowersGeneralEventHandler {
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
     public void onMobSpawn(LivingSpawnEvent.CheckSpawn e) {
-		if (!e.world.isRemote &&
-			e.entityLiving instanceof EntitySkeleton) { /*&&
-			e.world.getBiomeGenForCoords(new BlockPos(e.x, e.y, e.z))
-			instanceof BiomeGenMazeTowerLv7*/
-			((EntitySkeleton) e.entityLiving).setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
-			((EntitySkeleton) e.entityLiving).setSkeletonType(1);
+		BlockPos pos = new BlockPos(e.x, e.y, e.z);
+		if (MTUtils.getIsMazeTowerPos(pos)) {
+			if (!e.world.isRemote) { /*&&
+				e.world.getBiomeGenForCoords(new BlockPos(e.x, e.y, e.z))
+				instanceof BiomeGenMazeTowerLv7*/
+				MazeTower tower = MazeTowers.mazeTowers.getTowerAtCoords(pos.getX() >> 4,
+					pos.getZ() >> 4);
+				if (e.entityLiving instanceof EntitySkeleton) {
+					((EntitySkeleton) e.entityLiving).setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
+					((EntitySkeleton) e.entityLiving).setSkeletonType(1);
+				}
+				if (pos.getY() - tower.baseY % 6 == 5)
+					e.entityLiving.setDead();
+			}
 		}
 	}
 }

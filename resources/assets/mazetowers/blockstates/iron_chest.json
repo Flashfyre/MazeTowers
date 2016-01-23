@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "mazetowers:iron_chest" },
+        "facing=east": { "model": "mazetowers:iron_chest", "y": 90  },
+        "facing=south": { "model": "mazetowers:iron_chest", "y": 180  },
+        "facing=west": { "model": "mazetowers:iron_chest", "y": 270  }
+    }
+}

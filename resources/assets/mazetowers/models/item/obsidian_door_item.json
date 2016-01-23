@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "mazetowers:items/obsidian_door"
+        "layer0": "mazetowers:items/door_obsidian"
     },
     "display": {
         "thirdperson": {

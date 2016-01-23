@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "mazetowers:items/bedrock_door"
+        "layer0": "mazetowers:items/door_bedrock"
     },
     "display": {
         "thirdperson": {

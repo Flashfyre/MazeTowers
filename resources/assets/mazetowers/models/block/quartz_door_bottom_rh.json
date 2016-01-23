@@ -1,0 +1,7 @@
+{
+    "parent": "block/door_bottom_rh",
+    "textures": {
+        "bottom": "mazetowers:blocks/door_quartz_lower",
+        "top": "mazetowers:blocks/door_quartz_lower"
+    }
+}

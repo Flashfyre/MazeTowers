@@ -12,6 +12,8 @@ public class ModItems {
 	
 	public static Item resistant_door_end_stone =
 			MazeTowers.ItemEndStoneDoor;
+	public static Item resistant_door_quartz =
+			MazeTowers.ItemQuartzDoor;
 	public static Item resistant_door_obsidian =
 			MazeTowers.ItemObsidianDoor;
 	public static Item resistant_door_bedrock =
@@ -19,6 +21,7 @@ public class ModItems {
 	
 	public static void createItems() {
 		GameRegistry.registerItem(resistant_door_end_stone, "end_stone_door_item");
+		GameRegistry.registerItem(resistant_door_quartz, "quartz_door_item");
 		GameRegistry.registerItem(resistant_door_obsidian, "obsidian_door_item");
 		GameRegistry.registerItem(resistant_door_bedrock, "bedrock_door_item");
 	}

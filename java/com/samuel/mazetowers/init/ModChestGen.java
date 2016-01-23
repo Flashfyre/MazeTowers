@@ -61,9 +61,11 @@ public class ModChestGen {
 		addItem(6, MTUtils.getEnchantmentBookById(2, 4), 1, 1, 15); // Feather Falling IV
 		addItem(6, MTUtils.getEnchantmentBookById(4, 4), 1, 1, 15); // Projectile Protect IV
 		addItem(6, MTUtils.getEnchantmentBookById(3, 2), 1, 1, 10); // Blast Protection II
+		addItem(6, MTUtils.getEnchantmentBookById(5, 1), 1, 1, 10); // Respiration I
 		addItem(7, MTUtils.getEnchantmentBookById(3, 3), 1, 1, 10); // Blast Protection III
 		addItem(7, MTUtils.getEnchantmentBookById(21, 1), 1, 1, 10); // Looting I
 		addItem(7, MTUtils.getEnchantmentBookById(48, 3), 1, 1, 10); // Power III
+		addItem(7, MTUtils.getEnchantmentBookById(5, 2), 1, 1, 10); // Respiration II
 		addItem(7, MTUtils.getEnchantmentBookById(48, 3), 1, 1, 5); // Power III
 		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.emerald_block), 2), 1, 2, 10);
 		addItem(8, MTUtils.getEnchantmentBookById(49, 1), 1, 1, 15); // Punch I

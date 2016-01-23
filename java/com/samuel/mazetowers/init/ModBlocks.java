@@ -23,8 +23,12 @@ public class ModBlocks {
 	public static Block memoryPistonHeadOff;
 	public static Block memoryPistonExtension;
 	public static Block memoryPistonExtensionOff;
-	public static Block quartzButton;
+	public static Block mineralChestIron;
+	public static Block mineralChestGold;
+	public static Block mineralChestDiamond;
+	public static Block hiddenButton;
 	public static Block resistantDoorEndStone;
+	public static Block resistantDoorQuartz;
 	public static Block resistantDoorObsidian;
 	public static Block resistantDoorBedrock;
 
@@ -40,8 +44,12 @@ public class ModBlocks {
     	GameRegistry.registerBlock(memoryPistonHeadOff = MazeTowers.BlockMemoryPistonHeadOff, "memory_piston_head_off");
     	GameRegistry.registerBlock(memoryPistonExtension = MazeTowers.BlockMemoryPistonExtension, "memory_piston_extension");
     	GameRegistry.registerBlock(memoryPistonExtensionOff = MazeTowers.BlockMemoryPistonExtensionOff, "memory_piston_extension_off");
-    	GameRegistry.registerBlock(quartzButton = MazeTowers.BlockQuartzButton, "quartz_button");
+    	GameRegistry.registerBlock(mineralChestIron = MazeTowers.BlockIronChest, "iron_chest");
+    	GameRegistry.registerBlock(mineralChestGold = MazeTowers.BlockGoldChest, "gold_chest");
+    	GameRegistry.registerBlock(mineralChestDiamond = MazeTowers.BlockDiamondChest, "diamond_chest");
+    	GameRegistry.registerBlock(hiddenButton = MazeTowers.BlockHiddenButton, "quartz_button");
     	GameRegistry.registerBlock(resistantDoorEndStone = MazeTowers.BlockEndStoneDoor, "end_stone_door");
+    	GameRegistry.registerBlock(resistantDoorQuartz = MazeTowers.BlockQuartzDoor, "quartz_door");
     	GameRegistry.registerBlock(resistantDoorObsidian = MazeTowers.BlockObsidianDoor, "obsidian_door");
     	GameRegistry.registerBlock(resistantDoorBedrock = MazeTowers.BlockBedrockDoor, "bedrock_door");
     }

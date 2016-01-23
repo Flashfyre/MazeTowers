@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "mazetowers:gold_chest" },
+        "facing=east": { "model": "mazetowers:gold_chest", "y": 90  },
+        "facing=south": { "model": "mazetowers:gold_chest", "y": 180  },
+        "facing=west": { "model": "mazetowers:gold_chest", "y": 270  }
+    }
+}

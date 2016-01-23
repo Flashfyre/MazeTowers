@@ -23,18 +23,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MazeTowersData extends WorldSavedData {
-	
-	private World world;
+
 	public BlockPos[] spawnPos;
 	public boolean[] isGenerated;
 	public int genCount;
-
-	public MazeTowersData(World worldIn, String tagName) {
+	
+	public MazeTowersData(String tagName) {
 		super(tagName);
 		genCount = MazeTowers.mazeTowers.getGenCount();
 		spawnPos = new BlockPos[genCount];
 		isGenerated = new boolean[genCount];
-		world = worldIn;
 	}
 
 	@Override
@@ -49,7 +47,7 @@ public class MazeTowersData extends WorldSavedData {
 	public void writeToNBT(NBTTagCompound compound) {
 		NBTTagList spawnPosSublist = new NBTTagList();
 		NBTTagList isGeneratedSublist = new NBTTagList();
-		for (int g = 0; g < Math.min(genCount, MazeTowers.mazeTowers.getGenCount(world)); g++) {
+		for (int g = 0; g < Math.min(genCount, MazeTowers.mazeTowers.getGenCount()); g++) {
 			NBTTagLong spawnPosTag;
 			NBTTagInt isGeneratedTag;
 			try {

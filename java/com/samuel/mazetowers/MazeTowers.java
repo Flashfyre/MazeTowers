@@ -8,8 +8,8 @@ import java.util.Random;
 
 import io.netty.buffer.ByteBuf;
 
-import com.samuel.mazetowers.etc.CommandItemScanner;
 import com.samuel.mazetowers.etc.CommandMazeTowers;
+import com.samuel.mazetowers.etc.MaterialLogicSolid;
 import com.samuel.mazetowers.eventhandlers.MazeTowersChunkEventHandler;
 import com.samuel.mazetowers.eventhandlers.MazeTowersGeneralEventHandler;
 import com.samuel.mazetowers.init.ModEntities;
@@ -110,7 +110,9 @@ public class MazeTowers {
     public static TileEntityMazeTowerThreshold TileEntityMazeTowerThreshold;
     public static TileEntityMemoryPiston TileEntityMemoryPiston;
     public static TileEntityMemoryPistonMemory TileEntityMemoryPistonMemory;
+    public static TileEntityMineralChest TileEntityMineralChest;
     public static TileEntityWebSpiderSpawner TileEntityWebSpiderSpawner;
+    public static Block BlockHiddenButton;
     public static Block BlockHiddenPressurePlateWeighted;
     public static Block BlockItemScanner;
     public static Block BlockItemScannerGold;
@@ -120,13 +122,18 @@ public class MazeTowers {
     public static Block BlockMemoryPistonHeadOff;
 	public static Block BlockMemoryPistonExtension;
 	public static Block BlockMemoryPistonExtensionOff;
-	public static Block BlockQuartzButton;
+	public static Block BlockIronChest;
+	public static Block BlockGoldChest;
+	public static Block BlockDiamondChest;
 	public static Block BlockEndStoneDoor;
+	public static Block BlockQuartzDoor;
 	public static Block BlockObsidianDoor;
 	public static Block BlockBedrockDoor;
 	public static Item ItemEndStoneDoor;
+	public static Item ItemQuartzDoor;
 	public static Item ItemObsidianDoor;
 	public static Item ItemBedrockDoor;
+	public static MaterialLogicSolid solidCircuits;
 	public static BiomeGenMazeTowerLv1 biomeGenMazeTowerLv1;
 	public static BiomeGenMazeTowerLv7 biomeGenMazeTowerLv7;
     public static boolean enableMazeTowers = true;
@@ -142,6 +149,8 @@ public class MazeTowers {
 		//network.registerMessage(PacketBGMClient.Handler.class, PacketBGMClient.class, 0, Side.CLIENT);
 		network.registerMessage(PacketActivateItemScanner.Handler.class,
 			PacketActivateItemScanner.class, 0, Side.SERVER);
+		network.registerMessage(PacketDebugMessage.Handler.class,
+			PacketDebugMessage.class, 1, Side.CLIENT);
 		config = new Configuration(e.getSuggestedConfigurationFile());
 	    config.load();
 	    saveConfig();

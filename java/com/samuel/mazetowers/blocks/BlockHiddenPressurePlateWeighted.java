@@ -39,7 +39,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	private final int field_150068_a;
 	
 	public BlockHiddenPressurePlateWeighted(String unlocalizedName) {
-		super(Material.circuits, 150);
+		super(MazeTowers.solidCircuits, 150);
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 		this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.0625F, 0.9375F);
 		this.setTickRandomly(true);
@@ -128,12 +128,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	  
 	  private boolean isMTPFallTrap(World worldIn, BlockPos pos) {
 		  IBlockState state = getMTPFallTrapPistonState(worldIn, pos);
-		  return state != null && state.getBlock() instanceof BlockMemoryPistonBase;
-	  }
-	  
-	  private boolean isActivatedMTPFallTrap(World worldIn, BlockPos pos) {
-		  IBlockState state = getMTPFallTrapPistonState(worldIn, pos);
-		  return state != null && !(state.getBlock() instanceof BlockMemoryPistonBaseOff);
+		  return state != null;
 	  }
 	  
 	  @Override
@@ -170,7 +165,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 
 	  private IBlockState getBelowState(IBlockAccess world, BlockPos blockPos)
 	  {
-	    final IBlockState normal = Blocks.iron_block.getDefaultState();
+	    final IBlockState normal = Blocks.quartz_block.getDefaultState();
 	    IBlockState belowState = null;
 
 	    if (blockPos.getY() == 0 || (belowState = world.getBlockState(blockPos.down()))
