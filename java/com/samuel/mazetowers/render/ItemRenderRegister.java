@@ -19,6 +19,7 @@ public final class ItemRenderRegister {
     	reg(ModItems.resistant_door_quartz);
     	reg(ModItems.resistant_door_obsidian);
     	reg(ModItems.resistant_door_bedrock);
+    	reg(ModItems.explosive_arrow);
     }
 
     public static void reg(Item item) {

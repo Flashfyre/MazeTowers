@@ -10,8 +10,7 @@ import io.netty.buffer.ByteBuf;
 
 import com.samuel.mazetowers.etc.CommandMazeTowers;
 import com.samuel.mazetowers.etc.MaterialLogicSolid;
-import com.samuel.mazetowers.eventhandlers.MazeTowersChunkEventHandler;
-import com.samuel.mazetowers.eventhandlers.MazeTowersGeneralEventHandler;
+import com.samuel.mazetowers.eventhandlers.*;
 import com.samuel.mazetowers.init.ModEntities;
 import com.samuel.mazetowers.packets.*;
 import com.samuel.mazetowers.proxy.CommonProxy;
@@ -100,11 +99,12 @@ guiFactory = "com.samuel." + MazeTowers.MODID + ".GUIFactoryMazeTowers")
 public class MazeTowers {
     public static final String MODNAME = "mazetowers";
     public static final String MODID = "mazetowers";
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.3.0";
     
     @Mod.Instance
 	public static MazeTowers instance = new MazeTowers();
     public static WorldGenMazeTowers mazeTowers = null;
+    public static TileEntityBlockProtect TileEntityBlockProtect;
     public static TileEntityCircuitBreaker TileEntityCircuitBreaker;
     public static TileEntityItemScanner TileEntityItemScanner;
     public static TileEntityMazeTowerThreshold TileEntityMazeTowerThreshold;
@@ -116,6 +116,7 @@ public class MazeTowers {
     public static Block BlockHiddenPressurePlateWeighted;
     public static Block BlockItemScanner;
     public static Block BlockItemScannerGold;
+    public static Block BlockMazeTowerThreshold;
     public static Block BlockMemoryPiston;
     public static Block BlockMemoryPistonOff;
     public static Block BlockMemoryPistonHead;
@@ -133,12 +134,13 @@ public class MazeTowers {
 	public static Item ItemQuartzDoor;
 	public static Item ItemObsidianDoor;
 	public static Item ItemBedrockDoor;
+	public static Item ItemExplosiveArrow;
 	public static MaterialLogicSolid solidCircuits;
 	public static BiomeGenMazeTowerLv1 biomeGenMazeTowerLv1;
 	public static BiomeGenMazeTowerLv7 biomeGenMazeTowerLv7;
     public static boolean enableMazeTowers = true;
 
-	@SidedProxy(clientSide="com.samuel.mazetowers.proxy.ClientProxy", serverSide="com.samuel.mazeTowers.proxy.ServerProxy")
+	@SidedProxy(clientSide="com.samuel.mazetowers.proxy.ClientProxy", serverSide="com.samuel.mazetowers.proxy.ServerProxy")
 	public static CommonProxy proxy;
 	public static SimpleNetworkWrapper network;
 	public static Configuration config;
@@ -146,17 +148,20 @@ public class MazeTowers {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		network = NetworkRegistry.INSTANCE.newSimpleChannel("MazeTowers");
-		//network.registerMessage(PacketBGMClient.Handler.class, PacketBGMClient.class, 0, Side.CLIENT);
 		network.registerMessage(PacketActivateItemScanner.Handler.class,
 			PacketActivateItemScanner.class, 0, Side.SERVER);
+		network.registerMessage(PacketMazeTowersGui.Handler.class,
+			PacketMazeTowersGui.class, 1, Side.CLIENT);
+		network.registerMessage(PacketUpdateBlockRange.Handler.class,
+			PacketUpdateBlockRange.class, 2, Side.CLIENT);
 		network.registerMessage(PacketDebugMessage.Handler.class,
-			PacketDebugMessage.class, 1, Side.CLIENT);
+			PacketDebugMessage.class, 3, Side.CLIENT);
 		config = new Configuration(e.getSuggestedConfigurationFile());
 	    config.load();
 	    saveConfig();
 	    MinecraftForge.EVENT_BUS.register(new MazeTowersChunkEventHandler());
 	    MinecraftForge.EVENT_BUS.register(new MazeTowersGeneralEventHandler());
-		//MinecraftForge.EVENT_BUS.register(new ChaosLabyrinthBGMEventHandler());
+	    MinecraftForge.EVENT_BUS.register(new MazeTowersGuiEventHandler());
 	    proxy.preInit(e);
 	}
 

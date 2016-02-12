@@ -83,14 +83,14 @@ public class HiddenButtonModel implements ISmartBlockModel {
 	= new ModelResourceLocation("mazetowers:quartz_button_u_pressed");
   public static final ModelResourceLocation modelResourceLocationDPressed
 	= new ModelResourceLocation("mazetowers:quartz_button_d_pressed");
-public static final ModelResourceLocation modelResourceLocationEPressed
-	= new ModelResourceLocation("mazetowers:quartz_button_e_pressed");
-public static final ModelResourceLocation modelResourceLocationWPressed
-	= new ModelResourceLocation("mazetowers:quartz_button_w_pressed");
-public static final ModelResourceLocation modelResourceLocationSPressed
-	= new ModelResourceLocation("mazetowers:quartz_button_s_pressed");
-public static final ModelResourceLocation modelResourceLocationNPressed
-	= new ModelResourceLocation("mazetowers:quartz_button_n_pressed");
+	public static final ModelResourceLocation modelResourceLocationEPressed
+		= new ModelResourceLocation("mazetowers:quartz_button_e_pressed");
+	public static final ModelResourceLocation modelResourceLocationWPressed
+		= new ModelResourceLocation("mazetowers:quartz_button_w_pressed");
+	public static final ModelResourceLocation modelResourceLocationSPressed
+		= new ModelResourceLocation("mazetowers:quartz_button_s_pressed");
+	public static final ModelResourceLocation modelResourceLocationNPressed
+		= new ModelResourceLocation("mazetowers:quartz_button_n_pressed");
 
   @Override
   public IBakedModel handleBlockState(IBlockState iBlockState)

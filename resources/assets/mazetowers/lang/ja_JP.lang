@@ -17,4 +17,6 @@ item.end_stone_door_item.name=ネザー水晶ドア
 item.quartz_door_item.name=End Stone Door
 item.obsidian_door_item.name=Obsidian Door
 item.bedrock_door_item.name=Bedrock Door
+item.explosive_arrow.name=爆発的矢
+entity.explosive_arrow.name=爆発的矢
 entity.ultraviolet_blaze.name=紫外ブレーズ

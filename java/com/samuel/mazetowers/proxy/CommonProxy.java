@@ -6,6 +6,8 @@ import java.util.Random;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.*;
+import com.samuel.mazetowers.items.*;
+import com.samuel.mazetowers.client.gui.GUIMazeTowerFloor;
 import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
 import com.samuel.mazetowers.etc.MaterialLogicSolid;
 import com.samuel.mazetowers.init.*;
@@ -55,6 +57,7 @@ public class CommonProxy {
 			new BlockHiddenPressurePlateWeighted("hidden_heavy_pressure_plate");
 		MazeTowers.BlockItemScanner = new BlockItemScanner().setUnlocalizedName("item_scanner");
 		MazeTowers.BlockItemScannerGold = new BlockItemScannerGold().setUnlocalizedName("item_scanner_gold");
+		MazeTowers.BlockMazeTowerThreshold = new BlockMazeTowerThreshold().setUnlocalizedName("maze_tower_threshold");
 		MazeTowers.BlockMemoryPiston = new BlockMemoryPistonBase("memory_piston");
 		MazeTowers.BlockMemoryPistonOff = new BlockMemoryPistonBaseOff("memory_piston_off");
 		MazeTowers.BlockMemoryPistonHead = new BlockMemoryPistonExtension("memory_piston_head");
@@ -73,6 +76,8 @@ public class CommonProxy {
 		MazeTowers.ItemQuartzDoor = new ItemDoor(MazeTowers.BlockQuartzDoor).setUnlocalizedName("quartz_door_item");
 		MazeTowers.ItemObsidianDoor = new ItemDoor(MazeTowers.BlockObsidianDoor).setUnlocalizedName("obsidian_door_item");
 		MazeTowers.ItemBedrockDoor = new ItemDoor(MazeTowers.BlockBedrockDoor).setUnlocalizedName("bedrock_door_item");
+		MazeTowers.ItemExplosiveArrow = new ItemExplosiveArrow().setUnlocalizedName("explosive_arrow");
+		MazeTowers.TileEntityBlockProtect = new TileEntityBlockProtect();
 		MazeTowers.TileEntityCircuitBreaker = new TileEntityCircuitBreaker();
 		MazeTowers.TileEntityItemScanner = new TileEntityItemScanner();
 		MazeTowers.TileEntityMazeTowerThreshold = new TileEntityMazeTowerThreshold();
@@ -91,6 +96,7 @@ public class CommonProxy {
 		ModItems.createItems();
 		ModTileEntities.initTileEntities();
 		ModChestGen.initChestGen();
+		ModDispenserBehavior.initDispenserBehavior();
 		ModWorldGen.initWorldGen();
 		
 		FMLCommonHandler.instance().bus().register(MazeTowers.instance);

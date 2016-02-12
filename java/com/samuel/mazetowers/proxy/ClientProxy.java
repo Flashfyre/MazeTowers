@@ -68,45 +68,44 @@ public class ClientProxy extends CommonProxy {
 					HiddenPressurePlateWeightedModel.modelResourceLocationUp :
 					HiddenPressurePlateWeightedModel.modelResourceLocationDown;
 				} else {
-					ModelResourceLocation mlr;
 					switch (state.getBlock().getMetaFromState(state)) {
 						case 0:
-							mlr = HiddenButtonModel.modelResourceLocationU;
+							mrl = HiddenButtonModel.modelResourceLocationU;
 							break;
 						case 1:
-							mlr = HiddenButtonModel.modelResourceLocationD;
+							mrl = HiddenButtonModel.modelResourceLocationD;
 							break;
 						case 2:
-							mlr = HiddenButtonModel.modelResourceLocationE;
+							mrl = HiddenButtonModel.modelResourceLocationE;
 							break;
 						case 3:
-							mlr = HiddenButtonModel.modelResourceLocationW;
+							mrl = HiddenButtonModel.modelResourceLocationW;
 							break;
 						case 4:
-							mlr = HiddenButtonModel.modelResourceLocationS;
+							mrl = HiddenButtonModel.modelResourceLocationS;
 							break;
 						case 5:
-							mlr = HiddenButtonModel.modelResourceLocationN;
+							mrl = HiddenButtonModel.modelResourceLocationN;
 							break;
 						case 6:
-							mlr = HiddenButtonModel.modelResourceLocationUPressed;
+							mrl = HiddenButtonModel.modelResourceLocationUPressed;
 							break;
 						case 7:
-							mlr = HiddenButtonModel.modelResourceLocationDPressed;
+							mrl = HiddenButtonModel.modelResourceLocationDPressed;
 							break;
 						case 8:
-							mlr = HiddenButtonModel.modelResourceLocationEPressed;
+							mrl = HiddenButtonModel.modelResourceLocationEPressed;
 							break;
 						case 9:
-							mlr = HiddenButtonModel.modelResourceLocationWPressed;
+							mrl = HiddenButtonModel.modelResourceLocationWPressed;
 							break;
 						case 10:
-							mlr = HiddenButtonModel.modelResourceLocationSPressed;
+							mrl = HiddenButtonModel.modelResourceLocationSPressed;
 							break;
 						default:
-							mlr = HiddenButtonModel.modelResourceLocationNPressed;
+							mrl = HiddenButtonModel.modelResourceLocationNPressed;
 					}
-					return mlr;
+					return mrl;
 				}
 			}
 	    };
@@ -125,6 +124,8 @@ public class ClientProxy extends CommonProxy {
 		super.init(e);
 		BlockRenderRegister.registerBlockRenderer();
 		
+		RenderingRegistry.registerEntityRenderingHandler(EntityExplosiveArrow.class,
+				new RenderExplosiveArrow(Minecraft.getMinecraft().getRenderManager()));
 		RenderingRegistry.registerEntityRenderingHandler(EntitySmallUltravioletFireball.class,
 				new RenderSmallUltravioletFireball(Minecraft.getMinecraft().getRenderManager(), 1.0F));
 		RenderingRegistry.registerEntityRenderingHandler(EntityUltravioletBlaze.class,

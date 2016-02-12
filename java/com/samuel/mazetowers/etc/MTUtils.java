@@ -1,21 +1,27 @@
 package com.samuel.mazetowers.etc;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTower;
+import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MiniTower;
 
 import scala.Char;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.world.World;
 
 public class MTUtils {
@@ -24,7 +30,8 @@ public class MTUtils {
 	private static final int minYSurface = 49;
 	private static final int minYWater = 30;
 	
-	public static int getSurfaceY(World world, int x, int z, int range, boolean isUnderwater) {
+	public static int getSurfaceY(World world, int x, int z, int range,
+		boolean isUnderwater) {
 		int minY = !isUnderwater ? minYSurface : minYWater;
 		int cy = minY;
 		boolean nextY = true;
@@ -55,7 +62,8 @@ public class MTUtils {
 		return cy;
 	}
 	
-	public static int getGroundY(World world, int x, int y, int z, int range, boolean isUnderwater) {
+	public static int getGroundY(World world, int x, int y, int z, int range,
+		boolean isUnderwater) {
 		int minY = !isUnderwater ? minYSurface : minYWater;
 		int cy = y - 1;
 		boolean nextY = cy > 0;
@@ -68,8 +76,7 @@ public class MTUtils {
 					Block cBlock = null;
 					IBlockState cstate = world.getBlockState(cpos);
 					if (cstate == air || (cBlock = cstate.getBlock()) == Blocks.leaves ||
-						cBlock == Blocks.leaves2 || cBlock == Blocks.log ||
-						(cBlock == Blocks.water && !isUnderwater)) {
+						cBlock == Blocks.leaves2 || (cBlock == Blocks.water && isUnderwater)) {
 						nextY = true;
 						break;
 					}
@@ -90,10 +97,16 @@ public class MTUtils {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
 		int y = pos.getY();
+		BlockPos[] towerPos = MazeTowers.mazeTowers.getSpawnPos();
 		
-		for (MazeTower t : MazeTowers.mazeTowers.getTowers()) {
+		/*for (MazeTower t : MazeTowers.mazeTowers.getTowers()) {
 			if (chunkX == t.chunkX && chunkZ == t.chunkZ &&
 				y >= t.baseY && y <= t.baseY + ((t.floors + 1) * 6))
+				return true;
+		}*/
+		for (int p = 0; p < towerPos.length; p++) {
+			if (towerPos[p] != null && chunkX == towerPos[p].getX() >> 4 &&
+				chunkZ == towerPos[p].getZ() >> 4 && y >= towerPos[p].getY())
 				return true;
 		}
 		
@@ -159,5 +172,155 @@ public class MTUtils {
 		}
 		
 		return encodedName.toString();
+	}
+	
+	public static IBlockState[][][] getStairRotatedStairsMap(IBlockState[][][] map,
+		EnumFacing fromDir, EnumFacing toDir, IBlockState[] stairsBlocks,
+		IBlockState[] torch) {
+		IBlockState[][][] newMap = map.clone();
+		final int[] dirMap = (fromDir.getAxis() == toDir.getAxis()) ?
+			new int[] { 1, 2, 3, 0 } : (fromDir.getAxisDirection() ==
+			toDir.getAxisDirection()) ? new int[] { 2, 1, 0, 3 } : new int[] { 0, 1, 2, 3 };
+
+		if (fromDir != toDir) {
+			newMap[0][5][2] = stairsBlocks[dirMap[2]];
+			newMap[1][4][2] = stairsBlocks[dirMap[2]];
+			newMap[1][6][3] = torch[dirMap[3]];
+			newMap[2][3][2] = stairsBlocks[dirMap[2]];
+			newMap[3][2][3] = stairsBlocks[dirMap[3]];
+			newMap[4][2][4] = stairsBlocks[dirMap[3]];
+			newMap[4][3][2] = torch[dirMap[0]];
+			newMap[5][2][5] = stairsBlocks[dirMap[3]];
+			newMap[6][3][6] = stairsBlocks[dirMap[0]];
+			newMap[7][4][6] = stairsBlocks[dirMap[0]];
+			newMap[7][2][5] = torch[dirMap[1]];
+			newMap[8][5][6] = stairsBlocks[dirMap[0]];
+			newMap[9][6][5] = stairsBlocks[dirMap[1]];
+			newMap[10][6][4] = stairsBlocks[dirMap[1]];
+			newMap[10][5][6] = torch[dirMap[2]];
+			newMap[11][6][3] = stairsBlocks[dirMap[1]];
+		}
+		
+		return newMap;
+	}
+	
+	public static IBlockState[][][] getRotatedStateMap(IBlockState[][][] map,
+		EnumFacing fromDir, EnumFacing toDir, boolean reorder) {
+		int dirAxis = toDir.getAxis() == Axis.X ? 2 : 1;
+		int dirSign = dirAxis % 2 == 0 ? -1 : 1;
+		IBlockState[][][] newMap;
+		if (fromDir != toDir) {
+			int ry, rz, rx, ryMax = map.length - 1, rzMax = map[0].length - 1,
+				rxMax = map[0][0].length - 1;
+			if (fromDir.getAxis() == toDir.getAxis()) {
+				newMap = new IBlockState[map.length][map[0].length][map[0][0].length];
+				for (ry = 0; ry <= ryMax; ry++) {
+					for (rz = 0; rz <= rzMax; rz++) {
+						for (rx = 0; rx <= rxMax; rx++)
+							newMap[ry][reorder && dirAxis == 1 ? rzMax - rz : rz]
+								[reorder && dirAxis == 2 ? rxMax - rx : rx] =
+								map[ry][rz][rx];
+					}
+				}
+			} else {
+				newMap = new IBlockState[map.length][map[0][0].length][map[0].length];
+				if (fromDir.getAxisDirection() == toDir.getAxisDirection()) {
+					for (ry = 0; ry <= ryMax; ry++) {
+						for (rz = 0; rz <= rzMax; rz++) {
+							for (rx = 0; rx <= rxMax; rx++)
+								newMap[ry][reorder && dirAxis == 2 ? rxMax - rx : rx]
+									[reorder && dirAxis == 1 ? rzMax - rz : rz] =
+									map[ry][rz][rx];
+						}
+					}
+				} else {
+					for (ry = 0; ry <= ryMax; ry++) {
+						for (rz = 0; rz <= rzMax; rz++) {
+							for (rx = 0; rx <= rxMax; rx++)
+								newMap[ry][reorder ? rxMax - rx : rx]
+									[reorder ? rzMax - rz : rz] =
+									map[ry][rz][rx];
+						}
+					}
+				}
+			}
+			/*if (fromDir.getAxis() == toDir.getAxis()) {
+			newMap = new IBlockState[map.length][map[0].length][map[0][0].length];
+			for (ry = 0; ry <= ryMax; ry++) {
+				for (rz = 0; rz <= rzMax; rz++) {
+					for (rx = 0; rx <= rxMax; rx++)
+						newMap[ry][reorder && dirAxis == 2 ? rzMax - rz : rz]
+							[reorder && dirAxis == 1 ? rxMax - rx : rx] =
+							map[ry][rz][rx];
+				}
+			}
+		} else {
+			newMap = new IBlockState[map.length][map[0][0].length][map[0].length];
+			if (fromDir.getAxisDirection() == toDir.getAxisDirection()) {
+				for (ry = 0; ry <= ryMax; ry++) {
+					for (rz = 0; rz <= rzMax; rz++) {
+						for (rx = 0; rx <= rxMax; rx++)
+							newMap[ry][rx][rz] =
+								map[ry][rz][rx];
+					}
+				}
+			} else {
+				for (ry = 0; ry <= ryMax; ry++) {
+					for (rz = 0; rz <= rzMax; rz++) {
+						for (rx = 0; rx <= rxMax; rx++)
+							newMap[ry][reorder ? rxMax - rx : rx]
+								[reorder ? rzMax - rz : rz] =
+								map[ry][rz][rx];
+					}
+				}
+			}
+		}*/
+		} else
+			newMap = map.clone();
+		return newMap;
+	}
+
+	public static BitSet[][] getBlockBreakabilityData(IBlockState[][][] blockData) {
+		BitSet[][] data = new BitSet[blockData.length][];
+		for (int y = 0; y < blockData.length; y++) {
+			data[y] = new BitSet[16];
+			for (int z = 0; z < 16; z++) {
+				data[y][z] = new BitSet(16);
+				for (int x = 0; x < 16; x++) {
+					IBlockState state = blockData[y][z][x];
+					Block block;
+					data[y][z].set(x, (state == air || state == null ||
+						(block = state.getBlock()) == Blocks.water ||
+						block == Blocks.torch || block == Blocks.glass ||
+						block == Blocks.web || block instanceof BlockChest ||
+						block == Blocks.mob_spawner));
+				}
+			}
+		}
+		return data;
+	}
+
+	public static BitSet[][] getMTBlockBreakabilityData(IBlockState[][][] stateMap) {
+		BitSet[][] data = new BitSet[stateMap.length][];
+		final int zLen = stateMap[0].length;
+		final int xLen = stateMap[0][0].length;
+		for (int y = 0; y < stateMap.length; y++) {
+			data[y] = new BitSet[zLen];
+			for (int z = 0; z < zLen; z++) {
+				data[y][z] = new BitSet(xLen);
+				for (int x = 0; x < xLen; x++) {
+					IBlockState state = stateMap[y][z][x];
+					Block block;
+					if (state == air || state == null ||
+						(block = state.getBlock()) == Blocks.water ||
+						block == Blocks.carpet || block == Blocks.glass_pane ||
+						block == Blocks.redstone_lamp || block == Blocks.mob_spawner ||
+						block == Blocks.torch || block instanceof BlockChest ||
+						block == Blocks.lever)
+						data[y][z].set(x);
+				}
+			}
+		}
+		return data;
 	}
 }

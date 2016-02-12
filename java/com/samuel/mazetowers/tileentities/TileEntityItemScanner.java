@@ -74,7 +74,8 @@ public class TileEntityItemScanner extends TileEntity implements IInventory {
 	
 	public void generateRandomKeyStackFromList(List<ItemStack> itemsList)
     {
-    	keyStack = itemsList.get(worldObj.rand.nextInt(itemsList.size()));
+		ItemStack listStack = itemsList.get(worldObj.rand.nextInt(itemsList.size()));
+    	keyStack = new ItemStack(listStack.getItem(), 1, listStack.getItemDamage());
     	markDirty();
     }
 	
@@ -314,7 +315,8 @@ public class TileEntityItemScanner extends TileEntity implements IInventory {
         return (te = this.worldObj.getTileEntity(this.pos)) != this ? false :
         	player.getDistanceSq((double)this.pos.getX() + 0.5D,
         	(double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D &&
-        	((TileEntityItemScanner) te).getOwnerName().equals(player.getDisplayNameString());
+        	(player.capabilities.isCreativeMode || ((TileEntityItemScanner) te)
+        	.getOwnerName().equals(player.getDisplayNameString()));
     }
 
     @Override

@@ -2,5 +2,6 @@
 	"door_locked": { "category": "block", "sounds": ["mazetowers:door_locked"] },
 	"door_unlock": { "category": "block", "sounds": ["mazetowers:door_unlock"] },
 	"correct": { "category": "block", "sounds": ["mazetowers:correct"] },
-	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"] }
+	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"] },
+	"primed": { "category": "block", "sounds": ["mazetowers:primed"] }
 }

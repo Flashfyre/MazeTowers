@@ -1,8 +1,7 @@
 package com.samuel.mazetowers.init;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.entities.EntitySmallUltravioletFireball;
-import com.samuel.mazetowers.entities.EntityUltravioletBlaze;
+import com.samuel.mazetowers.entities.*;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -14,6 +13,8 @@ public class ModEntities {
 	private static int entityID = 0;
 
 	public static void initEntities(MazeTowers mod) {
+		EntityRegistry.registerModEntity(EntityExplosiveArrow.class,
+			"ExplosiveArrow", entityID++, mod, 128, 1, true);
 		EntityRegistry.registerModEntity(EntityUltravioletBlaze.class,
 			"UltravioletBlaze", entityID++, mod, 128, 1, true);
 		EntityRegistry.registerModEntity(EntitySmallUltravioletFireball.class,

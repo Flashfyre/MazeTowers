@@ -17,4 +17,6 @@ item.end_stone_door_item.name=End Stone Door
 item.quartz_door_item.name=Quartz Door
 item.obsidian_door_item.name=Obsidian Door
 item.bedrock_door_item.name=Bedrock Door
+item.explosive_arrow.name=Explosive Arrow
+entity.explosive_arrow.name=Explosive Arrow
 entity.ultraviolet_blaze.name=Ultraviolet Blaze

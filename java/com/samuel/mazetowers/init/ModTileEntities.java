@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModTileEntities {
 	
+	public static Class block_protect;
 	public static Class circuit_breaker;
 	public static Class item_scanner;
 	public static Class maze_tower_threshold;
@@ -16,7 +17,8 @@ public class ModTileEntities {
 	public static Class web_spider_spawner;
 	
 	public static void initTileEntities() {
-		GameRegistry.registerTileEntity(circuit_breaker = TileEntityMazeTowerThreshold.class, "circuit_breaker");
+		GameRegistry.registerTileEntity(block_protect = TileEntityBlockProtect.class, "block_protect");
+		GameRegistry.registerTileEntity(circuit_breaker = TileEntityCircuitBreaker.class, "circuit_breaker");
 		GameRegistry.registerTileEntity(item_scanner = TileEntityItemScanner.class, "item_scanner");
 		GameRegistry.registerTileEntity(maze_tower_threshold = TileEntityMazeTowerThreshold.class, "maze_tower_threshold");
 		GameRegistry.registerTileEntity(memory_piston = TileEntityMemoryPiston.class, "memory_piston");

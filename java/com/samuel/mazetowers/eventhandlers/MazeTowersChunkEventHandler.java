@@ -32,9 +32,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MazeTowersChunkEventHandler {
-	
-	public MazeTowersChunkEventHandler() {
-	}
 
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
     public void onPopulateChunkEvent(PopulateChunkEvent.Post e) {
@@ -67,7 +64,7 @@ public class MazeTowersChunkEventHandler {
 		//MazeTowers.network.sendToDimension(new PacketDebugMessage("Chunk populated at (" +
 			//e.chunkX + ", " + e.chunkZ + ")"), e.world.provider.getDimensionId());
 		if (e.world.provider.getDimensionId() == 0 &&
-			new Random().nextInt(256) == 0 && !e.hasVillageGenerated) {
+			e.rand.nextInt(256) == 0 && !e.hasVillageGenerated) {
 			int chunkIndex;
 			if ((chunkIndex = MazeTowers.mazeTowers.getSpawnPosLoadedCount(e.world)) <
 				MazeTowers.mazeTowers.getGenCount() && MazeTowers.mazeTowers
@@ -82,18 +79,5 @@ public class MazeTowersChunkEventHandler {
 			}
 			e.chunkProvider.provideChunk(e.chunkX, e.chunkZ).setModified(true);
 		}
-		
-		//BlockPos spawnPos = ChaosBlock.chaosLabyrinth.getSpawnPos(e.world);
-		//Chunk chunk = e.getChunk();
-		/*if (e.world.provider.getDimensionId() == 0 && !spawnPos.equals(new BlockPos(-1, 1, -1)) && spawnPos.getY() > 0 && 
-			(chunk.xPosition == spawnPos.getX() >> 4 ||
-			chunk.xPosition == (spawnPos.getX() >> 4) + 1) &&
-			(chunk.zPosition == spawnPos.getZ() >> 4 ||
-			chunk.zPosition == (spawnPos.getZ() >> 4) + 1)) {*/
-			/*byte chaosBiomeIndex = 86;
-			byte[] biomeArray = new byte[256];
-			Arrays.fill(biomeArray, chaosBiomeIndex);
-			e.getChunk().setBiomeArray(biomeArray);*/
-		//}
 	}
 }

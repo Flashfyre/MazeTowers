@@ -167,7 +167,13 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
      */
     public boolean onBlockEventReceived(World worldIn, BlockPos pos, IBlockState state, int eventID, int eventParam)
     {
-        EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+		EnumFacing enumfacing;
+		
+		try {
+			enumfacing = state.getValue(FACING);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
 
         if (!worldIn.isRemote)
         {

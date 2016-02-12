@@ -205,7 +205,8 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 		if (canScan) {
 			TileEntityItemScanner te;
 			if (!(te = (TileEntityItemScanner) worldIn.getTileEntity(pos))
-				.getOwnerName().equals(playerIn.getDisplayNameString())) {
+				.getOwnerName().equals(playerIn.getDisplayNameString()) &&
+				!playerIn.capabilities.isCreativeMode) {
 				(te = (TileEntityItemScanner) worldIn.getTileEntity(pos))
 					.setEntityId(playerIn.getEntityId());
 				if (te.getKeyStack() != null) {

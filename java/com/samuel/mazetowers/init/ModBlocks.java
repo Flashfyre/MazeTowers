@@ -17,6 +17,7 @@ public class ModBlocks {
 	public static Block hiddenPressurePlateWeighted;
 	public static Block itemScanner;
 	public static Block itemScannerGold;
+	public static Block mazeTowerThreshold;
 	public static Block memoryPiston;
 	public static Block memoryPistonOff;
 	public static Block memoryPistonHead;
@@ -38,6 +39,7 @@ public class ModBlocks {
     		"hidden_heavy_pressure_plate");
     	GameRegistry.registerBlock(itemScanner = MazeTowers.BlockItemScanner, "item_scanner");
     	GameRegistry.registerBlock(itemScannerGold = MazeTowers.BlockItemScannerGold, "item_scanner_gold");
+    	GameRegistry.registerBlock(mazeTowerThreshold = MazeTowers.BlockMazeTowerThreshold, "maze_tower_threshold");
     	GameRegistry.registerBlock(memoryPiston = MazeTowers.BlockMemoryPiston, "memory_piston");
     	GameRegistry.registerBlock(memoryPistonOff = MazeTowers.BlockMemoryPistonOff, "memory_piston_off");
     	GameRegistry.registerBlock(memoryPistonHead = MazeTowers.BlockMemoryPistonHead, "memory_piston_head");
