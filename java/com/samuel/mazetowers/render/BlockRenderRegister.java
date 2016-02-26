@@ -10,7 +10,7 @@ import com.samuel.mazetowers.init.ModBlocks;
 
 public class BlockRenderRegister {
 	public static String modid = MazeTowers.MODID;
-	
+
 	public static void registerBlockRenderer() {
 		reg(ModBlocks.hiddenButton, 0);
 		reg(ModBlocks.hiddenPressurePlateWeighted, 0);
@@ -25,6 +25,20 @@ public class BlockRenderRegister {
 		reg(ModBlocks.mineralChestIron, 0);
 		reg(ModBlocks.mineralChestGold, 0);
 		reg(ModBlocks.mineralChestDiamond, 0);
+		reg(ModBlocks.packedIceStairs, 0);
+		reg(ModBlocks.prismarineBrickStairs, 0);
+		reg(ModBlocks.endStoneStairs, 0);
+		reg(ModBlocks.obsidianStairs, 0);
+		reg(ModBlocks.bedrockStairs, 0);
+		reg(ModBlocks.sandstoneWall, 0);
+		reg(ModBlocks.redSandstoneWall, 0);
+		reg(ModBlocks.stoneBrickWall, 0);
+		reg(ModBlocks.packedIceWall, 0);
+		reg(ModBlocks.prismarineBrickWall, 0);
+		reg(ModBlocks.quartzWall, 0);
+		reg(ModBlocks.endStoneWall, 0);
+		reg(ModBlocks.obsidianWall, 0);
+		reg(ModBlocks.bedrockWall, 0);
 		reg(ModBlocks.resistantDoorEndStone, 0);
 		reg(ModBlocks.resistantDoorQuartz, 0);
 		reg(ModBlocks.resistantDoorObsidian, 0);
@@ -32,10 +46,23 @@ public class BlockRenderRegister {
 	}
 
 	public static void reg(Block block, int meta) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), meta, new ModelResourceLocation(modid + ":" + block.getUnlocalizedName().substring(5), "inventory"));
+		Minecraft.getMinecraft().getRenderItem()
+			.getItemModelMesher().register(
+				Item.getItemFromBlock(block),
+				meta,
+				new ModelResourceLocation(modid
+					+ ":"
+					+ block.getUnlocalizedName().substring(
+						5), "inventory"));
 	}
-    
-	public static void reg(Block block, int meta, String name) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), meta, new ModelResourceLocation(modid + ":" + name, "inventory"));
+
+	public static void reg(Block block, int meta,
+		String name) {
+		Minecraft.getMinecraft().getRenderItem()
+			.getItemModelMesher().register(
+				Item.getItemFromBlock(block),
+				meta,
+				new ModelResourceLocation(modid + ":"
+					+ name, "inventory"));
 	}
 }

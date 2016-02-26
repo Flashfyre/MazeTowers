@@ -1,0 +1,7 @@
+{
+	"parent": "block/cube_all",
+	"textures": {
+		"all": "mazetowers:blocks/chaotic_sludge_still",
+		"flowing": "mazetowers:blocks/chaotic_sludge_still"
+	}
+}

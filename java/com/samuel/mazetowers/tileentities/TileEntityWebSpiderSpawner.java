@@ -8,22 +8,21 @@ import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityDispenser;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ITickable;
 
-public class TileEntityWebSpiderSpawner extends TileEntity implements ITickable {
+public class TileEntityWebSpiderSpawner extends TileEntity
+	implements ITickable {
 
 	private final int difficulty;
-	
+
 	public TileEntityWebSpiderSpawner() {
 		difficulty = 1;
 	}
-	
+
 	public TileEntityWebSpiderSpawner(int difficulty) {
 		this.difficulty = difficulty;
 	}
@@ -34,35 +33,51 @@ public class TileEntityWebSpiderSpawner extends TileEntity implements ITickable 
 			boolean isValid = false;
 			boolean isWeb = false;
 			IBlockState state;
-			if ((state = this.worldObj.getBlockState(pos)) != null &&
-				(isWeb = state.getBlock() == Blocks.web)) {
+			if ((state = this.worldObj.getBlockState(pos)) != null
+				&& (isWeb = state.getBlock() == Blocks.web)) {
 				float posX, posY, posZ;
-				List list = worldObj.getEntitiesWithinAABB(EntityPlayer.class,
-					AxisAlignedBB.fromBounds((posX = this.pos.getX()),
-					(posY = this.pos.getY()) + 0D, (posZ = this.pos.getZ()),
-					posX + 1.0D, posY + 0.5D, posZ + 1.0D));
+				List list = worldObj.getEntitiesWithinAABB(
+					EntityPlayer.class, AxisAlignedBB
+						.fromBounds(
+							(posX = this.pos.getX()),
+							(posY = this.pos.getY()) + 0D,
+							(posZ = this.pos.getZ()),
+							posX + 1.0D, posY + 0.5D,
+							posZ + 1.0D));
 				if (list.isEmpty())
 					isValid = true;
 				else {
-					EntityPlayer player = (EntityPlayer) list.get(0);
+					EntityPlayer player = (EntityPlayer) list
+						.get(0);
 					if (player.capabilities.isCreativeMode)
 						isValid = true;
-					else if ((this.worldObj.rand.nextInt(10) + 1) < difficulty) {
-						EntitySpider spider = difficulty < 5 ?
-							new EntitySpider(this.worldObj) :
-							new EntityCaveSpider(this.worldObj);
+					else if ((this.worldObj.rand
+						.nextInt(10) + 1) < difficulty) {
+						EntitySpider spider = difficulty < 5 ? new EntitySpider(
+							this.worldObj)
+							: new EntityCaveSpider(
+								this.worldObj);
 						EnumFacing offsetDir = EnumFacing
-							.fromAngle(player.getRotationYawHead()).getOpposite();
+							.fromAngle(
+								player.getRotationYawHead())
+							.getOpposite();
 						if (offsetDir.getAxis() == Axis.X) {
-							posX += offsetDir.getAxisDirection() == AxisDirection.POSITIVE ? 1.5F : -0.5F;
+							posX += offsetDir
+								.getAxisDirection() == AxisDirection.POSITIVE ? 1.5F
+								: -0.5F;
 							posZ += (posZ < 0 ? 0.5 : -0.5);
 						} else {
 							posX += (posX < 0 ? 0.5 : -0.5);
-							posZ += offsetDir.getAxisDirection() == AxisDirection.POSITIVE ? 1.5F : -0.5F;
+							posZ += offsetDir
+								.getAxisDirection() == AxisDirection.POSITIVE ? 1.5F
+								: -0.5F;
 						}
-						spider.setLocationAndAngles(posX, posY - 2.0F, posZ,
-							player.getRotationYawHead(), spider.cameraPitch);
-						this.worldObj.spawnEntityInWorld(spider);
+						spider.setLocationAndAngles(posX,
+							posY - 2.0F, posZ, player
+								.getRotationYawHead(),
+							spider.cameraPitch);
+						this.worldObj
+							.spawnEntityInWorld(spider);
 					}
 				}
 			}

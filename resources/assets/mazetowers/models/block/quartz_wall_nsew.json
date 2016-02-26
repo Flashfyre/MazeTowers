@@ -1,0 +1,7 @@
+{
+    "parent": "block/wall_nsew",
+    "textures": {
+        "wall": "blocks/quartz_block_side",
+		"top": "blocks/quartz_block_top"
+    }
+}

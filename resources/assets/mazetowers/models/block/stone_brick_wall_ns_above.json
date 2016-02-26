@@ -1,0 +1,7 @@
+{
+    "parent": "block/wall_ns_above",
+    "textures": {
+        "wall": "blocks/stonebrick",
+		"top": "blocks/stonebrick"
+    }
+}

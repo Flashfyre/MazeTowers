@@ -3,21 +3,13 @@ package com.samuel.mazetowers.tileentities;
 import java.util.Iterator;
 import java.util.List;
 
-import com.samuel.mazetowers.blocks.BlockMineralChest;
-import com.samuel.mazetowers.etc.ContainerMineralChest;
-import com.samuel.mazetowers.etc.InventoryLargeMineralChest;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -25,277 +17,289 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityMineralChest extends TileEntityChest implements ITickable, IInventory
-{
+import com.samuel.mazetowers.blocks.BlockMineralChest;
+import com.samuel.mazetowers.etc.ContainerMineralChest;
+import com.samuel.mazetowers.etc.InventoryLargeMineralChest;
+
+public class TileEntityMineralChest extends TileEntityChest
+	implements ITickable, IInventory {
 	private int ticksSinceSync;
-    private int cachedChestType;
-    private String customName;
-    
-    public TileEntityMineralChest()
-    {
-        this.cachedChestType = -1;
-    }
+	private int cachedChestType;
+	private String customName;
 
-    public TileEntityMineralChest(int chestType)
-    {
-        this.cachedChestType = chestType;
-    }
+	public TileEntityMineralChest() {
+		this.cachedChestType = -1;
+	}
 
-    @Override
-    /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
-     */
-    public String getCommandSenderName()
-    {
-        return this.hasCustomName() ? this.customName : cachedChestType == 0 ?
-        	"mazetowers:container.iron_chest" : cachedChestType == 1 ?
-        	"mazetowers:container.gold_chest" : "mazetowers:container.diamond_chest";
-    }
+	public TileEntityMineralChest(int chestType) {
+		this.cachedChestType = chestType;
+	}
 
-    @Override
-    /**
-     * Returns true if this thing is named
-     */
-    public boolean hasCustomName()
-    {
-        return this.customName != null && this.customName.length() > 0;
-    }
+	@Override
+	/**
+	 * Gets the name of this command sender (usually username, but possibly "Rcon")
+	 */
+	public String getCommandSenderName() {
+		return this.hasCustomName() ? this.customName
+			: cachedChestType == 0 ? "mazetowers:container.iron_chest"
+				: cachedChestType == 1 ? "mazetowers:container.gold_chest"
+					: "mazetowers:container.diamond_chest";
+	}
 
-    public void setCustomName(String name)
-    {
-    	super.setCustomName(name);
-        this.customName = name;
-    }
-    
-    @Override
+	@Override
+	/**
+	 * Returns true if this thing is named
+	 */
+	public boolean hasCustomName() {
+		return this.customName != null
+			&& this.customName.length() > 0;
+	}
+
+	public void setCustomName(String name) {
+		super.setCustomName(name);
+		this.customName = name;
+	}
+
+	@Override
 	public IChatComponent getDisplayName() {
-		String name = StatCollector.translateToLocal((blockType != null ?
-			blockType.getUnlocalizedName() : "tile.") + (cachedChestType == 0 ?
-			"iron" : cachedChestType == 1 ? "gold" : "diamond") + "_chest.name");
+		String name = StatCollector
+			.translateToLocal((blockType != null ? blockType
+				.getUnlocalizedName()
+				: "tile.")
+				+ (cachedChestType == 0 ? "iron"
+					: cachedChestType == 1 ? "gold"
+						: "diamond") + "_chest.name");
 		return new ChatComponentText(name);
 	}
-    
-    public int getChestType()
-    {
-        if (this.cachedChestType == -1)
-        {
-            if (this.worldObj == null || !(this.getBlockType() instanceof BlockMineralChest))
-            {
-                return 0;
-            }
 
-            this.cachedChestType = ((BlockMineralChest)this.getBlockType()).chestType;
-        }
+	public int getChestType() {
+		if (this.cachedChestType == -1) {
+			if (this.worldObj == null
+				|| !(this.getBlockType() instanceof BlockMineralChest)) {
+				return 0;
+			}
 
-        return this.cachedChestType;
-    }
+			this.cachedChestType = ((BlockMineralChest) this
+				.getBlockType()).chestType;
+		}
 
-    @Override
-    protected TileEntityChest getAdjacentChest(EnumFacing side)
-    {
-        BlockPos blockpos = this.pos.offset(side);
+		return this.cachedChestType;
+	}
 
-        if (this.isChestAt(blockpos))
-        {
-            TileEntity tileentity = this.worldObj.getTileEntity(blockpos);
+	@Override
+	protected TileEntityChest getAdjacentChest(
+		EnumFacing side) {
+		BlockPos blockpos = this.pos.offset(side);
 
-            if (tileentity instanceof TileEntityChest)
-            {
-                TileEntityMineralChest tileentitychest = (TileEntityMineralChest)tileentity;
-                tileentitychest.func_174910_a(tileentitychest, side);
-                return tileentitychest;
-            }
-        }
+		if (this.isChestAt(blockpos)) {
+			TileEntity tileentity = this.worldObj
+				.getTileEntity(blockpos);
 
-        return null;
-    }
-    
-    @SuppressWarnings("incomplete-switch")
-    private void func_174910_a(TileEntityMineralChest chestTe, EnumFacing side)
-    {
-        if (chestTe.isInvalid())
-        {
-            this.adjacentChestChecked = false;
-        }
-        else if (this.adjacentChestChecked)
-        {
-            switch (side)
-            {
-                case NORTH:
+			if (tileentity instanceof TileEntityChest) {
+				TileEntityMineralChest tileentitychest = (TileEntityMineralChest) tileentity;
+				tileentitychest.func_174910_a(
+					tileentitychest, side);
+				return tileentitychest;
+			}
+		}
 
-                    if (this.adjacentChestZNeg != chestTe)
-                    {
-                        this.adjacentChestChecked = false;
-                    }
+		return null;
+	}
 
-                    break;
-                case SOUTH:
+	@SuppressWarnings("incomplete-switch")
+	private void func_174910_a(
+		TileEntityMineralChest chestTe, EnumFacing side) {
+		if (chestTe.isInvalid()) {
+			this.adjacentChestChecked = false;
+		} else if (this.adjacentChestChecked) {
+			switch (side) {
+			case NORTH:
 
-                    if (this.adjacentChestZPos != chestTe)
-                    {
-                        this.adjacentChestChecked = false;
-                    }
+				if (this.adjacentChestZNeg != chestTe) {
+					this.adjacentChestChecked = false;
+				}
 
-                    break;
-                case EAST:
+				break;
+			case SOUTH:
 
-                    if (this.adjacentChestXPos != chestTe)
-                    {
-                        this.adjacentChestChecked = false;
-                    }
+				if (this.adjacentChestZPos != chestTe) {
+					this.adjacentChestChecked = false;
+				}
 
-                    break;
-                case WEST:
+				break;
+			case EAST:
 
-                    if (this.adjacentChestXNeg != chestTe)
-                    {
-                        this.adjacentChestChecked = false;
-                    }
-            }
-        }
-    }
+				if (this.adjacentChestXPos != chestTe) {
+					this.adjacentChestChecked = false;
+				}
 
-    private boolean isChestAt(BlockPos posIn)
-    {
-        if (this.worldObj == null)
-        {
-            return false;
-        }
-        else
-        {
-            Block block = this.worldObj.getBlockState(posIn).getBlock();
-            return block instanceof BlockMineralChest &&
-            	((BlockMineralChest)block).chestType == this.getChestType();
-        }
-    }
+				break;
+			case WEST:
 
-    @Override
-    /**
-     * Updates the JList with a new model.
-     */
-    public void update()
-    {
-        this.checkForAdjacentChests();
-        int var1 = this.pos.getX();
-        int var2 = this.pos.getY();
-        int var3 = this.pos.getZ();
-        ++this.ticksSinceSync;
-        float var4;
+				if (this.adjacentChestXNeg != chestTe) {
+					this.adjacentChestChecked = false;
+				}
+			}
+		}
+	}
 
-        if (!this.worldObj.isRemote && this.numPlayersUsing != 0 && (this.ticksSinceSync + var1 + var2 + var3) % 200 == 0)
-        {
-            this.numPlayersUsing = 0;
-            var4 = 5.0F;
-            List var5 = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)var1 - var4), (double)((float)var2 - var4), (double)((float)var3 - var4), (double)((float)(var1 + 1) + var4), (double)((float)(var2 + 1) + var4), (double)((float)(var3 + 1) + var4)));
-            Iterator var6 = var5.iterator();
+	private boolean isChestAt(BlockPos posIn) {
+		if (this.worldObj == null) {
+			return false;
+		} else {
+			Block block = this.worldObj
+				.getBlockState(posIn).getBlock();
+			return block instanceof BlockMineralChest
+				&& ((BlockMineralChest) block).chestType == this
+					.getChestType();
+		}
+	}
 
-            while (var6.hasNext())
-            {
-                EntityPlayer var7 = (EntityPlayer)var6.next();
+	@Override
+	/**
+	 * Updates the JList with a new model.
+	 */
+	public void update() {
+		this.checkForAdjacentChests();
+		int var1 = this.pos.getX();
+		int var2 = this.pos.getY();
+		int var3 = this.pos.getZ();
+		++this.ticksSinceSync;
+		float var4;
 
-                if (var7.openContainer instanceof ContainerMineralChest)
-                {
-                    IInventory var8 = ((ContainerMineralChest)var7.openContainer).getLowerChestInventory();
+		if (!this.worldObj.isRemote
+			&& this.numPlayersUsing != 0
+			&& (this.ticksSinceSync + var1 + var2 + var3) % 200 == 0) {
+			this.numPlayersUsing = 0;
+			var4 = 5.0F;
+			List var5 = this.worldObj
+				.getEntitiesWithinAABB(
+					EntityPlayer.class,
+					new AxisAlignedBB(
+						(double) ((float) var1 - var4),
+						(double) ((float) var2 - var4),
+						(double) ((float) var3 - var4),
+						(double) ((float) (var1 + 1) + var4),
+						(double) ((float) (var2 + 1) + var4),
+						(double) ((float) (var3 + 1) + var4)));
+			Iterator var6 = var5.iterator();
 
-                    if (var8 == this || var8 instanceof InventoryLargeMineralChest &&
-                    	((InventoryLargeMineralChest)var8).isPartOfLargeChest(this))
-                    {
-                        ++this.numPlayersUsing;
-                    }
-                }
-            }
-        }
+			while (var6.hasNext()) {
+				EntityPlayer var7 = (EntityPlayer) var6
+					.next();
 
-        this.prevLidAngle = this.lidAngle;
-        var4 = 0.1F;
-        double var14;
+				if (var7.openContainer instanceof ContainerMineralChest) {
+					IInventory var8 = ((ContainerMineralChest) var7.openContainer)
+						.getLowerChestInventory();
 
-        if (this.numPlayersUsing > 0 && this.lidAngle == 0.0F && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
-        {
-            double var11 = (double)var1 + 0.5D;
-            var14 = (double)var3 + 0.5D;
+					if (var8 == this
+						|| var8 instanceof InventoryLargeMineralChest
+						&& ((InventoryLargeMineralChest) var8)
+							.isPartOfLargeChest(this)) {
+						++this.numPlayersUsing;
+					}
+				}
+			}
+		}
 
-            if (this.adjacentChestZPos != null)
-            {
-                var14 += 0.5D;
-            }
+		this.prevLidAngle = this.lidAngle;
+		var4 = 0.1F;
+		double var14;
 
-            if (this.adjacentChestXPos != null)
-            {
-                var11 += 0.5D;
-            }
+		if (this.numPlayersUsing > 0
+			&& this.lidAngle == 0.0F
+			&& this.adjacentChestZNeg == null
+			&& this.adjacentChestXNeg == null) {
+			double var11 = (double) var1 + 0.5D;
+			var14 = (double) var3 + 0.5D;
 
-            this.worldObj.playSoundEffect(var11, (double)var2 + 0.5D, var14, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
-        }
+			if (this.adjacentChestZPos != null) {
+				var14 += 0.5D;
+			}
 
-        if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
-        {
-            float var12 = this.lidAngle;
+			if (this.adjacentChestXPos != null) {
+				var11 += 0.5D;
+			}
 
-            if (this.numPlayersUsing > 0)
-            {
-                this.lidAngle += var4;
-            }
-            else
-            {
-                this.lidAngle -= var4;
-            }
+			this.worldObj
+				.playSoundEffect(
+					var11,
+					(double) var2 + 0.5D,
+					var14,
+					"random.chestopen",
+					0.5F,
+					this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+		}
 
-            if (this.lidAngle > 1.0F)
-            {
-                this.lidAngle = 1.0F;
-            }
+		if (this.numPlayersUsing == 0
+			&& this.lidAngle > 0.0F
+			|| this.numPlayersUsing > 0
+			&& this.lidAngle < 1.0F) {
+			float var12 = this.lidAngle;
 
-            float var13 = 0.5F;
+			if (this.numPlayersUsing > 0) {
+				this.lidAngle += var4;
+			} else {
+				this.lidAngle -= var4;
+			}
 
-            if (this.lidAngle < var13 && var12 >= var13 && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
-            {
-                var14 = (double)var1 + 0.5D;
-                double var9 = (double)var3 + 0.5D;
+			if (this.lidAngle > 1.0F) {
+				this.lidAngle = 1.0F;
+			}
 
-                if (this.adjacentChestZPos != null)
-                {
-                    var9 += 0.5D;
-                }
+			float var13 = 0.5F;
 
-                if (this.adjacentChestXPos != null)
-                {
-                    var14 += 0.5D;
-                }
+			if (this.lidAngle < var13 && var12 >= var13
+				&& this.adjacentChestZNeg == null
+				&& this.adjacentChestXNeg == null) {
+				var14 = (double) var1 + 0.5D;
+				double var9 = (double) var3 + 0.5D;
 
-                this.worldObj.playSoundEffect(var14, (double)var2 + 0.5D, var9, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
-            }
+				if (this.adjacentChestZPos != null) {
+					var9 += 0.5D;
+				}
 
-            if (this.lidAngle < 0.0F)
-            {
-                this.lidAngle = 0.0F;
-            }
-        }
-    }
+				if (this.adjacentChestXPos != null) {
+					var14 += 0.5D;
+				}
 
-    @Override
-    /**
-     * invalidates a tile entity
-     */
-    public void invalidate()
-    {
-        super.invalidate();
-        this.updateContainingBlockInfo();
-        this.checkForAdjacentChests();
-    }
+				this.worldObj
+					.playSoundEffect(
+						var14,
+						(double) var2 + 0.5D,
+						var9,
+						"random.chestclosed",
+						0.5F,
+						this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+			}
 
-    @Override
-    public String getGuiID()
-    {
-        return "minecraft:chest";
-    }
+			if (this.lidAngle < 0.0F) {
+				this.lidAngle = 0.0F;
+			}
+		}
+	}
 
-    @Override
-    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
-    {
-        return new ContainerMineralChest(playerInventory, this, playerIn);
-    }
+	@Override
+	/**
+	 * invalidates a tile entity
+	 */
+	public void invalidate() {
+		super.invalidate();
+		this.updateContainingBlockInfo();
+		this.checkForAdjacentChests();
+	}
+
+	@Override
+	public String getGuiID() {
+		return "minecraft:chest";
+	}
+
+	@Override
+	public Container createContainer(
+		InventoryPlayer playerInventory,
+		EntityPlayer playerIn) {
+		return new ContainerMineralChest(playerInventory,
+			this, playerIn);
+	}
 }

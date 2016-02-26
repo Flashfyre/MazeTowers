@@ -1,0 +1,7 @@
+{
+    "parent": "block/wall_ns_above",
+    "textures": {
+        "wall": "blocks/end_stone",
+		"top": "blocks/end_stone"
+    }
+}
