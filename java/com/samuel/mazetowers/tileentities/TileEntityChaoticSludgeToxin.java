@@ -40,11 +40,11 @@ public class TileEntityChaoticSludgeToxin extends
 					EntityLivingBase entity = (EntityLivingBase) list
 						.get(i);
 					if (entity instanceof EntityPlayer) {
-						MazeTowers.network.sendTo(
+						/*MazeTowers.network.sendTo(
 							new PacketDebugMessage(
 								"Added effect: "
 									+ this.toString()),
-							(EntityPlayerMP) entity);
+							(EntityPlayerMP) entity);*/
 						if (!((EntityPlayer) entity).capabilities.isCreativeMode)
 							continue;
 					}

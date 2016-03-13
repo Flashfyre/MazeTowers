@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "facing=north,nodrop=false": { "model": "mazetowers:explosive_creeper_skull" },
+        "facing=east,nodrop=false": { "model": "mazetowers:explosive_creeper_skull", "y": 90  },
+        "facing=south,nodrop=false": { "model": "mazetowers:explosive_creeper_skull", "y": 180  },
+        "facing=west,nodrop=false": { "model": "mazetowers:explosive_creeper_skull", "y": 270  },
+	"facing=up,nodrop=false": { "model": "mazetowers:explosive_creeper_skull" },
+	"facing=down,nodrop=false": { "model": "mazetowers:explosive_creeper_skull" },
+	"facing=north,nodrop=true": { "model": "mazetowers:explosive_creeper_skull" },
+        "facing=east,nodrop=true": { "model": "mazetowers:explosive_creeper_skull", "y": 90  },
+        "facing=south,nodrop=true": { "model": "mazetowers:explosive_creeper_skull", "y": 180  },
+        "facing=west,nodrop=true": { "model": "mazetowers:explosive_creeper_skull", "y": 270  },
+	"facing=up,nodrop=true": { "model": "mazetowers:explosive_creeper_skull" },
+	"facing=down,nodrop=true": { "model": "mazetowers:explosive_creeper_skull" }
+    }
+}

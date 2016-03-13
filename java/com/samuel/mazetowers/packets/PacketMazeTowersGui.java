@@ -2,12 +2,15 @@ package com.samuel.mazetowers.packets;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.samuel.mazetowers.etc.PlayerMazeTower;
 
 public class PacketMazeTowersGui implements IMessage {
@@ -84,8 +87,8 @@ public class PacketMazeTowersGui implements IMessage {
 			mainThread.addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
-					PlayerMazeTower props = PlayerMazeTower
-						.get(Minecraft.getMinecraft().thePlayer);
+					final EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+					PlayerMazeTower props = PlayerMazeTower.get(player);
 					if (props != null) {
 						boolean enabled = props
 							.getEnabled();
@@ -107,7 +110,6 @@ public class PacketMazeTowersGui implements IMessage {
 							}
 						} else if (enabled) {
 							props.setEnabled(false);
-							// Minecraft.getMinecraft().setIngameFocus();
 						}
 					} else {
 						props = null;

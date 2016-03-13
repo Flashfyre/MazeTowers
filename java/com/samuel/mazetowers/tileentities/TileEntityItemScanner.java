@@ -20,31 +20,8 @@ import net.minecraft.world.World;
 import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 import com.samuel.mazetowers.etc.ContainerItemScanner;
 
-public class TileEntityItemScanner extends TileEntity
-	implements IInventory {
+public class TileEntityItemScanner extends TileEntity implements IInventory {
 
-	/*
-	 * private static final ItemStack[] stackList = new ItemStack[] { new
-	 * ItemStack(Items.acacia_door), new ItemStack(Items.apple), new
-	 * ItemStack(Items.arrow), new ItemStack(Items.baked_potato), new
-	 * ItemStack(Items.banner), new ItemStack(Items.bed), new
-	 * ItemStack(Items.beef), new ItemStack(Items.birch_door), new
-	 * ItemStack(Items.blaze_powder), new ItemStack(Items.blaze_rod), new
-	 * ItemStack(Items.boat), new ItemStack(Items.bone), new
-	 * ItemStack(Items.book), new ItemStack(Items.bowl), new
-	 * ItemStack(Items.bread), new ItemStack(Items.brewing_stand), new
-	 * ItemStack(Items.brick), new ItemStack(Items.bucket), new
-	 * ItemStack(Items.cake), new ItemStack(Items.cake), new
-	 * ItemStack(Items.carrot), new ItemStack(Items.cauldron), new
-	 * ItemStack(Items.chicken), new ItemStack(Items.clay_ball), new
-	 * ItemStack(Items.clock), new ItemStack(Items.coal), new
-	 * ItemStack(Items.comparator), new ItemStack(Items.compass), new
-	 * ItemStack(Items.cooked_beef), new ItemStack(Items.cooked_chicken), new
-	 * ItemStack(Items.cooked_fish), new ItemStack(Items.cooked_mutton), new
-	 * ItemStack(Items.cooked_chicken), new ItemStack(Items.cooked_porkchop),
-	 * new ItemStack(Items.cooked_rabbit), new ItemStack(Items.cookie), new
-	 * ItemStack(Items.) };
-	 */
 	private int entityId;
 	private String customName;
 	private String ownerName;

@@ -11,7 +11,7 @@ public class BlockMazeTowerThreshold extends BlockContainer {
 
 	public BlockMazeTowerThreshold() {
 		super(MazeTowers.solidCircuits);
-		this.setBlockBounds(0F, 0.0F, 0F, 0F, 0F, 0F);
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 	}
 
 	@Override

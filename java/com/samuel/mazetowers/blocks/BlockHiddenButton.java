@@ -29,7 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.UnlistedPropertyCopiedBlock;
 
-public class BlockHiddenButton extends Block {
+public class BlockHiddenButton extends BlockVendorTradeable {
 
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing");
@@ -47,13 +47,12 @@ public class BlockHiddenButton extends Block {
 	 * (cubeSize * cubeSize)) - 1)); } properties[6] = COPIEDBLOCK; }
 	 */
 
-	public BlockHiddenButton(String unlocalizedName) {
-		super(MazeTowers.solidCircuits);
+	public BlockHiddenButton() {
+		super(MazeTowers.solidCircuits, 1, 6, 9, 25, 250);
 		IExtendedBlockState state = ((IExtendedBlockState) this.blockState
 			.getBaseState()).withProperty(COPIEDBLOCK,
 			Blocks.quartz_block.getDefaultState());
 		setCreativeTab(CreativeTabs.tabRedstone);
-		setUnlocalizedName(unlocalizedName);
 		setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(POWERED, Boolean.valueOf(false)));
@@ -431,7 +430,7 @@ public class BlockHiddenButton extends Block {
 			Boolean.valueOf((meta & 8) > 0));
 	}
 
-	private IBlockState getConnectedBlockState(
+	private static IBlockState getConnectedBlockState(
 		IBlockAccess world, BlockPos blockPos) {
 		final IBlockState normal = Blocks.quartz_block
 			.getStateFromMeta(3);

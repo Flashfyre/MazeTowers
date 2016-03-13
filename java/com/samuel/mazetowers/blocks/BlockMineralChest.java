@@ -20,6 +20,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 
+import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.InventoryLargeMineralChest;
 import com.samuel.mazetowers.tileentities.TileEntityMineralChest;
 
@@ -28,6 +29,7 @@ public class BlockMineralChest extends BlockChest {
 
 	public BlockMineralChest(int chestType) {
 		super(chestType);
+		this.setCreativeTab(MazeTowers.tabExtra);
 	}
 
 	@Override
@@ -205,13 +207,13 @@ public class BlockMineralChest extends BlockChest {
 			|| this.isOcelotSittingOnChest(worldIn, pos);
 	}
 
-	private boolean isBelowSolidBlock(World worldIn,
+	private static boolean isBelowSolidBlock(World worldIn,
 		BlockPos pos) {
 		return worldIn.isSideSolid(pos.up(),
 			EnumFacing.DOWN, false);
 	}
 
-	private boolean isOcelotSittingOnChest(World worldIn,
+	private static boolean isOcelotSittingOnChest(World worldIn,
 		BlockPos pos) {
 		Iterator iterator = worldIn.getEntitiesWithinAABB(
 			EntityOcelot.class,

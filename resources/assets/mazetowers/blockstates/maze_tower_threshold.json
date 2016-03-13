@@ -1,0 +1,5 @@
+{
+	"variants": {
+		"normal": { "model": "mazetowers:maze_tower_threshold" }
+	}
+}

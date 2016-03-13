@@ -1,0 +1,6 @@
+{
+	"parent": "mazetowers:block/vendor_spawner",
+    "textures": {
+		"texture": "mazetowers:blocks/invisible"
+    }
+}

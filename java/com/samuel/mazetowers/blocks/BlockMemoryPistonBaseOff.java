@@ -15,8 +15,8 @@ import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
 public class BlockMemoryPistonBaseOff extends
 	BlockMemoryPistonBase implements ITileEntityProvider {
 
-	public BlockMemoryPistonBaseOff(String unlocalizedName) {
-		super(unlocalizedName);
+	public BlockMemoryPistonBaseOff() {
+		super();
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 

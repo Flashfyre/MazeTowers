@@ -32,17 +32,27 @@ public class BlockRenderRegister {
 		reg(ModBlocks.bedrockStairs, 0);
 		reg(ModBlocks.sandstoneWall, 0);
 		reg(ModBlocks.redSandstoneWall, 0);
+		reg(ModBlocks.mossyStoneBrickWall, 0);
 		reg(ModBlocks.stoneBrickWall, 0);
 		reg(ModBlocks.packedIceWall, 0);
 		reg(ModBlocks.prismarineBrickWall, 0);
 		reg(ModBlocks.quartzWall, 0);
 		reg(ModBlocks.endStoneWall, 0);
+		reg(ModBlocks.purpurWall, 0);
 		reg(ModBlocks.obsidianWall, 0);
 		reg(ModBlocks.bedrockWall, 0);
-		reg(ModBlocks.resistantDoorEndStone, 0);
+		reg(ModBlocks.resistantDoorPrismarine, 0);
 		reg(ModBlocks.resistantDoorQuartz, 0);
+		reg(ModBlocks.resistantDoorEndStone, 0);
 		reg(ModBlocks.resistantDoorObsidian, 0);
 		reg(ModBlocks.resistantDoorBedrock, 0);
+		for (int c = 0; c < 20; c++)
+			reg(ModBlocks.lock, c );
+		reg(ModBlocks.redstone_clock, 0);
+		reg(ModBlocks.redstone_clock_inverted, 0);
+		reg(ModBlocks.explosiveCreeperSkull, 0);
+		reg(ModBlocks.specialMobSpawner, 0);
+		reg(ModBlocks.vendorSpawner, 0);
 	}
 
 	public static void reg(Block block, int meta) {

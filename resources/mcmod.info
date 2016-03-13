@@ -2,7 +2,7 @@
 {
   "modid": "mazetowers",
   "name": "Maze Towers",
-  "description": "Spawn large, randomly generated dungeons in your world!",
+  "description": "Spawn massive, randomly generated dungeons in your world!",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",

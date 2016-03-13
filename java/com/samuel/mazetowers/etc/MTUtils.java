@@ -4,26 +4,41 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.WeightedRandom;
+import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import scala.Char;
 
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.init.ModChestGen;
+import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase;
 
 public class MTUtils {
 
@@ -135,9 +150,130 @@ public class MTUtils {
 		int index, int level) {
 		ItemStack stack = new ItemStack(
 			Items.enchanted_book);
-		stack.addEnchantment(Enchantment
-			.getEnchantmentById(index), level);
+		//EnchantmentHelper.addRandomEnchantment(new Random(), stack, level);
+		Items.enchanted_book.addEnchantment(stack, new EnchantmentData(Enchantment
+			.getEnchantmentById(index), level));
 		return stack;
+	}
+	
+	public static void fillInventoryWithLoot(EntityPlayer player, int rarity) {
+		ChestGenHooks chestGen = ModChestGen.chestContents[rarity];
+		for (int i = 0; i < player.inventory.mainInventory.length; i++)
+			player.inventory.mainInventory[i] = chestGen.getOneItem(player.worldObj.rand);
+	}
+	
+	public static ArrayList<String> getLootList(Random rand, int rarity) {
+		//final boolean isSizeSensitive = false;
+		final double iterations = 100000d;
+		final List<WeightedRandomChestContent> items;
+		ArrayList<String> lootList = new ArrayList<String>();
+		HashMap<WeightedRandomChestContent, Integer> itemCount =
+			new HashMap<WeightedRandomChestContent, Integer>();
+		ChestGenHooks chestGen = ModChestGen.chestContents[rarity];
+		WeightedRandomChestContent weightedItem;
+		WeightedRandomChestContent[] keys;
+		Iterator iterator = chestGen.getItems(rand).iterator();
+		ItemStack stack;
+		int s = 0;
+		double totalWeight = 0, totalWeightNoDupe = 0;
+		
+		final Comparator<Entry<WeightedRandomChestContent, Integer>> chestGenComparator =
+			new Comparator<Entry<WeightedRandomChestContent, Integer>>() {
+
+			@Override
+			public int compare(
+				Entry<WeightedRandomChestContent, Integer> e1,
+				Entry<WeightedRandomChestContent, Integer> e2) {
+				Integer v1 = (Integer) e1.getValue();
+				Integer v2 = (Integer) e2.getValue();
+				return v1.compareTo(v2);
+			}
+		};
+		
+		while (iterator.hasNext()) {
+			boolean keyFound = false;
+			weightedItem = (WeightedRandomChestContent) iterator.next();
+			keys = itemCount.keySet().toArray(
+				new WeightedRandomChestContent[itemCount.size()]);
+			for (WeightedRandomChestContent key : keys) {
+				stack = weightedItem.theItemId;
+				if (stack.areItemsEqual(stack, key.theItemId) &&
+					weightedItem.itemWeight == key.itemWeight &&
+					weightedItem.minStackSize == key.minStackSize &&
+					weightedItem.maxStackSize == key.maxStackSize) {
+					keyFound = true;
+					break;
+				}
+			}
+			if (!keyFound) {
+				totalWeightNoDupe += weightedItem.itemWeight;
+				itemCount.put(weightedItem, 0);
+			} else
+				totalWeight += weightedItem.itemWeight;
+		}
+		
+		totalWeight += totalWeightNoDupe;
+		
+		items = chestGen.getItems(rand);
+		keys = itemCount.keySet().toArray(new WeightedRandomChestContent[itemCount.size()]);
+		
+		for (int i = 0; i < iterations; i++) {
+			weightedItem = WeightedRandom.getRandomItem(rand, items);
+			stack = weightedItem.theItemId;
+			for (s = 0; s < keys.length; s++) {
+				if (
+					stack.areItemsEqual(stack, keys[s].theItemId) &&
+					weightedItem.itemWeight == keys[s].itemWeight &&
+					weightedItem.minStackSize == keys[s].minStackSize &&
+					weightedItem.maxStackSize == keys[s].maxStackSize) {
+					itemCount.put(keys[s], itemCount.get(keys[s]) + 1);
+					break;
+				}
+			}
+		}
+		
+		String lootListLine = "";
+		
+		lootList.add(MazeTowerBase.EnumLevel.getStringFromLevel(rarity, false) +
+			"--------------------");
+		
+		List<Entry<WeightedRandomChestContent, Integer>> stackEntries =
+			new ArrayList<Entry<WeightedRandomChestContent, Integer>>(itemCount.entrySet());
+		Collections.sort(stackEntries, chestGenComparator.reversed());
+		LinkedHashMap<WeightedRandomChestContent, Integer> chestGenSorted =
+			new LinkedHashMap<WeightedRandomChestContent, Integer>(itemCount.size());
+		for (Entry<WeightedRandomChestContent, Integer> entry : stackEntries) {
+			chestGenSorted.put(entry.getKey(), entry.getValue());
+		}
+		
+		keys = chestGenSorted.keySet().toArray(new WeightedRandomChestContent[keys.length]);
+		
+		for (s = 0; s < keys.length; s++) {
+			String stackName, countRange;
+			final double weight;
+			weightedItem = keys[s];
+			stack = weightedItem.theItemId;
+			stackName = stack.getDisplayName();
+			if (stackName.equals("Enchanted Book"))
+				stackName = "EB";
+			if (weightedItem.minStackSize == weightedItem.maxStackSize)
+				countRange = String.valueOf(weightedItem.minStackSize);
+			else
+				countRange = weightedItem.minStackSize + "-" + weightedItem.maxStackSize;
+			weight = itemCount.get(weightedItem) / iterations;
+			lootListLine += stackName + "(" + countRange + "): " + (Math.round(
+				weight * 100000d) / 1000d) + "%";
+			if (s % 2 != 1 && s != keys.length - 1)
+				lootListLine += " | ";
+			else {
+				lootList.add(lootListLine);
+				lootListLine = "";
+			}
+		}
+		
+		lootList.add(totalWeightNoDupe + " (" + totalWeight + ")");
+		
+		return lootList;
 	}
 
 	public static String getEncodedItemName(
@@ -355,6 +491,18 @@ public class MTUtils {
 		}
 		return data;
 	}
+	
+	public static int RGBToInt(float red, float green, float blue) {
+		int R = Math.round(255 * red);
+		int G = Math.round(255 * green);
+	    int B = Math.round(255 * blue);
+
+	    R = (R << 16) & 0x00FF0000;
+	    G = (G << 8) & 0x0000FF00;
+	    B = B & 0x000000FF;
+
+	    return 0xFF000000 | R | G | B;
+	}
 
 	/*
 	 * public static Block getNewStairsBlock(IBlockState baseState) { Block
@@ -374,10 +522,11 @@ public class MTUtils {
 			ObfuscationReflectionHelper.remapFieldNames(
 				clazz.getName(), names));
 	}
-
-	public static Method findObfuscatedMethod(
-		Class<?> clazz, String... names) {
-		return ReflectionHelper.findMethod(clazz, null,
-			names);
+	
+	public static <E> Method findObfuscatedMethod(Class<? super E> clazz, E instance,
+		String[] names, Class<?>... methodTypes) {
+		return ReflectionHelper.findMethod(clazz, instance,
+			ObfuscationReflectionHelper.remapFieldNames(
+				clazz.getName(), names), methodTypes);
 	}
 }

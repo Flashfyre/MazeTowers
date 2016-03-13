@@ -5,10 +5,14 @@ import java.util.List;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.init.ModChestGen;
+import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase;
 
 public class CommandMazeTowers implements ICommand,
 	Comparable<ICommand> {
@@ -92,6 +96,40 @@ public class CommandMazeTowers implements ICommand,
 					.getEntityWorld(), true);
 				// sender.addChatMessage(new
 				// ChatComponentText("Towers have been recreated and rebuilt"));
+			} else if (astring.length == 2 && astring[0].equals("refresh") &&
+				astring[1].toLowerCase().equals("chestgen")) {
+				ModChestGen.initChestGen(sender.getEntityWorld().rand, true);
+				sender.addChatMessage(new ChatComponentText(
+					"ChestGen items have been refreshed"));
+			} else if (astring[0].equals("loot")) {
+				MazeTowerBase tower = MazeTowers.mazeTowers.getTowerBesideCoords(
+					sender.getEntityWorld(), sender.getPosition().getX() >> 4,
+					sender.getPosition().getZ() >> 4);
+				if (tower != null) {
+					int rarity;
+					try {
+						if (astring.length >= 2 &&
+							(astring.length != 2 ||
+							astring[1].equals("inventory")))
+							rarity = Integer.parseInt(!astring[1].equals("inventory") ?
+								astring[1] : astring[2]);
+						else
+							rarity = tower.getRarity(tower.getFloorFromPosY(
+								sender.getPosition().getY()));
+					} catch (NumberFormatException e) {
+						rarity = tower.getRarity(tower.getFloorFromPosY(
+							sender.getPosition().getY()));
+					}
+					if (astring.length > 1 &&
+						astring[astring.length - 1].equals("inventory") ||
+						astring[astring.length - 2].equals("inventory"))
+						MTUtils.fillInventoryWithLoot((EntityPlayer) sender, rarity);
+    				ArrayList<String> lootList =
+    					MTUtils.getLootList(sender.getEntityWorld().rand, rarity);
+    				for (String s : lootList)
+    					sender.addChatMessage(new ChatComponentText(
+    						ChatFormatting.YELLOW + s));
+				}
 			}
 			/*
 			 * if (astring[0].equals("tp") || astring[0].equals("warp")) {

@@ -297,11 +297,11 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 		}
 	}
 
-	private TileEntityMemoryPiston getTileEntity(
+	private static TileEntityMemoryPiston getTileEntity(
 		IBlockAccess worldIn, BlockPos pos) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity instanceof TileEntityMemoryPiston ? (TileEntityMemoryPiston) tileentity
-			: null;
+		return tileentity instanceof TileEntityMemoryPiston ?
+			(TileEntityMemoryPiston) tileentity : null;
 	}
 
 	@Override

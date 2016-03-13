@@ -7,6 +7,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -99,6 +100,20 @@ public class ItemExplosiveBow extends ItemBow {
 	public EnumAction getItemUseAction(ItemStack stack) {
 		return EnumAction.BOW;
 	}
+	
+	private static ItemStack getFirstArrowStack(ItemStack[] inventory) {
+		ItemStack arrowStack;
+		for (int i = 0; i < inventory.length; ++i)
+        {
+			final Item arrowItem = inventory[i] == null ? null : inventory[i].getItem();
+            if (arrowItem == Items.arrow || arrowItem == ModItems.explosive_arrow)
+            {
+                return inventory[i];
+            }
+        }
+
+        return null;
+	}
 
 	@Override
 	/**
@@ -116,13 +131,18 @@ public class ItemExplosiveBow extends ItemBow {
 			.post(event))
 			return;
 		j = event.charge;
+		final ItemStack helmetStack = playerIn.inventory.armorInventory[3];
+		ItemStack arrowStack = getFirstArrowStack(playerIn.inventory.mainInventory);
+		final Item helmetItem = helmetStack == null ? null : helmetStack.getItem();
 
 		boolean flag = playerIn.capabilities.isCreativeMode
 			|| EnchantmentHelper.getEnchantmentLevel(
-				Enchantment.infinity.effectId, stack) > 0;
-		if (playerIn.inventory
-			.hasItem(ModItems.explosive_arrow)
-			|| flag) {
+				Enchantment.infinity.effectId, stack) > 0,
+			isExplosiveArrow = arrowStack != null &&
+			arrowStack.getItem() instanceof ItemExplosiveArrow;
+		if (flag && !isExplosiveArrow)
+			arrowStack = new ItemStack(Items.arrow);
+		if (arrowStack != null) {
 			float f = (float) j / 20.0F;
 			f = (f * f + f * 2.0F) / 3.0F;
 
@@ -134,9 +154,10 @@ public class ItemExplosiveBow extends ItemBow {
 				f = 1.0F;
 			}
 
-			EntityExplosiveArrow entityarrow = null;
-			entityarrow = new EntityExplosiveArrow(worldIn,
-				playerIn, f * 2.0F);
+			EntityArrow entityarrow = isExplosiveArrow ||
+				helmetItem == ModItems.explosive_creeper_skull ?
+				new EntityExplosiveArrow(worldIn,
+				playerIn, f * 2.0F) : new EntityArrow(worldIn, playerIn, f * 2.0F);
 
 			if (f == 1.0F) {
 				entityarrow.setIsCritical(true);
@@ -154,10 +175,9 @@ public class ItemExplosiveBow extends ItemBow {
 			int l = EnchantmentHelper.getEnchantmentLevel(
 				Enchantment.punch.effectId, stack);
 
-			if (l > 0) {
-				entityarrow
-					.setKnockbackStrength(entityarrow
-						.getKnockbackStrength() + 1);
+			if (entityarrow instanceof EntityExplosiveArrow && l > 0) {
+				entityarrow.setKnockbackStrength(((EntityExplosiveArrow) entityarrow)
+					.getKnockbackStrength() + 1);
 			}
 
 			if (EnchantmentHelper.getEnchantmentLevel(
@@ -174,7 +194,7 @@ public class ItemExplosiveBow extends ItemBow {
 				entityarrow.canBePickedUp = 2;
 			} else {
 				playerIn.inventory
-					.consumeInventoryItem(ModItems.explosive_arrow);
+					.consumeInventoryItem(arrowStack.getItem());
 			}
 
 			playerIn

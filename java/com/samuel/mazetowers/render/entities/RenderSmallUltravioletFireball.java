@@ -2,7 +2,10 @@ package com.samuel.mazetowers.render.entities;
 
 import net.minecraft.client.renderer.entity.RenderFireball;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class RenderSmallUltravioletFireball extends
 	RenderFireball {
 

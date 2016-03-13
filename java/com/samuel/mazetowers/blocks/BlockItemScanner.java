@@ -15,11 +15,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
@@ -31,24 +33,28 @@ import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
 import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
 
-public class BlockItemScanner extends Block implements
+public class BlockItemScanner extends BlockVendorTradeable implements
 	ITileEntityProvider {
 
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing", EnumFacing.Plane.HORIZONTAL);
 	public static final PropertyInteger STATE = PropertyInteger
 		.create("state", 0, 3);
-
-	public BlockItemScanner(Material material,
-		MapColor mapColor) {
-		super(material, mapColor);
+	
+	public BlockItemScanner(Material material, MapColor mapColor) {
+		super(material, mapColor, 1, 5, 7, material == Material.iron ? 100 : 500,
+			material == Material.iron ? 25 : 250);
 		this.setHardness(5.0F);
 		this.setTickRandomly(true);
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
-
+	
+	public BlockItemScanner(Material material) {
+		this(material, material.getMaterialMapColor());
+	}
+	
 	public BlockItemScanner() {
-		this(Material.iron, MapColor.ironColor);
+		this(Material.iron);
 	}
 
 	@Override

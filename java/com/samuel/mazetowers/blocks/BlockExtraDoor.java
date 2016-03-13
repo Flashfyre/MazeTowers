@@ -16,6 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.init.ModBlocks;
 
 public class BlockExtraDoor extends BlockDoor {
 
@@ -60,17 +61,21 @@ public class BlockExtraDoor extends BlockDoor {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Item getItem(World worldIn, BlockPos pos) {
-		return (this.type == 0) ? MazeTowers.ItemEndStoneDoor
-			: this.type == 1 ? MazeTowers.ItemQuartzDoor
-				: this.type == 2 ? MazeTowers.ItemObsidianDoor
-					: MazeTowers.ItemBedrockDoor;
+		return (this.type == 0) ? MazeTowers.ItemPrismarineDoor :
+			this.type == 1 ? MazeTowers.ItemQuartzDoor :
+			this.type == 2 ? MazeTowers.ItemEndStoneDoor :
+			this.type == 3 ? MazeTowers.ItemPurpurDoor :
+			this.type == 4 ? MazeTowers.ItemObsidianDoor :
+			MazeTowers.ItemBedrockDoor;
 	}
 
 	private Item getItem() {
-		return (this.type == 0) ? MazeTowers.ItemEndStoneDoor
-			: this.type == 1 ? MazeTowers.ItemQuartzDoor
-				: this.type == 2 ? MazeTowers.ItemObsidianDoor
-					: MazeTowers.ItemBedrockDoor;
+		return (this.type == 0) ? MazeTowers.ItemPrismarineDoor :
+			this.type == 1 ? MazeTowers.ItemQuartzDoor :
+			this.type == 2 ? MazeTowers.ItemEndStoneDoor :
+			this.type == 3 ? MazeTowers.ItemPurpurDoor :
+			this.type == 4 ? MazeTowers.ItemObsidianDoor :
+			MazeTowers.ItemBedrockDoor;
 	}
 
 	@Override
@@ -78,12 +83,6 @@ public class BlockExtraDoor extends BlockDoor {
 		BlockPos pos, IBlockState state,
 		EntityPlayer playerIn, EnumFacing side, float hitX,
 		float hitY, float hitZ) {
-		if (worldIn.isRemote)
-			return false;
-
-		worldIn.playSoundAtEntity(playerIn,
-			"mazetowers:door_locked", 1.0F, 1.0F);
-
 		return false;
 	}
 
@@ -180,22 +179,22 @@ public class BlockExtraDoor extends BlockDoor {
 					|| !hasScannerFront || !hasScannerBack)
 					&& neighborBlock.canProvidePower()))
 					&& neighborBlock != this) {
-					boolean isBackPowered = getIsPowered(
+					boolean isLocked = worldIn.getBlockState(blockpos1.offset(
+						enumfacing.getOpposite())).getBlock() == ModBlocks.lock,
+					isBackPowered = getIsPowered(
 						worldIn, pos, enumfacing,
 						hasScannerBack,
-						scannerBackStateId == 3, true);
-					boolean isFrontPowered = getIsPowered(
+						scannerBackStateId == 3, true),
+					isFrontPowered = !isLocked && getIsPowered(
 						worldIn, pos, enumfacing
 							.getOpposite(),
 						hasScannerFront,
-						scannerFrontStateId == 3, true);
-					boolean isPowered = isFrontPowered
-						|| isBackPowered;
-					boolean isOpen = ((Boolean) state
+						scannerFrontStateId == 3, true),
+					isPowered = isFrontPowered || isBackPowered,
+					isOpen = ((Boolean) state
 						.getValue(OPEN)).booleanValue();
 
-					worldIn
-						.setBlockState(
+					worldIn.setBlockState(
 							blockpos1,
 							iblockstate1
 								.withProperty(
@@ -206,19 +205,11 @@ public class BlockExtraDoor extends BlockDoor {
 					if (((isOpen && (!flag || !isPowered)) || (!isOpen
 						&& (isScannerPowered
 							|| (isFrontPowered && !hasScannerFront) || (isBackPowered && !hasScannerBack)) && flag))) {
-						worldIn
-							.setBlockState(
-								pos,
-								state
-									.withProperty(
-										OPEN,
-										Boolean
-											.valueOf((isScannerPowered || isPowered)
-												&& flag)),
-								2);
-						worldIn
-							.markBlockRangeForRenderUpdate(
-								pos, pos);
+						worldIn.setBlockState(
+							pos, state.withProperty(OPEN,
+							Boolean.valueOf((isScannerPowered || isPowered)
+							&& flag)), 2);
+						worldIn.markBlockRangeForRenderUpdate(pos, pos);
 						worldIn.playAuxSFXAtEntity(
 							(EntityPlayer) null,
 							isScannerPowered
@@ -231,7 +222,7 @@ public class BlockExtraDoor extends BlockDoor {
 		}
 	}
 
-	private boolean getIsPowered(World worldIn,
+	private static boolean getIsPowered(World worldIn,
 		BlockPos bottomPos, EnumFacing facing,
 		boolean hasScanner, boolean scannerActivated,
 		boolean isBack) {

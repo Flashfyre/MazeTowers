@@ -3,5 +3,6 @@
 	"door_unlock": { "category": "block", "sounds": ["mazetowers:door_unlock"] },
 	"correct": { "category": "block", "sounds": ["mazetowers:correct"] },
 	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"] },
-	"primed": { "category": "block", "sounds": ["mazetowers:primed"] }
+	"primed": { "category": "block", "sounds": ["mazetowers:primed"] },
+	"charge": { "category": "block", "sounds": ["mazetowers:charge"] }
 }

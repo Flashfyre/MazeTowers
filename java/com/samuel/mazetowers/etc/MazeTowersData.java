@@ -28,7 +28,6 @@ public class MazeTowersData extends WorldSavedData {
 	public ArrayList<int[]>[][] towerDataMini;
 	public BitSet[][][][] blockBreakabilityData;
 	public ArrayList<BitSet[][][]>[][] blockBreakabilityDataMini;
-	public String[][] towerTypeName;
 
 	public MazeTowersData(String tagName) {
 		super(tagName);
@@ -42,17 +41,15 @@ public class MazeTowersData extends WorldSavedData {
 		towerDataMini = new ArrayList[3][];
 		blockBreakabilityData = new BitSet[3][][][];
 		blockBreakabilityDataMini = new ArrayList[3][];
-		towerTypeName = new String[3][];
 		for (int d = 0; d < 3; d++) {
 			final int genCountD = genCount[d];
 			spawnPos[d] = new BlockPos[genCountD];
 			isGenerated[d] = new boolean[genCountD];
 			isUnderground[d] = new boolean[genCountD];
-			towerData[d] = new int[genCountD][6];
+			towerData[d] = new int[genCountD][5];
 			towerDataMini[d] = new ArrayList[genCountD];
 			blockBreakabilityData[d] = new BitSet[genCountD][][];
 			blockBreakabilityDataMini[d] = new ArrayList[genCountD];
-			towerTypeName[d] = new String[genCountD];
 		}
 	}
 
@@ -75,15 +72,11 @@ public class MazeTowersData extends WorldSavedData {
 				NBTTagList towerDataMiniList = (NBTTagList) compound
 					.getTagList("towerDataMini",
 						Constants.NBT.TAG_LIST).get(d);
-				NBTTagList towerTypeNameList = (NBTTagList) compound
-					.getTagList("towerTypeName",
-						Constants.NBT.TAG_LIST).get(d);
 				NBTTagList bbdList = (NBTTagList) compound
 					.getTagList("blockBreakabilityData",
 						Constants.NBT.TAG_LIST).get(d);
 				NBTTagList bbdmList = (NBTTagList) compound
-					.getTagList(
-						"blockBreakabilityDataMini",
+					.getTagList("blockBreakabilityDataMini",
 						Constants.NBT.TAG_LIST).get(d);
 				for (int g = 0; g < isGeneratedList
 					.tagCount(); g++) {
@@ -107,8 +100,6 @@ public class MazeTowersData extends WorldSavedData {
 							towerDataMini[d][g]
 								.add((int[]) (((NBTTagIntArray) towerDataMiniSublist
 									.get(m)).getIntArray()));
-						towerTypeName[d][g] = ((String) ((NBTTagString) towerTypeNameList
-							.get(g)).getString());
 						NBTTagList bbdSublist = ((NBTTagList) bbdList
 							.get(g));
 						int tagCount = bbdSublist
@@ -178,7 +169,6 @@ public class MazeTowersData extends WorldSavedData {
 		NBTTagList isUndergroundList = new NBTTagList();
 		NBTTagList towerDataList = new NBTTagList();
 		NBTTagList towerDataMiniList = new NBTTagList();
-		NBTTagList towerTypeNameList = new NBTTagList();
 		NBTTagList bbdList = new NBTTagList();
 		NBTTagList bbdmList = new NBTTagList();
 		for (int d = 0; d < 3; d++) {
@@ -187,7 +177,6 @@ public class MazeTowersData extends WorldSavedData {
 			NBTTagList isUndergroundSublist = new NBTTagList();
 			NBTTagList towerDataSublist = new NBTTagList();
 			NBTTagList towerDataMiniSublist = new NBTTagList();
-			NBTTagList towerTypeNameSublist = new NBTTagList();
 			NBTTagList bbdSublist = new NBTTagList();
 			NBTTagList bbdmSublist = new NBTTagList();
 			if (genCount[d] != 0) {
@@ -202,7 +191,6 @@ public class MazeTowersData extends WorldSavedData {
 					NBTTagInt isUndergroundTag;
 					NBTTagIntArray towerDataTag;
 					NBTTagList towerDataMiniTagList;
-					NBTTagString towerTypeNameTag;
 					NBTTagList bbdTagList;
 					NBTTagList bbdmTagList;
 					try {
@@ -216,8 +204,7 @@ public class MazeTowersData extends WorldSavedData {
 						isGeneratedSublist
 							.appendTag(isGeneratedTag);
 						isUndergroundTag = new NBTTagInt(
-							(int) (isUnderground[d][g] ? 1
-								: 0));
+							(isUnderground[d][g] ? 1 : 0));
 						isUndergroundSublist
 							.appendTag(isUndergroundTag);
 						towerDataTag = new NBTTagIntArray(
@@ -237,10 +224,6 @@ public class MazeTowersData extends WorldSavedData {
 							towerDataMiniSublist
 								.appendTag(towerDataMiniTagList);
 						}
-						towerTypeNameTag = new NBTTagString(
-							towerTypeName[d][g]);
-						towerTypeNameSublist
-							.appendTag(towerTypeNameTag);
 						bbdTagList = new NBTTagList();
 						if (blockBreakabilityData[d][g] != null) {
 							for (int y = 0; y < blockBreakabilityData[d][g].length; y++) {
@@ -306,8 +289,6 @@ public class MazeTowersData extends WorldSavedData {
 				towerDataList.appendTag(towerDataSublist);
 				towerDataMiniList
 					.appendTag(towerDataMiniSublist);
-				towerTypeNameList
-					.appendTag(towerTypeNameSublist);
 				bbdList.appendTag(bbdSublist);
 				bbdmList.appendTag(bbdmSublist);
 			}
@@ -318,7 +299,6 @@ public class MazeTowersData extends WorldSavedData {
 		compound.setTag("isUnderground", isUndergroundList);
 		compound.setTag("towerData", towerDataList);
 		compound.setTag("towerDataMini", towerDataMiniList);
-		compound.setTag("towerTypeName", towerTypeNameList);
 		compound.setTag("blockBreakabilityData", bbdList);
 		compound.setTag("blockBreakabilityDataMini",
 			bbdmList);
@@ -360,14 +340,6 @@ public class MazeTowersData extends WorldSavedData {
 		return towerDataMini[dimId][index];
 	}
 
-	public String[][] getTowerTypeName() {
-		return towerTypeName;
-	}
-
-	public String getTowerTypeName(int dimId, int index) {
-		return towerTypeName[dimId][index];
-	}
-
 	public BitSet[][] getBlockBreakabilityData(int dimId,
 		int index) {
 		return blockBreakabilityData[dimId][index];
@@ -398,10 +370,9 @@ public class MazeTowersData extends WorldSavedData {
 	}
 
 	public void setTowerData(int chunkX, int baseY,
-		int chunkZ, int floors, int difficulty, int rarity,
-		int dimId, int index) {
+		int chunkZ, int floors, int type, int dimId, int index) {
 		this.towerData[dimId][index] = new int[] { chunkX,
-			baseY, chunkZ, floors, difficulty, rarity };
+			baseY, chunkZ, floors, type };
 		this.markDirty();
 	}
 
@@ -415,12 +386,6 @@ public class MazeTowersData extends WorldSavedData {
 		else
 			this.towerDataMini[dimId][index].set(indexMini,
 				bounds);
-		this.markDirty();
-	}
-
-	public void setTowerTypeName(String name, int dimId,
-		int index) {
-		this.towerTypeName[dimId][index] = name;
 		this.markDirty();
 	}
 

@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "facing=east,hinge=left":  { "model": "mazetowers:lock", "y": 90 },
+        "facing=west,hinge=left":  { "model": "mazetowers:lock", "y": 270 },
+        "facing=south,hinge=left": { "model": "mazetowers:lock", "y": 180 },
+        "facing=north,hinge=left": { "model": "mazetowers:lock" },
+		"facing=east,hinge=right":  { "model": "mazetowers:lock_rh", "y": 90 },
+        "facing=west,hinge=right":  { "model": "mazetowers:lock_rh", "y": 270 },
+        "facing=south,hinge=right": { "model": "mazetowers:lock_rh", "y": 180 },
+        "facing=north,hinge=right": { "model": "mazetowers:lock_rh" }
+    }
+}

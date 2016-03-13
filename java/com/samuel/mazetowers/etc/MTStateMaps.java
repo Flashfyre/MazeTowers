@@ -29,7 +29,7 @@ public class MTStateMaps {
 	};
 	
 	public static void initStateMaps(MazeTower tower) {
-		if (rawMaps != null && rawMaps.containsKey(tower.wallBlock)) {
+		if (rawMaps != null && rawMaps.containsKey(tower.wallBlock_external)) {
 			final EnumDyeColor[] dyeColors = tower.getDyeColors();
 			final IBlockState air2 = Blocks.air.getDefaultState();
 			final IBlockState wall = tower.wallBlock_external;
@@ -49,18 +49,14 @@ public class MTStateMaps {
 			final IBlockState lamp = Blocks.redstone_lamp.getDefaultState();
 			final IBlockState wire = Blocks.redstone_wire.getDefaultState();
 			
-			try {
 			for (EnumFacing dir : dirs) {
-				maps.get(tower.wallBlock)[EnumStateMap.MINI_TOWER_ROOF_1.ordinal()].put(dir,
-						getRoof(air2, wall, wall2, c, g[0], lamp));
-				maps.get(tower.wallBlock)[EnumStateMap.MINI_TOWER_ROOF_2.ordinal()].put(dir,
-						getRoof(air2, wall, wall2, c, g[1], lamp));
-				maps.get(tower.wallBlock)[EnumStateMap.MINI_TOWER_ROOF_3.ordinal()].put(dir,
-						getRoof(air2, wall, wall2, c, g[2], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_1.ordinal()]
+					.put(dir, getRoof(air2, wall, wall2, c, g[0], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_2.ordinal()]
+					.put(dir, getRoof(air2, wall, wall2, c, g[1], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_3.ordinal()]
+					.put(dir, getRoof(air2, wall, wall2, c, g[2], lamp));
 				
-			}
-			} catch (Exception e) {
-				e = null;
 			}
 		} else {
 			final IBlockState[][][][] towerRawMaps;
@@ -72,7 +68,7 @@ public class MTStateMaps {
 					Map<EnumFacing, IBlockState[][][]>[]>();
 			}
 			towerRawMaps = getRawMapsForTower(tower);
-			rawMaps.put(tower.wallBlock, towerRawMaps);
+			rawMaps.put(tower.wallBlock_external, towerRawMaps);
 			towerMaps = new Map[EnumStateMap.values().length];
 			
 			for (EnumStateMap map : EnumStateMap.values()) {
@@ -95,7 +91,7 @@ public class MTStateMaps {
 				}
 			}
 			
-			maps.put(tower.wallBlock, towerMaps);
+			maps.put(tower.wallBlock_external, towerMaps);
 		}
 	}
 	
@@ -129,12 +125,14 @@ public class MTStateMaps {
 	
 	public static IBlockState[][][] getStateMap(EnumFacing dir, String mapName,
 		IBlockState wallBlock, IBlockState wallBlock_external, IBlockState floorBlock,
-		IBlockState ceilBlock, IBlockState carpetBlock, IBlockState glass,
-		IBlockState glass2, IBlockState glass3, IBlockState window, IBlockState mineral,
-		int dyeColorIndex) {
-		final boolean hasBeacon = mineral != null;
+		IBlockState ceilBlock, IBlockState fenceBlock, IBlockState carpetBlock,
+		IBlockState glass, IBlockState glass2, IBlockState glass3, IBlockState window,
+		IBlockState mineral, int dyeColorIndex) {
+		final boolean hasShop = fenceBlock != null;
+		final boolean hasBeacon = !hasShop && mineral != null;
 		final int mapIndex = EnumStateMap.valueOf(mapName).ordinal();
-		final Map<EnumFacing, IBlockState[][][]> map = maps.get(wallBlock)[mapIndex];
+		final Map<EnumFacing, IBlockState[][][]> map =
+			maps.get(wallBlock_external)[mapIndex];
 		final IBlockState[][][] stateMap;
 		final IBlockState air2 = Blocks.air.getDefaultState(),
 		lever = !hasBeacon ? Blocks.lever.getStateFromMeta(7) :
@@ -142,9 +140,9 @@ public class MTStateMaps {
 		lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : glass,
 		wire = !hasBeacon ? Blocks.redstone_wire.getDefaultState() : air2;
 		if (mapName.startsWith("MINI_TOWER_TOP"))
-			map.put(dir,
-				getTopMap(air2, wallBlock_external, carpetBlock, floorBlock,
-					window, lever, mineral));
+			map.put(dir, !hasShop ? getTopMap(air2, wallBlock_external, carpetBlock,
+				window, floorBlock, lever, mineral) : getTopMapShop(air2,
+				wallBlock_external, carpetBlock, window, fenceBlock, mineral));
 		else if (mapName.startsWith("MINI_TOWER_ROOF_")) {
 			if (mapName.equals("MINI_TOWER_ROOF_WIRE"))
 				map.put(dir, getRoofWire(air2, wallBlock_external, wire, glass3));
@@ -388,7 +386,7 @@ public class MTStateMaps {
 	}
 	
 	private static IBlockState[][][] getTopMap(IBlockState air2, IBlockState wall,
-		IBlockState carpet, IBlockState floor, IBlockState window,
+		IBlockState carpet, IBlockState window, IBlockState floor,
 		IBlockState lever, IBlockState mineral) {
 		if (mineral == null) {
 			mineral = carpet;
@@ -422,6 +420,43 @@ public class MTStateMaps {
 				new IBlockState[] { wall, air2, air2, air2, air2, air2, air2, air2, wall },
 				new IBlockState[] { wall, air2, air2, air2, lever, air2, air2, air2, wall },
 				new IBlockState[] { wall, air2, air2, air2, air2, air2, air2, air2, wall },
+				new IBlockState[] { null, wall, air2, air2, air2, air2, air2, wall, null },
+				new IBlockState[] { null, null, wall, air2, air2, air2, wall, null, null },
+				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null }
+			}
+		};
+	}
+	
+	private static IBlockState[][][] getTopMapShop(IBlockState air2, IBlockState wall,
+		IBlockState carpet, IBlockState window, IBlockState fence, IBlockState spawner) {
+		return new IBlockState[][][] {
+			new IBlockState[][] {
+				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null },
+				new IBlockState[] { null, null, wall, carpet, carpet, carpet, wall, null, null },
+				new IBlockState[] { null, wall, carpet, carpet, carpet, carpet, carpet, wall, null },
+				new IBlockState[] { wall, carpet, carpet, wall, wall, wall, carpet, carpet, wall },
+				new IBlockState[] { wall, carpet, carpet, wall, spawner, wall, carpet, carpet, wall },
+				new IBlockState[] { wall, carpet, carpet, wall, wall, wall, carpet, carpet, wall },
+				new IBlockState[] { null, wall, carpet, carpet, carpet, carpet, carpet, wall, null },
+				new IBlockState[] { null, null, wall, carpet, carpet, carpet, wall, null, null },
+				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null }
+			}, new IBlockState[][] {
+				new IBlockState[] { null, null, null, wall, window, wall, null, null, null },
+				new IBlockState[] { null, null, wall, air2, air2, air2, wall, null, null },
+				new IBlockState[] { null, wall, air2, air2, air2, air2, air2, wall, null },
+				new IBlockState[] { wall, air2, air2, wall, wall, wall, air2, air2, wall },
+				new IBlockState[] { window, air2, air2, wall, air2, wall, air2, air2, window },
+				new IBlockState[] { wall, air2, air2, fence, air2, fence, air2, air2, wall },
+				new IBlockState[] { null, wall, air2, air2, air2, air2, air2, wall, null },
+				new IBlockState[] { null, null, wall, air2, air2, air2, wall, null, null },
+				new IBlockState[] { null, null, null, wall, window, wall, null, null, null }
+			}, new IBlockState[][] {
+				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null },
+				new IBlockState[] { null, null, wall, air2, air2, air2, wall, null, null },
+				new IBlockState[] { null, wall, air2, air2, air2, air2, air2, wall, null },
+				new IBlockState[] { wall, air2, air2, wall, wall, wall, air2, air2, wall },
+				new IBlockState[] { wall, air2, air2, wall, air2, wall, air2, air2, wall },
+				new IBlockState[] { wall, air2, air2, fence, fence, fence, air2, air2, wall },
 				new IBlockState[] { null, wall, air2, air2, air2, air2, air2, wall, null },
 				new IBlockState[] { null, null, wall, air2, air2, air2, wall, null, null },
 				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null }

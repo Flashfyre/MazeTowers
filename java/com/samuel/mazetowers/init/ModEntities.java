@@ -3,9 +3,7 @@ package com.samuel.mazetowers.init;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.entities.EntityExplosiveArrow;
-import com.samuel.mazetowers.entities.EntitySmallUltravioletFireball;
-import com.samuel.mazetowers.entities.EntityUltravioletBlaze;
+import com.samuel.mazetowers.entities.*;
 
 public class ModEntities {
 
@@ -16,12 +14,16 @@ public class ModEntities {
 			EntityExplosiveArrow.class, "ExplosiveArrow",
 			entityID++, mod, 128, 1, true);
 		EntityRegistry.registerModEntity(
+			EntityExplosiveCreeper.class,
+			"ExplosiveCreeper", entityID++, mod,
+			128, 1, true, 8388608, 16736256);
+		EntityRegistry.registerModEntity(
+			EntitySpecialVillager.class,
+			"SpecialVillager", entityID++, mod,
+			128, 1, true);
+		EntityRegistry.registerModEntity(
 			EntityUltravioletBlaze.class,
 			"UltravioletBlaze", entityID++, mod, 128, 1,
 			true);
-		EntityRegistry.registerModEntity(
-			EntitySmallUltravioletFireball.class,
-			"SmallUltravioletFireball", entityID++, mod,
-			128, 1, true);
 	}
 }

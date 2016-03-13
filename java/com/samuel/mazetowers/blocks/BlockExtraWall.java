@@ -2,6 +2,9 @@ package com.samuel.mazetowers.blocks;
 
 import java.util.Random;
 
+import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.init.ModBlocks;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
@@ -37,12 +40,11 @@ public class BlockExtraWall extends Block {
 			.withProperty(EAST, Boolean.valueOf(false))
 			.withProperty(SOUTH, Boolean.valueOf(false))
 			.withProperty(WEST, Boolean.valueOf(false)));
-		this.setHardness(modelBlock.getBlockHardness(null,
-			null));
+		this.setHardness(modelBlock.getBlockHardness(null, null));
 		this.setResistance(modelBlock
 			.getExplosionResistance(null, null, null, null) / 3.0F);
 		this.setStepSound(modelBlock.stepSound);
-		this.setCreativeTab(CreativeTabs.tabBlock);
+		this.setCreativeTab(MazeTowers.tabExtra);
 		if (modelBlock == Blocks.packed_ice) {
 			this.slipperiness = 0.98F;
 			noDrop = true;
@@ -64,10 +66,7 @@ public class BlockExtraWall extends Block {
 	 */
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal(this
-			.getUnlocalizedName()
-			+ "."
-			+ BlockWall.EnumType.NORMAL
-				.getUnlocalizedName() + ".name");
+			.getUnlocalizedName() + ".name");
 	}
 
 	@Override
@@ -144,30 +143,23 @@ public class BlockExtraWall extends Block {
 			state);
 	}
 
-	public boolean canConnectTo(IBlockAccess worldIn,
-		BlockPos pos) {
+	public boolean canConnectTo(IBlockAccess worldIn, BlockPos pos) {
 		Block block = worldIn.getBlockState(pos).getBlock();
 		return block == Blocks.barrier ? false
-			: (block != this
-				&& !(block instanceof BlockFenceGate) ? (block
-				.getMaterial().isOpaque()
-				&& block.isFullCube() ? block.getMaterial() != Material.gourd
-				: false)
-				: true);
+			: (block != this && !(block instanceof BlockFenceGate) &&
+			(!(block instanceof BlockExtraWall) || !getWallCompatibility(block)) ?
+			(block.getMaterial().isOpaque() && block.isFullCube() ?
+			block.getMaterial() != Material.gourd : false) : true);
 	}
-
-	// @Override
-	/**
-	 * returns a list of blocks with the same ID, but different meta (eg: wood
-	 * returns 4 blocks)
-	 */
-	/*
-	 * @SideOnly(Side.CLIENT) public void getSubBlocks(Item itemIn, CreativeTabs
-	 * tab, List<ItemStack> list) { for (BlockExtraWall.EnumType enumtype :
-	 * BlockExtraWall.EnumType.values()) { list.add(new ItemStack(itemIn, 1,
-	 * enumtype.getMetadata())); } }
-	 */
-
+	
+	private boolean getWallCompatibility(Block block) {
+		return (block instanceof BlockExtraWall && ((this == ModBlocks.stoneBrickWall &&
+			block == ModBlocks.mossyStoneBrickWall) || (this == ModBlocks.mossyStoneBrickWall &&
+			block == ModBlocks.stoneBrickWall) || (this == ModBlocks.sandstoneWall &&
+			block == ModBlocks.redSandstoneWall) || (this == ModBlocks.redSandstoneWall &&
+			block == ModBlocks.sandstoneWall)));
+	}
+	
 	@Override
 	/**
 	 * Get the damage value that this Block should drop
@@ -224,11 +216,13 @@ public class BlockExtraWall extends Block {
 
 	public static enum EnumType implements
 		IStringSerializable {
-		PRISMARINE_BRICK(0, "prismarine_brick",
-			"prismarine_brick"), QUARTZ(1, "quartz",
-			"quartz"), END_STONE(2, "end_stone",
-			"end_stone"), OBSIDIAN(3, "obsidian",
-			"obsidian"), BEDROCK(4, "bedrock", "bedrock");
+			SANDSTONE(0, "sandstone", "sandstone"), RED_SANDSTONE(1, "red_sandstone",
+			"red_sandstone"), STONEBRICK(2, "stonebrick", "stonebrick"),
+			MOSSY_STONEBRICK(3, "mossy_stonebrick", "mossy_stonebrick"),
+			PACKED_ICE(4, "packed_ice", "packed_ice"), PRISMARINE_BRICK(5,
+			"prismarine_brick", "prismarine_brick"), QUARTZ(6, "quartz", "quartz"),
+			END_STONE(7, "end_stone", "end_stone"), PURPUR(8, "purpur", "purpur"), 
+			OBSIDIAN(9, "obsidian", "obsidian"), BEDROCK(10, "bedrock", "bedrock");
 
 		private static final BlockExtraWall.EnumType[] META_LOOKUP = new BlockExtraWall.EnumType[values().length];
 		private final int meta;

@@ -6,9 +6,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.BlockFluidBase;
@@ -23,19 +25,16 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockChaoticSludge;
 import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.entities.EntityExplosiveArrow;
-import com.samuel.mazetowers.entities.EntitySmallUltravioletFireball;
-import com.samuel.mazetowers.entities.EntityUltravioletBlaze;
+import com.samuel.mazetowers.entities.*;
 import com.samuel.mazetowers.etc.HiddenButtonModel;
 import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedModel;
 import com.samuel.mazetowers.eventhandlers.ModelBakeEventHandler;
 import com.samuel.mazetowers.render.BlockRenderRegister;
+import com.samuel.mazetowers.render.EntityRenderRegister;
 import com.samuel.mazetowers.render.ItemRenderRegister;
-import com.samuel.mazetowers.render.entities.RenderExplosiveArrow;
-import com.samuel.mazetowers.render.entities.RenderSmallUltravioletFireball;
-import com.samuel.mazetowers.render.entities.RenderUltravioletBlaze;
-import com.samuel.mazetowers.render.tileentities.TileEntityMineralChestRenderer;
-import com.samuel.mazetowers.tileentities.TileEntityMineralChest;
+import com.samuel.mazetowers.render.entities.*;
+import com.samuel.mazetowers.render.tileentities.*;
+import com.samuel.mazetowers.tileentities.*;
 
 public class ClientProxy extends CommonProxy {
 
@@ -95,23 +94,26 @@ public class ClientProxy extends CommonProxy {
 			}
 		};
 		ModelLoader.setCustomStateMapper(
-			MazeTowers.BlockHiddenPressurePlateWeighted,
-			ignoreState);
+			MazeTowers.BlockHiddenPressurePlateWeighted, ignoreState);
 		ModelLoader.setCustomStateMapper(
 			MazeTowers.BlockHiddenButton, ignoreState);
 		final ModelResourceLocation chaoticSludgeModelResourceLocation = new ModelResourceLocation(
 			"mazetowers:chaotic_sludge",
-			((BlockChaoticSludge) MazeTowers.BlockChaoticSludge)
-				.getFluid().getName());
-		Item chaoticSludgeItem = Item
-			.getItemFromBlock(MazeTowers.BlockChaoticSludge);
-		ModelBakery.addVariantName(chaoticSludgeItem);
+			MazeTowers.BlockChaoticSludge.getFluid().getName());
 		ModelLoader.setCustomStateMapper(
 			MazeTowers.BlockChaoticSludge,
 			(new StateMap.Builder()).ignore(
 				BlockFluidBase.LEVEL).build());
-
+		ModelLoader.setBucketModelDefinition(MazeTowers.ItemChaoticSludgeBucket);
+		EntityRenderRegister.registerEntityRenderer();
 		ItemRenderRegister.registerItemRenderer();
+		for (int k = 0; k < 20; k++) {
+			ModelLoader.setCustomModelResourceLocation(MazeTowers.ItemKey, k,
+				new ModelResourceLocation("mazetowers:key_" + k));
+			ModelLoader.setCustomModelResourceLocation(Item
+				.getItemFromBlock(MazeTowers.BlockLock), k,
+				new ModelResourceLocation("mazetowers:lock"));
+		}
 
 		MinecraftForge.EVENT_BUS
 			.register(ModelBakeEventHandler.instance);
@@ -121,22 +123,15 @@ public class ClientProxy extends CommonProxy {
 	public void init(FMLInitializationEvent e) {
 		super.init(e);
 		BlockRenderRegister.registerBlockRenderer();
-
-		RenderingRegistry.registerEntityRenderingHandler(
-			EntityExplosiveArrow.class,
-			new RenderExplosiveArrow(Minecraft
-				.getMinecraft().getRenderManager()));
-		RenderingRegistry.registerEntityRenderingHandler(
-			EntitySmallUltravioletFireball.class,
-			new RenderSmallUltravioletFireball(Minecraft
-				.getMinecraft().getRenderManager(), 1.0F));
-		RenderingRegistry.registerEntityRenderingHandler(
-			EntityUltravioletBlaze.class,
-			new RenderUltravioletBlaze(Minecraft
-				.getMinecraft().getRenderManager()));
+		ClientRegistry.bindTileEntitySpecialRenderer(
+			TileEntityExplosiveCreeperSkull.class,
+			new TileEntityExplosiveCreeperSkullRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(
 			TileEntityMineralChest.class,
 			new TileEntityMineralChestRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(
+			TileEntityRedstoneClock.class,
+			new TileEntityRedstoneClockRenderer());
 		ModelBakery.addVariantName(
 			MazeTowers.ItemExplosiveBow,
 			"mazetowers:explosive_bow");
@@ -149,17 +144,13 @@ public class ClientProxy extends CommonProxy {
 		ModelBakery.addVariantName(
 			MazeTowers.ItemExplosiveBow,
 			"mazetowers:explosive_bow_pulling_2");
+		ModelBakery.registerItemVariants(
+			Item.getItemFromBlock(MazeTowers.BlockLock),
+			new ResourceLocation("mazetowers:lock"));
 	}
 
 	@Override
 	public void postInit(FMLPostInitializationEvent e) {
 		super.postInit(e);
-	}
-
-	private static Field findObfuscatedField(
-		Class<?> clazz, String... names) {
-		return ReflectionHelper.findField(clazz,
-			ObfuscationReflectionHelper.remapFieldNames(
-				clazz.getName(), names));
 	}
 }

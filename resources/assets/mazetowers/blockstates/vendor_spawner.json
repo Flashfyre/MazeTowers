@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "facing=east,visible=true":  { "model": "mazetowers:vendor_spawner_visible", "y": 90 },
+        "facing=west,visible=true":  { "model": "mazetowers:vendor_spawner_visible", "y": 270 },
+        "facing=south,visible=true": { "model": "mazetowers:vendor_spawner_visible", "y": 180 },
+        "facing=north,visible=true": { "model": "mazetowers:vendor_spawner_visible" },
+		"facing=east,visible=false":  { "model": "mazetowers:vendor_spawner_invisible", "y": 90 },
+        "facing=west,visible=false":  { "model": "mazetowers:vendor_spawner_invisible", "y": 270 },
+        "facing=south,visible=false": { "model": "mazetowers:vendor_spawner_invisible", "y": 180 },
+        "facing=north,visible=false": { "model": "mazetowers:vendor_spawner_invisible" }
+    }
+}

@@ -1,12 +1,10 @@
-package com.samuel.mazetowers;
+package com.samuel.mazetowers.client.gui;
 
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
-
-import com.samuel.mazetowers.client.gui.GUIConfigMazeTowers;
 
 public class GUIFactoryMazeTowers implements IModGuiFactory {
 	@Override

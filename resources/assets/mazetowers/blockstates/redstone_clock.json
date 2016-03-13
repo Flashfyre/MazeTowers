@@ -1,0 +1,20 @@
+{
+    "variants": {
+		"power=0": { "model": "mazetowers:redstone_clock" },
+		"power=1": { "model": "mazetowers:redstone_clock" },
+		"power=2": { "model": "mazetowers:redstone_clock" },
+		"power=3": { "model": "mazetowers:redstone_clock" },
+		"power=4": { "model": "mazetowers:redstone_clock" },
+		"power=5": { "model": "mazetowers:redstone_clock" },
+		"power=6": { "model": "mazetowers:redstone_clock" },
+		"power=7": { "model": "mazetowers:redstone_clock" },
+		"power=8": { "model": "mazetowers:redstone_clock" },
+		"power=9": { "model": "mazetowers:redstone_clock" },
+		"power=10": { "model": "mazetowers:redstone_clock" },
+		"power=11": { "model": "mazetowers:redstone_clock" },
+		"power=12": { "model": "mazetowers:redstone_clock" },
+		"power=13": { "model": "mazetowers:redstone_clock" },
+		"power=14": { "model": "mazetowers:redstone_clock" },
+		"power=15": { "model": "mazetowers:redstone_clock" }
+    }
+}

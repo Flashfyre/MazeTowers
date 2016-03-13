@@ -30,7 +30,7 @@ import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
 import com.samuel.mazetowers.tileentities.TileEntityMemoryPistonMemory;
 
-public class BlockMemoryPistonBase extends Block implements
+public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 	ITileEntityProvider {
 
 	public static final PropertyDirection FACING = PropertyDirection
@@ -38,9 +38,8 @@ public class BlockMemoryPistonBase extends Block implements
 	public static final PropertyBool EXTENDED = PropertyBool
 		.create("extended");
 
-	public BlockMemoryPistonBase(String unlocalizedName) {
-		super(Material.piston);
-		setUnlocalizedName(unlocalizedName);
+	public BlockMemoryPistonBase() {
+		super(Material.piston, 1, 6, 9, 25, 250);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(EXTENDED, Boolean.valueOf(false)));
@@ -419,7 +418,7 @@ public class BlockMemoryPistonBase extends Block implements
 			return false;
 		} else if (pos.getY() >= 0
 			&& (direction != EnumFacing.DOWN || pos.getY() != 0)) {
-			if (pos.getY() <= worldIn.getHeight() - 1
+			if (pos.getY() < worldIn.getHeight()
 				&& (direction != EnumFacing.UP || pos
 					.getY() != worldIn.getHeight() - 1)) {
 				if (!(blockIn instanceof BlockMemoryPistonBase)
@@ -427,11 +426,11 @@ public class BlockMemoryPistonBase extends Block implements
 					&& blockIn != Blocks.sticky_piston) {
 					if (blockIn.getBlockHardness(worldIn,
 						pos) == -1.0F
-						&& (pos.getY() < 2 || blockIn != Blocks.bedrock)) {
+						&& (pos.getY() < 2)) {
 						return false;
 					}
-
-					if (blockIn.getMobilityFlag() == 2) {
+					
+					if (blockIn.getMobilityFlag() == 2 && blockIn != Blocks.bedrock) {
 						return false;
 					}
 
@@ -441,7 +440,7 @@ public class BlockMemoryPistonBase extends Block implements
 						}
 
 						return true;
-					}
+					} 
 				} else if (((Boolean) worldIn
 					.getBlockState(pos).getValue(EXTENDED))
 					.booleanValue()) {

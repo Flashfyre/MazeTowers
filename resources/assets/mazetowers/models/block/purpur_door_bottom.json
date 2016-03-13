@@ -1,0 +1,7 @@
+{
+    "parent": "block/door_bottom",
+    "textures": {
+        "bottom": "mazetowers:blocks/door_purpur_lower",
+        "top": "mazetowers:blocks/door_purpur_lower"
+    }
+}

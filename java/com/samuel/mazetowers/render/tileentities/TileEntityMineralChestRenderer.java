@@ -7,10 +7,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.blocks.BlockMineralChest;
 import com.samuel.mazetowers.tileentities.TileEntityMineralChest;
 
+@SideOnly(Side.CLIENT)
 public class TileEntityMineralChestRenderer extends
 	TileEntitySpecialRenderer {
 	private static final ResourceLocation textureIron = new ResourceLocation(

@@ -1,0 +1,7 @@
+{
+    "parent": "block/wall_nsew",
+    "textures": {
+        "wall": "blocks/purpur_block",
+		"top": "blocks/purpur_block"
+    }
+}

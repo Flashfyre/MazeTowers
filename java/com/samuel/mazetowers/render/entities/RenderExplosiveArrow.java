@@ -9,9 +9,12 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 
+@SideOnly(Side.CLIENT)
 public class RenderExplosiveArrow extends RenderArrow {
 	private static final ResourceLocation arrowTextures = new ResourceLocation(
 		"mazetowers:textures/entities/explosive_arrow.png");

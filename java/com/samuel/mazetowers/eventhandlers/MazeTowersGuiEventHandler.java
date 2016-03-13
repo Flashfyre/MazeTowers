@@ -45,8 +45,7 @@ public class MazeTowersGuiEventHandler {
 				final int floor;
 				if (e.partialTicks != partialTicksCache
 					&& (int) ((partialTicksCache = e.partialTicks) * 5000) % 10 == 0) {
-					final int[] towerData = props
-						.getTowerData();
+					final int[] towerData = props.getTowerData();
 					final int posY;
 					final boolean isTowerArea = (player.chunkCoordX == towerData[0]
 						|| player.chunkCoordX == towerData[0] - 1 || player.chunkCoordX == towerData[0] + 1)
@@ -54,11 +53,7 @@ public class MazeTowersGuiEventHandler {
 							|| player.chunkCoordZ == towerData[2] - 1 || player.chunkCoordZ == towerData[2] + 1), isTowerChunk = isTowerArea
 						&& player.chunkCoordX == towerData[0]
 						&& player.chunkCoordZ == towerData[2];
-					if (isTowerChunk/*
-									 * && (posY = ((int) player.posY)) >=
-									 * towerData[1] && posY <= (towerData[1] +
-									 * (towerData[3] + 1) * 6)
-									 */) {
+					if (isTowerChunk) {
 						final String[] propNames = new String[] {
 							StatCollector
 								.translateToLocal("towerinfo.floor"),
@@ -81,14 +76,11 @@ public class MazeTowersGuiEventHandler {
 							: 1;
 						isUnderground = props
 							.getIsUnderground();
-						floor = Math
-							.max(
-								Math.min(
-									(int) Math
-										.floor((((int) player.posY)
-											- towerData[1] - (!isUnderground ? 0
-											: 3)) / 6) + 1,
-									maxFloor), minFloor);
+						floor = Math.max(Math.min((int) Math
+							.floor((((int) player.posY)
+							- towerData[1] - (!isUnderground ? 0
+							: 3)) / 6) + 1,
+							maxFloor), minFloor);
 						props.setFloor(floor);
 						floorString = propNames[0]
 							+ ": "

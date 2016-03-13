@@ -1,0 +1,19 @@
+{
+    "textures": {
+		"texture": "mazetowers:blocks/lock",
+        "particle": "mazetowers:blocks/lock"
+    },
+    "elements": [
+        {   "from": [ 0, 0, 14 ],
+            "to": [ 5, 5, 16 ],
+            "faces": {
+                "down":  { "uv": [ 7, 5, 12, 6 ], "texture": "#texture", "tintindex": 0 },
+                "up":    { "uv": [ 1, 0, 6, 1 ], "texture": "#texture", "tintindex": 0 },
+                "north": { "uv": [ 1, 1, 6, 6 ], "texture": "#texture", "tintindex": 0 },
+                "south": { "uv": [ 7, 1, 7, 6 ], "texture": "#texture", "tintindex": 0 },
+                "west":  { "uv": [ 6, 1, 7, 6 ], "texture": "#texture", "tintindex": 0 },
+                "east":  { "uv": [ 0, 1, 1, 6 ], "texture": "#texture", "tintindex": 0 }
+            }
+        }
+	]
+}

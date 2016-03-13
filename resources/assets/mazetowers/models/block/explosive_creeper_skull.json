@@ -1,0 +1,19 @@
+{
+	"textures": {
+        "texture": "mazetowers:blocks/explosive_creeper_skull",
+		"particle": "mazetowers:blocks/explosive_creeper_skull"
+    },
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 8,    0,    12,    4 ], "texture": "#texture" },
+                "up":    { "uv": [ 4,    0,    8,    4 ], "texture": "#texture" },
+                "north": { "uv": [ 4,    4,    8,    8 ], "texture": "#texture" },
+                "south": { "uv": [ 4,    4,    8,    8 ], "texture": "#texture" },
+                "west":  { "uv": [ 8,    4,    12,    8 ], "texture": "#texture" },
+                "east":  { "uv": [ 0,    4,    4,    8 ], "texture": "#texture" }
+            }
+        }
+    ]
+}

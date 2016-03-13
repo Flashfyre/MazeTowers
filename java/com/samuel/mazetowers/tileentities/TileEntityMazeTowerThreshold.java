@@ -6,7 +6,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.StatCollector;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.PlayerMazeTower;
@@ -61,6 +63,12 @@ public class TileEntityMazeTowerThreshold extends
 							+ " Maze Tower"
 							+ (isUnderground ? " (Underground)"
 								: "");
+					} else if (!props.getEnabled() &&
+						(player.getBedLocation(worldObj.provider.getDimensionId()) == null ||
+						!player.getBedLocation().equals(pos.up()))) {
+						player.setSpawnPoint(pos.up(), true);
+						player.addChatMessage(new ChatComponentText(
+							StatCollector.translateToLocal("gui.spawn_point")));
 					}
 					MazeTowers.network.sendTo(
 						new PacketMazeTowersGui(chunkX,

@@ -38,8 +38,7 @@ public class PacketActivateItemScanner implements IMessage {
 		ByteBufUtils.writeUTF8String(buf, text);
 	}
 
-	public static class Handler
-		implements
+	public static class Handler implements
 		IMessageHandler<PacketActivateItemScanner, IMessage> {
 		@Override
 		public IMessage onMessage(
@@ -60,8 +59,7 @@ public class PacketActivateItemScanner implements IMessage {
 					((BlockItemScanner) (!isGold ? MazeTowers.BlockItemScanner
 						: MazeTowers.BlockItemScannerGold))
 						.setStateBasedOnMatchResult(world,
-							pos, world.getBlockState(pos),
-							true);
+							pos, world.getBlockState(pos), true);
 				}
 			});
 			return null;
