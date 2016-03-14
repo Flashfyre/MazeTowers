@@ -55,7 +55,7 @@ import com.samuel.mazetowers.worldgen.WorldGenMazeTowers;
 public class MazeTowers {
 	public static final String MODNAME = "mazetowers";
 	public static final String MODID = "mazetowers";
-	public static final String VERSION = "0.6.0";
+	public static final String VERSION = "0.6.1";
 
 	@Mod.Instance
 	public static MazeTowers instance = new MazeTowers();

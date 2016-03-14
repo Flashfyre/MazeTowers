@@ -1371,12 +1371,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			Path entrance;
 			entrance = new Path(this, null,
 				entranceMinX, 0, entranceMinZ, entranceDir);
-			int rebuildCount = 0;
+			int rebuildCount = 0, prevBeaconMiniTowerIndex = beaconMiniTowerIndex,
+				prevLocksmithMiniTowerIndex = locksmithMiniTowerIndex;
 			for (int f = 0; f < floors; f++) {
 				final Path prevPath = f != 0 ? floorExitPaths[f - 1] : null;
-				final int prevBeaconMiniTowerIndex = beaconMiniTowerIndex,
-				prevLocksmithMiniTowerIndex = locksmithMiniTowerIndex;
-				while (floorAlteredStates[f].size() < 200 + (10 * getDifficulty(f + 1))) {
+				while (floorAlteredStates[f].size() < 200 + (10 * getDifficulty(f + 1)) &&
+					beaconMiniTowerIndex != prevBeaconMiniTowerIndex) {
 					if (beaconMiniTowerIndex != -1 && miniTowers.get(beaconMiniTowerIndex).floor == f + 1) {
 						if (prevBeaconMiniTowerIndex != -1)
 							miniTowers.get(beaconMiniTowerIndex =
@@ -1393,6 +1393,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				}
 				if (floorExitPaths[f] != null) {
 					//fillGaps(f);
+					prevBeaconMiniTowerIndex = beaconMiniTowerIndex;
+					prevLocksmithMiniTowerIndex = locksmithMiniTowerIndex;
 					entrance = floorExitPaths[f].newFloor();
 				} else
 					break;
@@ -4888,21 +4890,14 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				}
 				break;
 			case 6:
+				mtp = new MTPDoor(tower, fromPath, this, dir,
+					distance, x, y, z);
+				break;
+			case 7:
 				mtp = new MTPPiston(tower, fromPath, this,
 					dir, distance, x, y, z);
 				break;
-			case 7:
-				break;
 			default:
-				// mtp = new MTPArrowGauntlet(tower, fromPath, toPath,
-				// toPath.dir, distance, x,
-				// y, z);
-				// mtp = new MTPWindow(tower, fromPath, toPath, dir, distance,
-				// x,
-				// y, z);
-				// mtp = new MTPPiston(tower, fromPath, toPath, dir, distance,
-				// x,
-				// y, z);
 
 			}
 			return (mtp != null && mtp.dir != null)
@@ -5424,6 +5419,39 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 	}
 	
+	private static class MTPDoor extends MTPuzzle {
+
+		private MTPDoor(MazeTower tower,
+			Path fromPath, Path toPath, EnumFacing dir,
+			int distance, int x, int y, int z) {
+			super(tower, fromPath, toPath, dir, distance,
+				x, y, z, xOffset = 0, zOffset = 1, 1);
+			dirSign = (dirIndex % 2 == 0 ? -2 : 1);
+			final IBlockState pressurePlate = MazeTowers.BlockHiddenPressurePlateWeighted
+				.getDefaultState(),
+			stone = Blocks.stone.getDefaultState();
+			stateMap = getRotatedStateMap(
+				new IBlockState[][][] {
+					{
+						{ pressurePlate },
+						{ doorStates[dir.getOpposite().getIndex() % 4] },
+						{ pressurePlate }
+					},
+					{
+						{ null },
+						{ doorStates[(dir.getIndex() % 2) == -1 ? 4 : 5] },
+						{ null }
+					},
+					{
+						{ null },
+						{ stone },
+						{ null }
+					}
+				}, EnumFacing.SOUTH, dir, true);
+			validateStateMap(stateMap, false);
+		}
+	}
+	
 	private static class MTPKeyDoor extends MTPuzzle {
 		
 		private MTPKeyDoor(MazeTower tower, Path fromPath,
@@ -5456,7 +5484,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 	}
 
-	private static class MTPuzzle {
+	private static abstract class MTPuzzle {
 		private final MazeTower tower;
 		private final Path fromPath;
 		private final Path toPath;

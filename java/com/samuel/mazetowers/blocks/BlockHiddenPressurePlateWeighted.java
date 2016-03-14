@@ -106,8 +106,8 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 		
 		i = !isInTower || worldIn.getEntitiesWithinAABB(EntityPlayer.class,
 			towerChunkBounds).size() != 0 ? Math.min(worldIn.getEntitiesWithinAABB(
-			(isInTower && isMTPFallTrap(worldIn, pos) ? EntityLivingBase.class
-			: Entity.class), this.getSensitiveAABB(pos)).size(),
+			(/*isInTower && isMTPFallTrap(worldIn, pos) ? EntityLivingBase.class
+			:*/ Entity.class), this.getSensitiveAABB(pos)).size(),
 			this.field_150068_a) : 0;
 
 		if (i > 0) {
