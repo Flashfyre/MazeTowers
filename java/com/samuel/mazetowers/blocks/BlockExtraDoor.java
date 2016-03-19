@@ -158,8 +158,7 @@ public class BlockExtraDoor extends BlockDoor {
 					true);
 				IBlockState scannerBackState = getScannerBackState(
 					worldIn, pos, state
-						.getValue(BlockExtraDoor.FACING),
-					true);
+						.getValue(BlockExtraDoor.FACING), true);
 				EnumFacing enumfacing = (EnumFacing) state
 					.getValue(FACING);
 				boolean hasScannerFront = scannerFrontState

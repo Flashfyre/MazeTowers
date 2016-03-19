@@ -52,7 +52,7 @@ public class CommonProxy {
 			"chaoticsludge", new ResourceLocation(
 				"mazetowers:blocks/chaotic_sludge_still"),
 			new ResourceLocation(
-				"mazetowers:blocks/chaotic_sludge_flowing"));
+				"mazetowers:blocks/chaotic_sludge_flowing")).setLuminosity(5).setViscosity(4000);
 		FluidRegistry.registerFluid(MazeTowers.FluidChaoticSludge);
 		FluidRegistry.addBucketForFluid(MazeTowers.FluidChaoticSludge);
 		MazeTowers.solidCircuits = new MaterialLogicSolid(
@@ -73,12 +73,18 @@ public class CommonProxy {
 		MazeTowers.BlockMemoryPistonExtensionOff = new BlockMemoryPistonMovingOff(
 			"memory_piston_extension_off");
 		(MazeTowers.BlockHiddenButton = new BlockHiddenButton()).setUnlocalizedName("quartz_button");
-		(MazeTowers.BlockIronChest = new BlockMineralChest(0))
-			.setUnlocalizedName("iron_chest");
-		(MazeTowers.BlockGoldChest = new BlockMineralChest(1))
-			.setUnlocalizedName("gold_chest");
-		(MazeTowers.BlockDiamondChest = new BlockMineralChest(
-			2)).setUnlocalizedName("diamond_chest");
+		(MazeTowers.BlockIronChest = new BlockMineralChest(2))
+    		.setUnlocalizedName("iron_chest");
+    	(MazeTowers.BlockGoldChest = new BlockMineralChest(3))
+    		.setUnlocalizedName("gold_chest");
+    	(MazeTowers.BlockDiamondChest = new BlockMineralChest(4))
+    		.setUnlocalizedName("diamond_chest");
+    	(MazeTowers.BlockTrappedIronChest = new BlockMineralChest(5))
+        	.setUnlocalizedName("iron_chest_trapped");
+        (MazeTowers.BlockTrappedGoldChest = new BlockMineralChest(6))
+        	.setUnlocalizedName("gold_chest_trapped");
+        (MazeTowers.BlockTrappedDiamondChest = new BlockMineralChest(7))
+        	.setUnlocalizedName("diamond_chest_trapped");
 		(MazeTowers.BlockPackedIceStairs = new BlockExtraStairs(
 			Blocks.packed_ice.getDefaultState()))
 			.setUnlocalizedName("packed_ice_stairs");

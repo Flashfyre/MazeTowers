@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "mazetowers:diamond_chest_trapped" },
+        "facing=east": { "model": "mazetowers:diamond_chest_trapped", "y": 90  },
+        "facing=south": { "model": "mazetowers:diamond_chest_trapped", "y": 180  },
+        "facing=west": { "model": "mazetowers:diamond_chest_trapped", "y": 270  }
+    }
+}

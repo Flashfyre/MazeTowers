@@ -14,8 +14,7 @@ import com.samuel.mazetowers.blocks.BlockMineralChest;
 import com.samuel.mazetowers.tileentities.TileEntityMineralChest;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityMineralChestRenderer extends
-	TileEntitySpecialRenderer {
+public class TileEntityMineralChestRenderer extends TileEntitySpecialRenderer {
 	private static final ResourceLocation textureIron = new ResourceLocation(
 		"mazetowers:textures/tileentities/chest_iron.png");
 	private static final ResourceLocation textureGold = new ResourceLocation(
@@ -28,6 +27,18 @@ public class TileEntityMineralChestRenderer extends
 		"mazetowers:textures/tileentities/chest_gold_double.png");
 	private static final ResourceLocation textureDoubleDiamond = new ResourceLocation(
 		"mazetowers:textures/tileentities/chest_diamond_double.png");
+	private static final ResourceLocation textureTrappedIron = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_iron_trapped.png");
+	private static final ResourceLocation textureTrappedGold = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_gold_trapped.png");
+	private static final ResourceLocation textureTrappedDiamond = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_diamond_trapped.png");
+	private static final ResourceLocation textureDoubleTrappedIron = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_iron_trapped_double.png");
+	private static final ResourceLocation textureDoubleTrappedGold = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_gold_trapped_double.png");
+	private static final ResourceLocation textureDoubleTrappedDiamond = new ResourceLocation(
+		"mazetowers:textures/tileentities/chest_diamond_trapped_double.png");
 	private ModelChest simpleChest = new ModelChest();
 	private ModelLargeChest largeChest = new ModelLargeChest();
 
@@ -60,6 +71,7 @@ public class TileEntityMineralChestRenderer extends
 
 		if (tile.adjacentChestZNeg == null
 			&& tile.adjacentChestXNeg == null) {
+			final int chestType = tile.getChestType();
 			ModelChest var15;
 
 			if (tile.adjacentChestXPos == null
@@ -75,19 +87,54 @@ public class TileEntityMineralChestRenderer extends
 						0.0625F, 0.0625F);
 					GlStateManager.matrixMode(5888);
 				} else {
-					ResourceLocation texture = tile
-						.getChestType() == 0 ? textureIron
-						: tile.getChestType() == 1 ? textureGold
-							: textureDiamond;
+					ResourceLocation texture = null;
+					switch (chestType) {
+						case 2:
+							texture = textureIron;
+							break;
+						case 3:
+							texture = textureGold;
+							break;
+						case 4:
+							texture = textureDiamond;
+							break;
+						case 5:
+							texture = textureTrappedIron;
+							break;
+						case 6:
+							texture = textureTrappedGold;
+							break;
+						case 7:
+							texture = textureTrappedDiamond;
+							break;
+						default:
+					}
 					this.bindTexture(texture);
 				}
 			} else {
 				var15 = this.largeChest;
-
-				ResourceLocation textureDouble = tile
-					.getChestType() == 0 ? textureDoubleIron
-					: tile.getChestType() == 1 ? textureDoubleGold
-						: textureDoubleDiamond;
+				ResourceLocation textureDouble = null;
+				switch (chestType) {
+    				case 2:
+    					textureDouble = textureDoubleIron;
+    					break;
+    				case 3:
+    					textureDouble = textureDoubleGold;
+    					break;
+    				case 4:
+    					textureDouble = textureDoubleDiamond;
+    					break;
+    				case 5:
+    					textureDouble = textureDoubleTrappedIron;
+    					break;
+    				case 6:
+    					textureDouble = textureDoubleTrappedGold;
+    					break;
+    				case 7:
+    					textureDouble = textureDoubleTrappedDiamond;
+    					break;
+    				default:
+    			}
 
 				if (breakStage >= 0) {
 					this.bindTexture(DESTROY_STAGES[breakStage]);

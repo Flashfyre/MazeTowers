@@ -141,15 +141,15 @@ public class EntitySpecialVillager extends EntityVillager {
 			IVendorTradeable tradeableItem = sellList[professionId][i];
 			Item item = tradeableItem instanceof Block ?
 				Item.getItemFromBlock((Block) tradeableItem) : (Item) tradeableItem;
+			ItemStack stack = new ItemStack(item, 1, professionId != 3 ? 0 : towerType.ordinal());
 			int tradeChance = tradeableItem.getVendorTradeChance(difficulty);
 			if (tradeChance == 1000 || rand.nextInt(1000) < tradeChance)
-				recipes.add(new MerchantRecipe(getTradeStack(),
-					new ItemStack(item, 1, professionId != 3 ? 0 : towerType.ordinal())));
+				recipes.add(new MerchantRecipe(getTradeStack(stack), stack));
 		}
 		return recipes;
 	}
 	
-	private ItemStack getTradeStack() {
+	private ItemStack getTradeStack(ItemStack item) {
 		return new ItemStack(Items.emerald, 1);
 	}
 	

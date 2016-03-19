@@ -25,6 +25,9 @@ public class BlockRenderRegister {
 		reg(ModBlocks.mineralChestIron, 0);
 		reg(ModBlocks.mineralChestGold, 0);
 		reg(ModBlocks.mineralChestDiamond, 0);
+		reg(ModBlocks.mineralChestIronTrapped, 0);
+		reg(ModBlocks.mineralChestGoldTrapped, 0);
+		reg(ModBlocks.mineralChestDiamondTrapped, 0);
 		reg(ModBlocks.packedIceStairs, 0);
 		reg(ModBlocks.prismarineBrickStairs, 0);
 		reg(ModBlocks.endStoneStairs, 0);

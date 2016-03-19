@@ -52,6 +52,16 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 
 	public static final Block.SoundType soundTypeLock =
 		new Block.SoundType("lock", 0.2F, 1.5F)  {
+		
+		@Override
+        /**
+         * Get the breaking sound for the Block
+         */
+        public String getStepSound()
+        {
+            return "dig.stone";
+        }
+		
 		@Override
         /**
          * Get the breaking sound for the Block
@@ -86,7 +96,8 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
 		this.setStepSound(soundTypeLock);
-		setCreativeTab(MazeTowers.tabExtra);
+		this.setBlockUnbreakable();
+		this.setCreativeTab(MazeTowers.tabExtra);
 	}
 	
 	@Override
@@ -123,6 +134,9 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
     			return false;
     		} else {
     			worldIn.playSoundAtEntity(playerIn, "mazetowers:door_unlock", 1.0F, 1.0F);
+    			// Consume key if in a Maze Tower
+    			if (MTUtils.getIsMazeTowerPos(worldIn.provider.getDimensionId(), pos))
+    				playerIn.setCurrentItemOrArmor(0, null);
     			this.dropBlockAsItem(worldIn, pos, state, 0);
     			worldIn.setBlockToAir(pos);
     			return true;

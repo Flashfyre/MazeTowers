@@ -67,6 +67,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 
 	@Override
 	public boolean isFullCube() {
+		Fixed Lock to prevent doors from opening when locked; replaced wooden locked Maze Tower doors with iron doors to prevent opening; added Trapped Iron, Gold, and Diamond Chests; changed Maze Tower entrances to use fences/walls; excluded ladders from block protection to prevent inaccessibility bug due to placing a solid block in the place of a missing ladder; added Redstone Clocks to creative mode inventory; fixed pressure plate "puzzles" to work; added luminosity and viscosity to Chaotic Sludge liquid; allowed Mini Towers to spawn starting on B3F instead of B5F; fixed generation bug that caused crashing; made default Item Scanner key stack one of 3 minerals depending on difficulty; made shops rarer in Nether Maze Towers and removed Redstone Clock from shops to avoid constant opening and closing (some Mini Tower entrances still do this); 
 		return false;
 	}
 
@@ -82,7 +83,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	public void onNeighborBlockChange(World worldIn,
 		BlockPos pos, IBlockState state, Block neighborBlock) {
 		if (!this.canBePlacedOn(worldIn, pos.down())) {
-			if (!isMTPFallTrap(worldIn, pos))
+			if (!MTUtils.getIsMazeTowerPos(worldIn.provider.getDimensionId(), pos))
 				this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
@@ -117,32 +118,6 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 			return MathHelper.ceiling_float_int(f * 15.0F);
 		} else
 			return 0;
-	}
-
-	private static IBlockState getMTPFallTrapPistonState(
-		World worldIn, BlockPos pos) {
-		BlockPos belowPos = pos.down();
-		IBlockState pistonState;
-		return ((pistonState = worldIn
-			.getBlockState(belowPos)).getBlock() instanceof BlockMemoryPistonBase
-			|| (pistonState = worldIn
-				.getBlockState(belowPos.east())).getBlock() instanceof BlockMemoryPistonBase
-			|| (pistonState = worldIn
-				.getBlockState(belowPos.south()))
-				.getBlock() instanceof BlockMemoryPistonBase
-			|| (pistonState = worldIn
-				.getBlockState(belowPos.west())).getBlock() instanceof BlockMemoryPistonBase
-			|| (pistonState = worldIn
-				.getBlockState(belowPos.north()))
-				.getBlock() instanceof BlockMemoryPistonBase ? pistonState
-			: null);
-	}
-
-	private static boolean isMTPFallTrap(World worldIn,
-		BlockPos pos) {
-		IBlockState state = getMTPFallTrapPistonState(
-			worldIn, pos);
-		return state != null;
 	}
 
 	@Override

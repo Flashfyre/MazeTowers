@@ -196,11 +196,12 @@ public class BlockMineralChest extends BlockChest {
 
 	@Override
 	/**
-	 * Can this block provide power. Only wire currently seems to have this change based on its state.
-	 */
-	public boolean canProvidePower() {
-		return false;
-	}
+     * Can this block provide power. Only wire currently seems to have this change based on its state.
+     */
+    public boolean canProvidePower()
+    {
+        return chestType > 4 ;
+    }
 
 	private boolean isBlocked(World worldIn, BlockPos pos) {
 		return this.isBelowSolidBlock(worldIn, pos)
