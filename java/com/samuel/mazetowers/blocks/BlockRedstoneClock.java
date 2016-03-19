@@ -12,6 +12,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -29,6 +30,7 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
 		super(Material.circuits, 1, 5, 9, 10, 100);
 		this.inverted = inverted;
 		this.setBlockBounds(0.0675F, 0.0F, 0.0675F, 0.9325F, 0.125F, 0.9325F);
+		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 	
 	@Override

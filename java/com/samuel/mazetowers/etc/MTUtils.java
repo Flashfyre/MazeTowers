@@ -450,6 +450,7 @@ public class MTUtils {
 								.getBlock()) == Blocks.water
 								|| block == Blocks.carpet
 								|| block == Blocks.torch
+								|| block == Blocks.ladder
 								|| block == Blocks.glass
 								|| block == Blocks.web
 								|| block instanceof BlockChest

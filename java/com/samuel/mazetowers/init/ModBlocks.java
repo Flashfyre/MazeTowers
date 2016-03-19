@@ -22,6 +22,9 @@ public class ModBlocks {
 	public static BlockMineralChest mineralChestIron;
 	public static BlockMineralChest mineralChestGold;
 	public static BlockMineralChest mineralChestDiamond;
+	public static BlockMineralChest mineralChestIronTrapped;
+	public static BlockMineralChest mineralChestGoldTrapped;
+	public static BlockMineralChest mineralChestDiamondTrapped;
 	public static BlockExtraStairs packedIceStairs;
 	public static BlockExtraStairs prismarineBrickStairs;
 	public static BlockExtraStairs endStoneStairs;
@@ -113,6 +116,12 @@ public class ModBlocks {
 			"gold_chest");
 		GameRegistry.registerBlock(mineralChestDiamond = MazeTowers.BlockDiamondChest,
 			"diamond_chest");
+		GameRegistry.registerBlock(mineralChestIronTrapped = MazeTowers.BlockTrappedIronChest,
+			"iron_chest_trapped");
+		GameRegistry.registerBlock(mineralChestGoldTrapped = MazeTowers.BlockTrappedGoldChest,
+			"gold_chest_trapped");
+		GameRegistry.registerBlock(mineralChestDiamondTrapped = MazeTowers.BlockTrappedDiamondChest,
+			"diamond_chest_trapped");
 		GameRegistry.registerBlock(hiddenButton = MazeTowers.BlockHiddenButton,
 			"quartz_button");
 		GameRegistry.registerBlock(resistantDoorPrismarine = MazeTowers.BlockPrismarineDoor, null,

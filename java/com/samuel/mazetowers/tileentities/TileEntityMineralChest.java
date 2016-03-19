@@ -41,10 +41,15 @@ public class TileEntityMineralChest extends TileEntityChest
 	 * Gets the name of this command sender (usually username, but possibly "Rcon")
 	 */
 	public String getCommandSenderName() {
-		return this.hasCustomName() ? this.customName
-			: cachedChestType == 0 ? "mazetowers:container.iron_chest"
-				: cachedChestType == 1 ? "mazetowers:container.gold_chest"
-					: "mazetowers:container.diamond_chest";
+		final boolean isTrapped = cachedChestType < 4;
+		int chestType = cachedChestType + (isTrapped ? 0 : -3);
+		String chestName = this.hasCustomName() ? this.customName
+			: cachedChestType == 2 ? "mazetowers:container.iron_chest"
+			: cachedChestType == 3 ? "mazetowers:container.gold_chest"
+			: "mazetowers:container.diamond_chest";
+		if (isTrapped)
+			chestName += "_trapped";
+		return chestName;
 	}
 
 	@Override
@@ -63,13 +68,11 @@ public class TileEntityMineralChest extends TileEntityChest
 
 	@Override
 	public IChatComponent getDisplayName() {
-		String name = StatCollector
-			.translateToLocal((blockType != null ? blockType
-				.getUnlocalizedName()
-				: "tile.")
-				+ (cachedChestType == 0 ? "iron"
-					: cachedChestType == 1 ? "gold"
-						: "diamond") + "_chest.name");
+		final int chestType = cachedChestType +
+			(cachedChestType <= 4 ? 0 : -3);
+		String name = StatCollector.translateToLocal((blockType != null ?
+			blockType .getUnlocalizedName() : "tile.") + (chestType == 2 ?
+			"iron" : chestType == 3 ? "gold" : "diamond") + "_chest.name");
 		return new ChatComponentText(name);
 	}
 

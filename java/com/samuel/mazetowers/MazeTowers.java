@@ -55,7 +55,7 @@ import com.samuel.mazetowers.worldgen.WorldGenMazeTowers;
 public class MazeTowers {
 	public static final String MODNAME = "mazetowers";
 	public static final String MODID = "mazetowers";
-	public static final String VERSION = "0.6.1";
+	public static final String VERSION = "0.6.2";
 
 	@Mod.Instance
 	public static MazeTowers instance = new MazeTowers();
@@ -86,6 +86,9 @@ public class MazeTowers {
 	public static BlockMineralChest BlockIronChest;
 	public static BlockMineralChest BlockGoldChest;
 	public static BlockMineralChest BlockDiamondChest;
+	public static BlockMineralChest BlockTrappedIronChest;
+	public static BlockMineralChest BlockTrappedGoldChest;
+	public static BlockMineralChest BlockTrappedDiamondChest;
 	public static BlockExtraStairs BlockPackedIceStairs;
 	public static BlockExtraStairs BlockPrismarineBrickStairs;
 	public static BlockExtraStairs BlockEndStoneStairs;

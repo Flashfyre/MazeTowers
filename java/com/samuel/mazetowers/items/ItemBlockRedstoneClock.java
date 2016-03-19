@@ -22,14 +22,12 @@ public class ItemBlockRedstoneClock extends ItemBlock implements IVendorTradeabl
 
 	public ItemBlockRedstoneClock(Block block) {
 		super(block);
-		this.setCreativeTab(CreativeTabs.tabRedstone);
 		professionId = 1;
 		minTradeLevel = 6;
 		maxTradeLevel = 9;
 		minTradeChance = 20;
 		maxTradeChance = 200;
 		tradeLevelDiff = maxTradeLevel - minTradeLevel;
-		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
 	@Override
