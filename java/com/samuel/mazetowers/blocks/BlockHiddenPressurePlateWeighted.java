@@ -67,7 +67,6 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 
 	@Override
 	public boolean isFullCube() {
-		Fixed Lock to prevent doors from opening when locked; replaced wooden locked Maze Tower doors with iron doors to prevent opening; added Trapped Iron, Gold, and Diamond Chests; changed Maze Tower entrances to use fences/walls; excluded ladders from block protection to prevent inaccessibility bug due to placing a solid block in the place of a missing ladder; added Redstone Clocks to creative mode inventory; fixed pressure plate "puzzles" to work; added luminosity and viscosity to Chaotic Sludge liquid; allowed Mini Towers to spawn starting on B3F instead of B5F; fixed generation bug that caused crashing; made default Item Scanner key stack one of 3 minerals depending on difficulty; made shops rarer in Nether Maze Towers and removed Redstone Clock from shops to avoid constant opening and closing (some Mini Tower entrances still do this); 
 		return false;
 	}
 
