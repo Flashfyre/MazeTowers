@@ -8,7 +8,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 import com.samuel.mazetowers.client.gui.KeyStackSlot;
-import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
 
 public class ContainerItemScanner extends Container {
 	private IInventory scannerInv;
@@ -17,7 +17,7 @@ public class ContainerItemScanner extends Container {
 
 	public ContainerItemScanner(IInventory playerInventory,
 		IInventory scannerInventory, EntityPlayer player) {
-		keyInv = (IInventory) new InventoryBasic("Key",
+		keyInv = new InventoryBasic("Key",
 			true, 1);
 		keyInv.setInventorySlotContents(0,
 			((TileEntityItemScanner) scannerInventory)
@@ -66,7 +66,7 @@ public class ContainerItemScanner extends Container {
 	public ItemStack transferStackInSlot(
 		EntityPlayer playerIn, int index) {
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(index);
+		Slot slot = this.inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();

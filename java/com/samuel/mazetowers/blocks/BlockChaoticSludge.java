@@ -3,13 +3,13 @@ package com.samuel.mazetowers.blocks;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 
-import com.samuel.mazetowers.tileentities.TileEntityChaoticSludgeToxin;
+import com.samuel.mazetowers.tileentity.TileEntityChaoticSludgeToxin;
 
 public class BlockChaoticSludge extends BlockFluidClassic
 	implements ITileEntityProvider {

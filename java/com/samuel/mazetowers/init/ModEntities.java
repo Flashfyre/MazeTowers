@@ -3,7 +3,9 @@ package com.samuel.mazetowers.init;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.entities.*;
+import com.samuel.mazetowers.entity.EntityExplosiveArrow;
+import com.samuel.mazetowers.entity.EntityExplosiveCreeper;
+import com.samuel.mazetowers.entity.EntityVillagerVendor;
 
 public class ModEntities {
 
@@ -18,12 +20,8 @@ public class ModEntities {
 			"ExplosiveCreeper", entityID++, mod,
 			128, 1, true, 8388608, 16736256);
 		EntityRegistry.registerModEntity(
-			EntitySpecialVillager.class,
+			EntityVillagerVendor.class,
 			"SpecialVillager", entityID++, mod,
 			128, 1, true);
-		EntityRegistry.registerModEntity(
-			EntityUltravioletBlaze.class,
-			"UltravioletBlaze", entityID++, mod, 128, 1,
-			true);
 	}
 }

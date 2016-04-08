@@ -4,14 +4,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.IThreadListener;
-import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-import com.samuel.mazetowers.etc.PlayerMazeTower;
+import com.samuel.mazetowers.etc.IMazeTowerCapability;
+import com.samuel.mazetowers.etc.MazeTowerGuiProvider;
 
 public class PacketMazeTowersGui implements IMessage {
 
@@ -88,7 +87,8 @@ public class PacketMazeTowersGui implements IMessage {
 				@Override
 				public void run() {
 					final EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-					PlayerMazeTower props = PlayerMazeTower.get(player);
+					IMazeTowerCapability props =
+						player.getCapability(MazeTowerGuiProvider.gui, null);
 					if (props != null) {
 						boolean enabled = props
 							.getEnabled();

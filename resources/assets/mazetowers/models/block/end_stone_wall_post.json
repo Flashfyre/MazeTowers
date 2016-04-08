@@ -1,7 +1,7 @@
 {
     "parent": "block/wall_post",
     "textures": {
-        "wall": "blocks/end_stone",
-		"top": "blocks/end_stone"
+        "wall": "blocks/end_bricks",
+		"top": "blocks/end_bricks"
     }
 }

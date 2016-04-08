@@ -1,40 +1,49 @@
 package com.samuel.mazetowers.proxy;
 
-import java.lang.reflect.Field;
-
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockPressurePlateWeighted;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockChaoticSludge;
 import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.entities.*;
+import com.samuel.mazetowers.client.renderer.BlockRenderRegister;
+import com.samuel.mazetowers.client.renderer.EntityRenderRegister;
+import com.samuel.mazetowers.client.renderer.ItemRenderRegister;
+import com.samuel.mazetowers.client.renderer.tileentity.TileEntityExplosiveCreeperSkullRenderer;
+import com.samuel.mazetowers.client.renderer.tileentity.TileEntityMineralChestRenderer;
+import com.samuel.mazetowers.client.renderer.tileentity.TileEntityRedstoneClockRenderer;
 import com.samuel.mazetowers.etc.HiddenButtonModel;
 import com.samuel.mazetowers.etc.HiddenPressurePlateWeightedModel;
+import com.samuel.mazetowers.eventhandlers.MazeTowersRenderEventHandler;
 import com.samuel.mazetowers.eventhandlers.ModelBakeEventHandler;
-import com.samuel.mazetowers.render.BlockRenderRegister;
-import com.samuel.mazetowers.render.EntityRenderRegister;
-import com.samuel.mazetowers.render.ItemRenderRegister;
-import com.samuel.mazetowers.render.entities.*;
-import com.samuel.mazetowers.render.tileentities.*;
-import com.samuel.mazetowers.tileentities.*;
+import com.samuel.mazetowers.init.ModBlocks;
+import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
+import com.samuel.mazetowers.tileentity.TileEntityLock;
+import com.samuel.mazetowers.tileentity.TileEntityMineralChest;
+import com.samuel.mazetowers.tileentity.TileEntityRedstoneClock;
 
 public class ClientProxy extends CommonProxy {
 
@@ -48,7 +57,8 @@ public class ClientProxy extends CommonProxy {
 				ModelResourceLocation mrl;
 				if (state.getBlock() == MazeTowers.BlockHiddenPressurePlateWeighted) {
 					return state
-						.getValue(BlockHiddenPressurePlateWeighted.POWER) == 0 ? HiddenPressurePlateWeightedModel.modelResourceLocationUp
+						.getValue(BlockPressurePlateWeighted.POWER) == 0 ?
+						HiddenPressurePlateWeightedModel.modelResourceLocationUp
 						: HiddenPressurePlateWeightedModel.modelResourceLocationDown;
 				} else {
 					switch (state.getBlock()
@@ -108,13 +118,30 @@ public class ClientProxy extends CommonProxy {
 		EntityRenderRegister.registerEntityRenderer();
 		ItemRenderRegister.registerItemRenderer();
 		for (int k = 0; k < 20; k++) {
-			ModelLoader.setCustomModelResourceLocation(MazeTowers.ItemKey, k,
+			ModelLoader.setCustomModelResourceLocation(MazeTowers.ItemColoredKey, k,
 				new ModelResourceLocation("mazetowers:key_" + k));
 			ModelLoader.setCustomModelResourceLocation(Item
 				.getItemFromBlock(MazeTowers.BlockLock), k,
 				new ModelResourceLocation("mazetowers:lock"));
 		}
-
+		ModelLoader.setCustomModelResourceLocation(Item
+			.getItemFromBlock(MazeTowers.BlockSpectriteOre), 0,
+			new ModelResourceLocation("mazetowers:spectrite_ore_surface"));
+		ModelLoader.setCustomModelResourceLocation(Item
+			.getItemFromBlock(MazeTowers.BlockSpectriteOre), 1,
+			new ModelResourceLocation("mazetowers:spectrite_ore_nether"));
+		ModelLoader.setCustomModelResourceLocation(Item
+			.getItemFromBlock(MazeTowers.BlockSpectriteOre), 2,
+			new ModelResourceLocation("mazetowers:spectrite_ore_end"));
+		ModelLoader.setCustomModelResourceLocation(Item
+			.getItemFromBlock(MazeTowers.BlockSpectriteOre), 0,
+			new ModelResourceLocation("mazetowers:spectrite_chest"));
+		ModelBakery.registerItemVariants(Item.getItemFromBlock(ModBlocks.spectriteOre),
+			new ResourceLocation("mazetowers:spectrite_ore_surface"),
+			new ResourceLocation("mazetowers:spectrite_ore_nether"),
+			new ResourceLocation("mazetowers:spectrite_ore_end"));
+		MinecraftForge.EVENT_BUS
+			.register(new MazeTowersRenderEventHandler());
 		MinecraftForge.EVENT_BUS
 			.register(ModelBakeEventHandler.instance);
 	}
@@ -132,21 +159,30 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(
 			TileEntityRedstoneClock.class,
 			new TileEntityRedstoneClockRenderer());
-		ModelBakery.addVariantName(
-			MazeTowers.ItemExplosiveBow,
-			"mazetowers:explosive_bow");
-		ModelBakery.addVariantName(
-			MazeTowers.ItemExplosiveBow,
-			"mazetowers:explosive_bow_pulling_0");
-		ModelBakery.addVariantName(
-			MazeTowers.ItemExplosiveBow,
-			"mazetowers:explosive_bow_pulling_1");
-		ModelBakery.addVariantName(
-			MazeTowers.ItemExplosiveBow,
-			"mazetowers:explosive_bow_pulling_2");
-		ModelBakery.registerItemVariants(
-			Item.getItemFromBlock(MazeTowers.BlockLock),
-			new ResourceLocation("mazetowers:lock"));
+		BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
+		ItemColors itemColors = Minecraft.getMinecraft().getItemColors();
+		blockColors.registerBlockColorHandler(new IBlockColor()
+        {
+			@Override
+			@SideOnly(Side.CLIENT)
+		    public int colorMultiplier(IBlockState state, IBlockAccess worldIn,
+		    	BlockPos pos, int tintIndex) {
+				int typeIndex = 14;
+				if (worldIn.getTileEntity(pos) != null) {
+		    		TileEntityLock te = (TileEntityLock) worldIn.getTileEntity(pos);
+		    		typeIndex = te.getTypeIndex();
+				}
+		        return MazeTowers.BlockLock.getColors()[typeIndex];
+		    }
+        }, new Block[] { MazeTowers.BlockLock } );
+		itemColors.registerItemColorHandler(new IItemColor()
+        {
+        	@Override
+            @SideOnly(Side.CLIENT)
+            public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+            	return MazeTowers.ItemColoredKey.getColors()[stack.getItemDamage()];
+            }
+        }, MazeTowers.ItemColoredKey, Item.getItemFromBlock(MazeTowers.BlockLock));
 	}
 
 	@Override

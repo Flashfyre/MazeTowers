@@ -3,84 +3,68 @@ package com.samuel.mazetowers.blocks;
 import java.util.List;
 import java.util.Random;
 
-import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.etc.IMetaBlockName;
-import com.samuel.mazetowers.etc.IVendorTradeable;
-import com.samuel.mazetowers.etc.MTUtils;
-import com.samuel.mazetowers.init.ModItems;
-import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
-import com.samuel.mazetowers.tileentities.TileEntityLock;
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, ITileEntityProvider {
+import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.etc.IMetaBlockName;
+import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.init.ModItems;
+import com.samuel.mazetowers.init.ModSounds;
+import com.samuel.mazetowers.tileentity.TileEntityLock;
+import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
+
+public class BlockLock extends Block implements IMetaBlockName,
+	ITileEntityProvider {
 	
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing", EnumFacing.Plane.HORIZONTAL);
 	public static final PropertyEnum<BlockDoor.EnumHingePosition> HINGE =
 		PropertyEnum.<BlockDoor.EnumHingePosition>create("hinge",
 		BlockDoor.EnumHingePosition.class);
-
-	public static final Block.SoundType soundTypeLock =
-		new Block.SoundType("lock", 0.2F, 1.5F)  {
-		
-		@Override
-        /**
-         * Get the breaking sound for the Block
-         */
-        public String getStepSound()
-        {
-            return "dig.stone";
-        }
-		
-		@Override
-        /**
-         * Get the breaking sound for the Block
-         */
-        public String getBreakSound()
-        {
-            return "dig.stone";
-        }
-		
-		@Override
-        public String getPlaceSound()
-        {
-            return "random.anvil_land";
-        }
-    };
+	public static final SoundType LOCK = new SoundType(0.2F, 1.5F,
+		SoundEvents.block_stone_break, SoundEvents.block_stone_step,
+		SoundEvents.block_anvil_place, SoundEvents.block_anvil_hit,
+		SoundEvents.block_anvil_fall);
+	protected static final AxisAlignedBB AABB_EAST =
+		new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.125F, 1.0F, 1.0F);
+	protected static final AxisAlignedBB AABB_WEST =
+		new AxisAlignedBB(0.875F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+	protected static final AxisAlignedBB AABB_SOUTH =
+		new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.125F);
+	protected static final AxisAlignedBB AABB_NORTH =
+		new AxisAlignedBB(0.0F, 0.0F, 0.875F, 1.0F, 1.0F, 1.0F);
 	private int[] colors;
 	
 	public BlockLock() {
-		super(Material.iron, 3, 500, 100);
+		super(Material.iron);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING,
 			EnumFacing.NORTH).withProperty(HINGE, BlockDoor.EnumHingePosition.LEFT));
 		EnumDyeColor[][] dyeColors = EnumTowerType.getAllBeaconColors();
@@ -88,61 +72,66 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 		for (int t = 0; t < dyeColors.length; t++) {
 			float[] rgbMix = new float[3];
 			for (int c = 0; c < dyeColors[t].length; c++) {
-        		float[] rgb = EntitySheep.func_175513_a(dyeColors[t][c]);
+        		float[] rgb = EntitySheep.getDyeRgb(dyeColors[t][c]);
         		rgbMix[0] += rgb[0] / dyeColors[t].length;
         		rgbMix[1] += rgb[1] / dyeColors[t].length;
         		rgbMix[2] += rgb[2] / dyeColors[t].length;
 			}
 			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
-		this.setStepSound(soundTypeLock);
+		this.setStepSound(LOCK);
 		this.setBlockUnbreakable();
-		this.setCreativeTab(MazeTowers.tabExtra);
+		this.setCreativeTab(MazeTowers.TabExtra);
 	}
 	
 	@Override
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
+	}
+	
+	public int[] getColors() {
+		return colors;
 	}
 	
 	@Override
 	 /**
     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
     */
-	public int getRenderType() {
-       return 3;
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+       return EnumBlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state,
+		EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side,
+		float hitX, float hitY, float hitZ)  {
 		if (!worldIn.isRemote) {
-    		final boolean holdingKey = playerIn.getHeldItem() != null &&
-    			playerIn.getHeldItem().areItemStacksEqual(playerIn.getHeldItem(),
-    			new ItemStack((Item) ModItems.key, 1, ((TileEntityLock) worldIn.getTileEntity(pos))
-    			.getTypeIndex()));
-    		if (!holdingKey) {
-    			worldIn.playSoundAtEntity(playerIn, "mazetowers:door_locked", 1.0F, 1.0F);
-    			return false;
+    		final boolean holdingKey = heldItem != null &&
+    			(ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.key_colored,
+    			1, ((TileEntityLock) worldIn.getTileEntity(pos)).getTypeIndex())) ||
+    			heldItem.getItem() == ModItems.key_spectrite ||
+    			ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.spectrite_key_sword)));
+    		if (holdingKey) {
+    			worldIn.playSound(hitX, hitY, hitZ, ModSounds.door_locked,
+    				SoundCategory.BLOCKS, 1.0F, 1.0F, true);
     		} else {
-    			worldIn.playSoundAtEntity(playerIn, "mazetowers:door_unlock", 1.0F, 1.0F);
-    			// Consume key if in a Maze Tower
-    			if (MTUtils.getIsMazeTowerPos(worldIn.provider.getDimensionId(), pos))
-    				playerIn.setCurrentItemOrArmor(0, null);
-    			this.dropBlockAsItem(worldIn, pos, state, 0);
+    			worldIn.playSound(null, pos, ModSounds.door_unlock,
+        			SoundCategory.BLOCKS, 1.0F, 1.0F);
+    			if (!MTUtils.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
+    				this.dropBlockAsItem(worldIn, pos, state, 0);
     			worldIn.setBlockToAir(pos);
     			return true;
     		}
-		} else
-			return false;
+		}
+		return false;
     }
 
 	@Override
@@ -203,7 +192,7 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 	public void onNeighborBlockChange(World worldIn,
 		BlockPos pos, IBlockState state, Block neighborBlock) {
 		if (!func_181088_a(worldIn, pos,
-			((EnumFacing) state.getValue(FACING)).getOpposite())) {
+			state.getValue(FACING).getOpposite())) {
 			if (this.checkForDrop(worldIn, pos, state))
 				this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
@@ -212,38 +201,24 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 
 	private boolean checkForDrop(World worldIn,
 		BlockPos pos, IBlockState state) {
-		return !MTUtils.getIsMazeTowerPos(worldIn.provider.getDimensionId(), pos) &&
+		return !MTUtils.getIsMazeTowerPos(worldIn.provider.getDimension(), pos) &&
 			this.canPlaceBlockAt(worldIn, pos);
 	}
 	
 	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		this.updateBlockBounds(worldIn.getBlockState(pos));
-	}
-
-	private void updateBlockBounds(IBlockState state) {
-		EnumFacing enumfacing = (EnumFacing) state
-			.getValue(FACING);
-		float f = 0.125F;
-
-		switch (enumfacing) {
-		case EAST:
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, f,
-				1.0F, 1.0F);
-			break;
-		case WEST:
-			this.setBlockBounds(1.0F - f, 0.0F, 0.0F,
-				1.0F, 1.0F, 1.0F);
-			break;
-		case SOUTH:
-			this.setBlockBounds(0.0F, 0.0F, 0.0F,
-				1.0F, 1.0F, f);
-			break;
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	    switch (state.getValue(FACING)) {
+	        case NORTH:
+	            return AABB_NORTH;
+	        case SOUTH:
+	            return AABB_SOUTH;
+	        case WEST:
+	            return AABB_WEST;
+	        case EAST:
+	            return AABB_EAST;
 		default:
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - f,
-				1.0F, 1.0F, 1.0F);
-		}
+			return null;
+	    }
 	}
 	
 	@Override
@@ -263,18 +238,14 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
         Random rand = world instanceof World ? ((World)world).rand : RANDOM;
 
         int count = quantityDropped(state, fortune, rand);
-        for(int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             Item item = this.getItemDropped(state, rand, fortune);
             if (item != null)
-            {
                 ret.add(new ItemStack(item, 1, getDamageValue((World) world, pos)));
-            }
         }
         return ret;
     }
-	
-	@Override
+
 	public int getDamageValue(World worldIn, BlockPos pos) {
         return ((TileEntityLock) worldIn.getTileEntity(pos)).getTypeIndex();
     }
@@ -313,7 +284,7 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 	public int getMetaFromState(IBlockState state) {
 		int i;
 
-		switch ((EnumFacing) state.getValue(FACING)) {
+		switch (state.getValue(FACING)) {
 		case EAST:
 			i = 0;
 			break;
@@ -337,9 +308,8 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		IProperty[] listedProperties = new IProperty[] { FACING, HINGE };
-		return new BlockState(this, listedProperties);
+	protected BlockStateContainer createBlockState() {
+		return (new BlockStateContainer.Builder(this)).add(FACING).add(HINGE).build();
 	}
 	
 	/**
@@ -356,25 +326,6 @@ public class BlockLock extends BlockVendorTradeable implements IMetaBlockName, I
             EnumTowerType type = types[j];
             list.add(new ItemStack(itemIn, 1, type.ordinal()));
         }
-    }
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-    public int getRenderColor(IBlockState state)
-    {
-		return colors[14];
-    }
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass)
-    {
-		int typeIndex = 14;
-		if (worldIn.getTileEntity(pos) != null) {
-    		TileEntityLock te = (TileEntityLock) worldIn.getTileEntity(pos);
-    		typeIndex = te.getTypeIndex();
-		}
-        return colors[typeIndex];
     }
 
 	@Override

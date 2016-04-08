@@ -8,6 +8,9 @@ public class ModWorldGen {
 
 	public static void initWorldGen() {
 		GameRegistry.registerWorldGenerator(
-			MazeTowers.mazeTowers, 1618);
+			MazeTowers.spectrite, 618);
+		GameRegistry.registerWorldGenerator(
+			MazeTowers.mazeTowers, 619);
+	
 	}
 }

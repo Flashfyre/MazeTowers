@@ -1,11 +1,10 @@
 package com.samuel.mazetowers.blocks;
 
-import com.samuel.mazetowers.tileentities.TileEntitySpecialMobSpawner;
-
 import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.world.World;
+
+import com.samuel.mazetowers.tileentity.TileEntitySpecialMobSpawner;
 
 public class BlockSpecialMobSpawner extends BlockMobSpawner {
 	

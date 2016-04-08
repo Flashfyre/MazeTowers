@@ -7,13 +7,15 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
-import net.minecraft.util.BlockPos;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.init.ModBlocks;
@@ -39,15 +41,14 @@ public class BlockExtraDoor extends BlockDoor {
 	}
 
 	@Override
-	public int getLightValue(IBlockAccess world,
+	public int getLightValue(IBlockState state, IBlockAccess world,
 		BlockPos pos) {
 
 		Block block = world.getBlockState(pos).getBlock();
 		if (block != this) {
-			return block.getLightValue(world, pos);
+			return block.getLightValue(state, world, pos);
 		}
 
-		IBlockState state = world.getBlockState(pos);
 		return type < 5 ? 0 : 10;
 	}
 
@@ -59,14 +60,14 @@ public class BlockExtraDoor extends BlockDoor {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World worldIn, BlockPos pos) {
-		return (this.type == 0) ? MazeTowers.ItemPrismarineDoor :
+	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+		Item item = (this.type == 0) ? MazeTowers.ItemPrismarineDoor :
 			this.type == 1 ? MazeTowers.ItemQuartzDoor :
 			this.type == 2 ? MazeTowers.ItemEndStoneDoor :
 			this.type == 3 ? MazeTowers.ItemPurpurDoor :
 			this.type == 4 ? MazeTowers.ItemObsidianDoor :
 			MazeTowers.ItemBedrockDoor;
+		return new ItemStack(item);
 	}
 
 	private Item getItem() {
@@ -81,8 +82,8 @@ public class BlockExtraDoor extends BlockDoor {
 	@Override
 	public boolean onBlockActivated(World worldIn,
 		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
+		EntityPlayer playerIn, EnumHand hand, ItemStack heldItem,
+		EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
 
@@ -97,13 +98,10 @@ public class BlockExtraDoor extends BlockDoor {
 		worldIn.setBlockState(blockpos1, state, 2);
 		worldIn.markBlockRangeForRenderUpdate(blockpos1,
 			pos);
-		worldIn.playSoundAtEntity(playerIn,
-			!((Boolean) state.getValue(OPEN))
-				.booleanValue() ? "random.door_close"
-				: "random.door_open", 1.0F, 1.0F);
-		if (((Boolean) state.getValue(OPEN)).booleanValue())
-			worldIn.playSoundAtEntity(playerIn,
-				"mazetowers:door_unlock", 1.0F, 1.0F);
+		worldIn.playSound(playerIn, blockpos1,
+			!state.getValue(OPEN)
+				.booleanValue() ? SoundEvents.block_iron_door_close
+				: SoundEvents.block_iron_door_open, SoundCategory.BLOCKS, 1.0F, 1.0F);
 	}
 
 	/**
@@ -125,24 +123,25 @@ public class BlockExtraDoor extends BlockDoor {
 			}
 		} else {
 			boolean flag1 = false;
-			BlockPos blockpos1 = pos.up();
-			IBlockState iblockstate1 = worldIn
-				.getBlockState(blockpos1);
+            BlockPos blockpos1 = pos.up();
+            IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
 
-			if (iblockstate1.getBlock() != this) {
-				worldIn.setBlockToAir(pos);
-				flag1 = true;
-			}
+            if (iblockstate1.getBlock() != this)
+            {
+                worldIn.setBlockToAir(pos);
+                flag1 = true;
+            }
 
-			if (!World.doesBlockHaveSolidTopSurface(
-				worldIn, pos.down())) {
-				worldIn.setBlockToAir(pos);
-				flag1 = true;
+            if (!worldIn.getBlockState(pos.down()).isFullyOpaque())
+            {
+                worldIn.setBlockToAir(pos);
+                flag1 = true;
 
-				if (iblockstate1.getBlock() == this) {
-					worldIn.setBlockToAir(blockpos1);
-				}
-			}
+                if (iblockstate1.getBlock() == this)
+                {
+                    worldIn.setBlockToAir(blockpos1);
+                }
+            }
 
 			if (flag1) {
 				if (!worldIn.isRemote) {
@@ -154,12 +153,12 @@ public class BlockExtraDoor extends BlockDoor {
 					|| worldIn.isBlockPowered(blockpos1);
 				IBlockState scannerFrontState = getScannerFrontState(
 					worldIn, pos, state
-						.getValue(BlockExtraDoor.FACING),
+						.getValue(BlockDoor.FACING),
 					true);
 				IBlockState scannerBackState = getScannerBackState(
 					worldIn, pos, state
-						.getValue(BlockExtraDoor.FACING), true);
-				EnumFacing enumfacing = (EnumFacing) state
+						.getValue(BlockDoor.FACING), true);
+				EnumFacing enumfacing = state
 					.getValue(FACING);
 				boolean hasScannerFront = scannerFrontState
 					.getBlock() instanceof BlockItemScanner;
@@ -176,7 +175,7 @@ public class BlockExtraDoor extends BlockDoor {
 				boolean useScanner = false;
 				if (((!flag || ((useScanner = neighborBlock instanceof BlockItemScanner)
 					|| !hasScannerFront || !hasScannerBack)
-					&& neighborBlock.canProvidePower()))
+					&& neighborBlock.canProvidePower(null)))
 					&& neighborBlock != this) {
 					boolean isLocked = worldIn.getBlockState(blockpos1.offset(
 						enumfacing.getOpposite())).getBlock() == ModBlocks.lock,
@@ -190,8 +189,8 @@ public class BlockExtraDoor extends BlockDoor {
 						hasScannerFront,
 						scannerFrontStateId == 3, true),
 					isPowered = isFrontPowered || isBackPowered,
-					isOpen = ((Boolean) state
-						.getValue(OPEN)).booleanValue();
+					isOpen = state
+						.getValue(OPEN).booleanValue();
 
 					worldIn.setBlockState(
 							blockpos1,

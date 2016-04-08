@@ -6,44 +6,52 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
-import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+import com.samuel.mazetowers.init.ModSounds;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
 
-public class BlockItemScanner extends BlockVendorTradeable implements
-	ITileEntityProvider {
+public class BlockItemScanner extends Block implements ITileEntityProvider {
 
+	protected static final AxisAlignedBB AABB_EAST =
+		new AxisAlignedBB(0.0F, 0.0625F, 0.125F, 0.25F, 0.9375F, 0.875F);
+    protected static final AxisAlignedBB AABB_WEST =
+    	new AxisAlignedBB(0.75F, 0.0625F, 0.125F, 1.0F, 0.9375F, 0.875F);
+    protected static final AxisAlignedBB AABB_SOUTH =
+    	new AxisAlignedBB(0.125F, 0.0625F, 0.0F, 0.875F, 0.9375F, 0.25F);
+    protected static final AxisAlignedBB AABB_NORTH =
+    	new AxisAlignedBB(0.125F, 0.0625F, 0.75F, 0.875F, 0.9375F, 1.0F);
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing", EnumFacing.Plane.HORIZONTAL);
 	public static final PropertyInteger STATE = PropertyInteger
 		.create("state", 0, 3);
 	
 	public BlockItemScanner(Material material, MapColor mapColor) {
-		super(material, mapColor, 1, 5, 7, material == Material.iron ? 100 : 500,
-			material == Material.iron ? 25 : 250);
+		super(material, mapColor);
 		this.setHardness(5.0F);
 		this.setTickRandomly(true);
 		this.setCreativeTab(CreativeTabs.tabRedstone);
@@ -56,6 +64,23 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	public BlockItemScanner() {
 		this(Material.iron);
 	}
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+		switch (state.getValue(FACING)) {
+	        case NORTH:
+	            return AABB_NORTH;
+	        case SOUTH:
+	            return AABB_SOUTH;
+	        case WEST:
+	            return AABB_WEST;
+	        case EAST:
+	            return AABB_EAST;
+		default:
+			return null;
+	    }
+    }
 
 	@Override
 	/**
@@ -69,12 +94,12 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
@@ -142,7 +167,7 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 		BlockPos pos, IBlockState state, Block neighborBlock) {
 		if (this.checkForDrop(worldIn, pos, state)
 			&& !func_181088_a(worldIn, pos,
-				((EnumFacing) state.getValue(FACING))
+				state.getValue(FACING)
 					.getOpposite())) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
@@ -161,52 +186,10 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	}
 
 	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		this.updateBlockBounds(worldIn.getBlockState(pos));
-	}
-
-	private void updateBlockBounds(IBlockState state) {
-		EnumFacing enumfacing = (EnumFacing) state
-			.getValue(FACING);
-		float f = 0.25F;
-
-		switch (enumfacing) {
-		case EAST:
-			this.setBlockBounds(0.0F, 0.0625F, 0.125F, f,
-				0.9375F, 0.875F);
-			break;
-		case WEST:
-			this.setBlockBounds(1.0F - f, 0.0625F, 0.125F,
-				1.0F, 0.9375F, 0.875F);
-			break;
-		case SOUTH:
-			this.setBlockBounds(0.125F, 0.0625F, 0.0F,
-				0.875F, 0.9375F, f);
-			break;
-		default:
-			this.setBlockBounds(0.125F, 0.0625F, 1.0F - f,
-				0.875F, 0.9375F, 1.0F);
-		}
-	}
-
-	@Override
-	/**
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		float f = 0.375F;
-		float f1 = 0.4375F;
-		float f2 = 0.1875F;
-		this.setBlockBounds(0.5F - f, 0.5F - f1, 0.5F - f2,
-			0.5F + f, 0.5F + f1, 0.5F + f2);
-	}
-
-	@Override
 	public boolean onBlockActivated(World worldIn,
 		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
+		EntityPlayer playerIn, EnumHand hand, ItemStack heldItem,
+		EnumFacing side, float hitX, float hitY, float hitZ) {
 		boolean canScan = state.getValue(STATE) == 0;
 		IBlockState scanState = state
 			.withProperty(STATE, 1);
@@ -220,11 +203,12 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 					.getTileEntity(pos))
 					.setEntityId(playerIn.getEntityId());
 				if (te.getKeyStack() != null) {
-					worldIn.playSoundEffect((double) pos
+					worldIn.playSound(pos
 						.getX() + 0.5D,
-						(double) pos.getY() + 0.5D,
-						(double) pos.getZ() + 0.5D,
-						"random.click", 0.3F, 0.5F);
+						pos.getY() + 0.5D,
+						pos.getZ() + 0.5D,
+						SoundEvents.block_metal_pressplate_click_on,
+						SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 					worldIn.setBlockState(pos, scanState);
 					worldIn.markBlockRangeForRenderUpdate(
 						pos, pos);
@@ -249,14 +233,14 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	}
 
 	@Override
-	public int isProvidingWeakPower(IBlockAccess worldIn,
-		BlockPos pos, IBlockState state, EnumFacing side) {
+	public int getWeakPower(IBlockState state, IBlockAccess worldIn,
+		BlockPos pos, EnumFacing side) {
 		return state.getValue(STATE) == 3 ? 15 : 0;
 	}
 
 	@Override
-	public int isProvidingStrongPower(IBlockAccess worldIn,
-		BlockPos pos, IBlockState state, EnumFacing side) {
+	public int getStrongPower(IBlockState state, IBlockAccess worldIn,
+		BlockPos pos, EnumFacing side) {
 		return !(state.getValue(STATE) == 3) ? 0 : (state
 			.getValue(FACING) == side ? 15 : 0);
 	}
@@ -265,7 +249,7 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	/**
 	 * Can this block provide power. Only wire currently seems to have this change based on its state.
 	 */
-	public boolean canProvidePower() {
+	public boolean canProvidePower(IBlockState state) {
 		return true;
 	}
 
@@ -291,12 +275,13 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 				worldIn.setBlockState(pos, state
 					.withProperty(STATE, 0));
 				this.notifyNeighbors(worldIn, pos,
-					(EnumFacing) state.getValue(FACING));
-				worldIn.playSoundEffect(
-					(double) pos.getX() + 0.5D,
-					(double) pos.getY() + 0.5D,
-					(double) pos.getZ() + 0.5D,
-					"random.click", 0.3F, 0.5F);
+					state.getValue(FACING));
+				worldIn.playSound(
+					pos.getX() + 0.5D,
+					pos.getY() + 0.5D,
+					pos.getZ() + 0.5D,
+					SoundEvents.block_metal_pressplate_click_on,
+					SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 				worldIn.markBlockRangeForRenderUpdate(pos,
 					pos);
 			}
@@ -308,12 +293,10 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 		worldIn.setBlockState(pos, state.withProperty(
 			STATE, correctItem ? 3 : 2));
 		this.notifyNeighbors(worldIn, pos,
-			(EnumFacing) state.getValue(FACING));
-		worldIn.playSoundEffect((double) pos.getX() + 0.5D,
-			(double) pos.getY() + 0.5D,
-			(double) pos.getZ() + 0.5D,
-			(correctItem ? "mazetowers:correct"
-				: "mazetowers:incorrect"), 0.15F, 1.0F);
+			state.getValue(FACING));
+		if (!worldIn.isRemote)
+			worldIn.playSound(null, pos, correctItem ? ModSounds.correct :
+				ModSounds.incorrect, SoundCategory.BLOCKS, 0.15F, 1.0F);
 		worldIn.markBlockRangeForRenderUpdate(pos, pos);
 		worldIn.scheduleUpdate(pos, this, (int) (this
 			.tickRate(worldIn) * (correctItem ? 2 : 0.5)));
@@ -386,7 +369,7 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	public int getMetaFromState(IBlockState state) {
 		int i;
 
-		switch ((EnumFacing) state.getValue(FACING)) {
+		switch (state.getValue(FACING)) {
 		case EAST:
 			i = 0;
 			break;
@@ -410,9 +393,8 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] {
-			FACING, STATE });
+	protected BlockStateContainer createBlockState() {
+		return (new BlockStateContainer.Builder(this)).add(FACING).add(STATE).build();
 	}
 
 	@Override
@@ -423,16 +405,16 @@ public class BlockItemScanner extends BlockVendorTradeable implements
 	 * @param pos Block position in world
 	 * @return True to allow the ender dragon to destroy this block
 	 */
-	public boolean canEntityDestroy(IBlockAccess world,
-		BlockPos pos, Entity entity) {
-		super.canEntityDestroy(world, pos, entity);
+	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
+		Entity entity) {
+		super.canEntityDestroy(state, world, pos, entity);
 		boolean isPlayerInCreativeMode = (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode);
 		boolean isOwner = (((TileEntityItemScanner) world
 			.getTileEntity(pos)).getOwnerName()
 			.equals(entity.getDisplayName()
 				.getUnformattedText()));
 		if (!isOwner && !isPlayerInCreativeMode) {
-			entity.addChatMessage(new ChatComponentText(
+			entity.addChatMessage(new TextComponentString(
 				"You may not destroy "
 					+ "an Item Scanner that is not yours"));
 			return false;

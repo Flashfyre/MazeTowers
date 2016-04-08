@@ -1,5 +1,5 @@
 {
-    "parent": "block/pressure_plate_inventory",
+    "parent": "block/heavy_pressure_plate_up",
     "textures": {
         "texture": "blocks/quartz_block_chiseled_top"
     }

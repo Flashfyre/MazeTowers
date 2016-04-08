@@ -12,7 +12,9 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTower;
+import org.apache.commons.lang3.StringUtils;
+
+import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTower;
 
 public class MTStateMaps {
 	
@@ -50,12 +52,12 @@ public class MTStateMaps {
 			final IBlockState wire = Blocks.redstone_wire.getDefaultState();
 			
 			for (EnumFacing dir : dirs) {
-				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_1.ordinal()]
-					.put(dir, getRoof(air2, wall, wall2, c, g[0], lamp));
-				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_2.ordinal()]
-					.put(dir, getRoof(air2, wall, wall2, c, g[1], lamp));
-				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_ROOF_3.ordinal()]
-					.put(dir, getRoof(air2, wall, wall2, c, g[2], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_CEILING_1.ordinal()]
+					.put(dir, getCeiling(air2, wall, wall2, c, g[0], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_CEILING_2.ordinal()]
+					.put(dir, getCeiling(air2, wall, wall2, c, g[1], lamp));
+				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_CEILING_3.ordinal()]
+					.put(dir, getCeiling(air2, wall, wall2, c, g[2], lamp));
 				
 			}
 		} else {
@@ -123,10 +125,53 @@ public class MTStateMaps {
 		return dir;
 	}
 	
+	public static IBlockState[][][][] getStateMaps(EnumFacing dir, IBlockState wallBlock,
+		IBlockState wallBlock_external, IBlockState floorBlock, IBlockState ceilBlock,
+		IBlockState fenceBlock, IBlockState carpetBlock, IBlockState commonGlass,
+		IBlockState topGlass2, IBlockState topGlass3, IBlockState beaconGlass2,
+		IBlockState beaconGlass3, IBlockState window, IBlockState mineral,
+		int dyeColorIndex, boolean hasShop) {
+		final boolean hasBeacon = !hasShop && mineral != null;
+		IBlockState[][][][] stateMap = new IBlockState[6][][][];
+		int index = 0;
+		for (EnumStateMap s : EnumStateMap.values()) {
+			final String mapName = s.name(),
+			lastChar = mapName.substring(mapName.length() - 1);
+			if (StringUtils.isNumeric(lastChar)) {
+				if (Integer.parseInt(lastChar) != dyeColorIndex + 1)
+					continue;
+			}
+			final int mapIndex = EnumStateMap.valueOf(mapName).ordinal();
+			final Map<EnumFacing, IBlockState[][][]> map =
+				maps.get(wallBlock_external)[mapIndex];
+			final IBlockState air2 = Blocks.air.getDefaultState(),
+			lever = !hasBeacon ? Blocks.lever.getStateFromMeta(7) :
+				beaconGlass2 != null ? beaconGlass2 : air2,
+			glass = Blocks.glass.getDefaultState(),
+			lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : commonGlass,
+			wire = !hasBeacon ? Blocks.redstone_wire.getDefaultState() : air2;
+			if (mapName.startsWith("MINI_TOWER_TOP"))
+				map.put(dir, !hasShop ? getTopMap(air2, wallBlock_external, carpetBlock,
+					window, floorBlock, lever, mineral) : getTopMapShop(air2,
+					wallBlock_external, carpetBlock, window, fenceBlock, mineral));
+			else if (mapName.startsWith("MINI_TOWER_ROOF")) {
+				if (mapName.equals("MINI_TOWER_ROOF_WIRE"))
+					map.put(dir, getRoofWire(air2, wallBlock_external, wire, beaconGlass3));
+				else
+					map.put(dir, getRoof(fenceBlock, glass, commonGlass, topGlass2, topGlass3));
+			} else if (mapName.startsWith("MINI_TOWER_CEILING_"))
+				map.put(dir, getCeiling(air2, wallBlock_external, wallBlock, ceilBlock,
+					commonGlass, lamp));
+			stateMap[index++] = map.get(dir);
+		}
+		
+		return stateMap;
+	}
+	
 	public static IBlockState[][][] getStateMap(EnumFacing dir, String mapName,
 		IBlockState wallBlock, IBlockState wallBlock_external, IBlockState floorBlock,
 		IBlockState ceilBlock, IBlockState fenceBlock, IBlockState carpetBlock,
-		IBlockState glass, IBlockState glass2, IBlockState glass3, IBlockState window,
+		IBlockState glass1, IBlockState glass2, IBlockState glass3, IBlockState window,
 		IBlockState mineral, int dyeColorIndex) {
 		final boolean hasShop = fenceBlock != null;
 		final boolean hasBeacon = !hasShop && mineral != null;
@@ -137,19 +182,21 @@ public class MTStateMaps {
 		final IBlockState air2 = Blocks.air.getDefaultState(),
 		lever = !hasBeacon ? Blocks.lever.getStateFromMeta(7) :
 			glass2 != null ? glass2 : air2,
-		lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : glass,
+		glass = Blocks.glass.getDefaultState(),
+		lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : glass1,
 		wire = !hasBeacon ? Blocks.redstone_wire.getDefaultState() : air2;
 		if (mapName.startsWith("MINI_TOWER_TOP"))
 			map.put(dir, !hasShop ? getTopMap(air2, wallBlock_external, carpetBlock,
 				window, floorBlock, lever, mineral) : getTopMapShop(air2,
 				wallBlock_external, carpetBlock, window, fenceBlock, mineral));
-		else if (mapName.startsWith("MINI_TOWER_ROOF_")) {
+		else if (mapName.startsWith("MINI_TOWER_ROOF")) {
 			if (mapName.equals("MINI_TOWER_ROOF_WIRE"))
 				map.put(dir, getRoofWire(air2, wallBlock_external, wire, glass3));
 			else
-				map.put(dir, getRoof(air2, wallBlock_external, wallBlock, ceilBlock,
-					glass, lamp));
-		}
+				map.put(dir, getRoof(fenceBlock, glass, glass1, glass2, glass3));
+		} else if (mapName.startsWith("MINI_TOWER_CEILING_"))
+			map.put(dir, getCeiling(air2, wallBlock_external, wallBlock, ceilBlock,
+				glass1, lamp));
 				
 		return map.get(dir);
 	}
@@ -162,6 +209,7 @@ public class MTStateMaps {
 			wall2 = tower.wallBlock,
 			floor = tower.floorBlock,
 			c = tower.ceilBlock,
+			fence = tower.fenceBlock,
 			floor2 = !(wall.getBlock() instanceof BlockPrismarine) ? floor :
 			Blocks.sea_lantern.getDefaultState();
 		final IBlockState[] carpet = new IBlockState[] {
@@ -331,13 +379,14 @@ public class MTStateMaps {
 					{ null, null, null, wall, wall, wall, null, null, null }
 				}
 			},
+			getRoofWire(air2, wall, wire, wire),
+			getRoof(fence, Blocks.glass.getDefaultState(), g[0], g[1], g[2]),
 			getTopMap(air2, wall2, carpet[0], floor, window[0], lever, null),
 			getTopMap(air2, wall2, carpet[1], floor, window[1], lever, null),
 			getTopMap(air2, wall2, carpet[2], floor, window[2], lever, null),
-			getRoof(air2, wall, wall2, c, g[0], lamp),
-			getRoof(air2, wall, wall2, c, g[1], lamp),
-			getRoof(air2, wall, wall2, c, g[2], lamp),
-			getRoofWire(air2, wall, wire, wire)/*,
+			getCeiling(air2, wall, wall2, c, g[0], lamp),
+			getCeiling(air2, wall, wall2, c, g[1], lamp),
+			getCeiling(air2, wall, wall2, c, g[2], lamp),/*,
 			{
 			  {
 				  { c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c },
@@ -464,7 +513,7 @@ public class MTStateMaps {
 		};
 	}
 	
-	private static IBlockState[][][] getRoof(IBlockState air2, IBlockState wall,
+	private static IBlockState[][][] getCeiling(IBlockState air2, IBlockState wall,
 		IBlockState wall2, IBlockState c, IBlockState g, IBlockState lamp) {
 		return new IBlockState[][][] {
 			new IBlockState[][] {
@@ -509,17 +558,35 @@ public class MTStateMaps {
 		};
 	}
 	
+	private static IBlockState[][][] getRoof(IBlockState fence, IBlockState glass,
+		IBlockState glass1, IBlockState glass2, IBlockState glass3) {
+		return new IBlockState[][][] {
+			new IBlockState[][] {
+				new IBlockState[] { null, null, null, fence, fence, fence, null, null, null },
+				new IBlockState[] { null, null, fence, fence, glass1, fence, fence, null, null },
+				new IBlockState[] { null, fence, fence, glass1, glass2, glass1, fence, fence, null },
+				new IBlockState[] { fence, fence, glass1, glass2, glass3, glass2, glass1, fence, fence },
+				new IBlockState[] { fence, glass1, glass2, glass3, glass, glass3, glass2, glass1, fence },
+				new IBlockState[] { fence, fence, glass1, glass2, glass3, glass2, glass1, fence, fence },
+				new IBlockState[] { null, fence, fence, glass1, glass2, glass1, fence, fence, null },
+				new IBlockState[] { null, null, fence, fence, glass1, fence, fence, null, null },
+				new IBlockState[] { null, null, null, fence, fence, fence, null, null, null }
+			}
+		};
+	}
+	
 	public static enum EnumStateMap implements IStringSerializable
     {
 		MINI_TOWER_BASE("mini_tower_base"),
 		MINI_TOWER_STAIRS("mini_tower_stairs"),
+		MINI_TOWER_ROOF_WIRE("mini_tower_roof_wire"),
+		MINI_TOWER_ROOF("mini_tower_roof"),
 		MINI_TOWER_TOP_1("mini_tower_top_1"),
 		MINI_TOWER_TOP_2("mini_tower_top_2"),
 		MINI_TOWER_TOP_3("mini_tower_top_3"),
-		MINI_TOWER_ROOF_1("mini_tower_roof_1"),
-		MINI_TOWER_ROOF_2("mini_tower_roof_2"),
-		MINI_TOWER_ROOF_3("mini_tower_roof_3"),
-		MINI_TOWER_ROOF_WIRE("mini_tower_roof_wire");
+		MINI_TOWER_CEILING_1("mini_tower_ceiling_1"),
+		MINI_TOWER_CEILING_2("mini_tower_ceiling_2"),
+		MINI_TOWER_CEILING_3("mini_tower_ceiling_3"),;
 
         private final String name;
 
@@ -528,12 +595,14 @@ public class MTStateMaps {
             this.name = name;
         }
 
-        public String toString()
+        @Override
+		public String toString()
         {
             return this.name;
         }
 
-        public String getName()
+        @Override
+		public String getName()
         {
             return this.name;
         }

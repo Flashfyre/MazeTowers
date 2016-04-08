@@ -4,13 +4,17 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
 
 public class BlockMemoryPistonBaseOff extends
 	BlockMemoryPistonBase implements ITileEntityProvider {
@@ -27,7 +31,7 @@ public class BlockMemoryPistonBaseOff extends
 	public boolean onBlockEventReceived(World worldIn,
 		BlockPos pos, IBlockState state, int eventID,
 		int eventParam) {
-		EnumFacing enumfacing = (EnumFacing) state
+		EnumFacing enumfacing = state
 			.getValue(FACING);
 
 		if (!worldIn.isRemote) {
@@ -64,12 +68,12 @@ public class BlockMemoryPistonBaseOff extends
 				EXTENDED, Boolean.valueOf(true)), 2);
 			worldIn.getTileEntity(pos).getTileData()
 				.setInteger("pushCount", pushCount);
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
+			worldIn.playSound(
+				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D,
-				"tile.piston.out", 0.5F, worldIn.rand
-					.nextFloat() * 0.25F + 0.6F);
+				pos.getZ() + 0.5D,
+				SoundEvents.block_piston_extend, SoundCategory.BLOCKS,
+				0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F, true);
 		} else if (eventID == 1) {
 			TileEntity tileentity1 = worldIn
 				.getTileEntity(pos.offset(enumfacing));
@@ -85,7 +89,7 @@ public class BlockMemoryPistonBaseOff extends
 				"pushCount"))
 				pushCount = tileentity1.getTileData()
 					.getInteger("pushCount");
-			tileentity1 = BlockMemoryPistonMovingOff
+			tileentity1 = BlockMemoryPistonMoving
 				.newTileEntity(this
 					.getStateFromMeta(eventParam),
 					enumfacing, false, true);
@@ -101,22 +105,22 @@ public class BlockMemoryPistonBaseOff extends
 
 			worldIn.setBlockToAir(pos.offset(enumfacing));
 
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
+			worldIn.playSound(
+				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D,
-				"tile.piston.in", 0.5F, worldIn.rand
-					.nextFloat() * 0.15F + 0.6F);
+				pos.getZ() + 0.5D,
+				SoundEvents.block_piston_contract, SoundCategory.BLOCKS,
+				0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F, true);
 		}
-
+		
 		return true;
 	}
 
 	@Override
 	public boolean onBlockActivated(World worldIn,
 		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
+		EntityPlayer playerIn, EnumHand hand, ItemStack heldItem,
+		EnumFacing side, float hitX, float hitY, float hitZ) {
 		boolean isExtended;
 		EnumFacing facing;
 		IBlockState onState = MazeTowers.BlockMemoryPiston
@@ -130,11 +134,12 @@ public class BlockMemoryPistonBaseOff extends
 				isExtended = state
 					.getValue(BlockMemoryPistonBase.EXTENDED));
 		if (!isExtended) {
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
+			worldIn.playSound(
+				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D, "random.click",
-				0.3F, 0.6F);
+				pos.getZ() + 0.5D, SoundEvents.block_stone_button_click_on,
+				SoundCategory.BLOCKS,
+				0.3F, 0.6F, true);
 			worldIn.setBlockState(pos, onState);
 		}
 		/*

@@ -5,7 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
 
 public class KeyStackSlot extends Slot {
 

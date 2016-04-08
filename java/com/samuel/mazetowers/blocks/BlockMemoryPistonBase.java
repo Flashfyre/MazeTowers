@@ -3,35 +3,34 @@ package com.samuel.mazetowers.blocks;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
-import com.samuel.mazetowers.tileentities.TileEntityMemoryPistonMemory;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPistonMemory;
 
-public class BlockMemoryPistonBase extends BlockVendorTradeable implements
-	ITileEntityProvider {
+public class BlockMemoryPistonBase extends Block implements ITileEntityProvider {
 
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing");
@@ -39,11 +38,11 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 		.create("extended");
 
 	public BlockMemoryPistonBase() {
-		super(Material.piston, 1, 6, 9, 25, 250);
+		super(Material.piston);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(EXTENDED, Boolean.valueOf(false)));
-		this.setStepSound(soundTypePiston);
+		this.setStepSound(SoundType.STONE);
 		this.setHardness(0.5F);
 	}
 
@@ -51,7 +50,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
@@ -107,7 +106,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 
 	private void checkForMove(World worldIn, BlockPos pos,
 		IBlockState state) {
-		EnumFacing enumfacing = (EnumFacing) state
+		EnumFacing enumfacing = state
 			.getValue(FACING);
 		boolean flag = this.shouldBeExtended(worldIn, pos,
 			enumfacing);
@@ -121,7 +120,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 				"pushCount");
 
 		if (flag
-			&& !((Boolean) state.getValue(EXTENDED))
+			&& !state.getValue(EXTENDED)
 				.booleanValue()) {
 			if ((new BlockMemoryPistonStructureHelper(
 				worldIn, pos, enumfacing, true))
@@ -130,7 +129,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 					enumfacing.getIndex());
 			}
 		} else if (!flag
-			&& ((Boolean) state.getValue(EXTENDED))
+			&& state.getValue(EXTENDED)
 				.booleanValue()) {
 			worldIn.setBlockState(pos, state.withProperty(
 				EXTENDED, Boolean.valueOf(false)), 2);
@@ -218,12 +217,12 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 				EXTENDED, Boolean.valueOf(true)), 2);
 			worldIn.getTileEntity(pos).getTileData()
 				.setInteger("pushCount", pushCount);
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
+			worldIn.playSound(
+				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D,
-				"tile.piston.out", 0.5F, worldIn.rand
-					.nextFloat() * 0.25F + 0.6F);
+				pos.getZ() + 0.5D,
+				SoundEvents.block_piston_extend, SoundCategory.BLOCKS,
+				0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F, true);
 		} else if (eventID == 1) {
 			TileEntity tileentity1 = worldIn
 				.getTileEntity(pos.offset(enumfacing));
@@ -261,8 +260,8 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 				.getFrontOffsetX() * 2, enumfacing
 				.getFrontOffsetY() * 2, enumfacing
 				.getFrontOffsetZ() * 2);
-			Block block = worldIn.getBlockState(blockpos)
-				.getBlock();
+			IBlockState iblockstate = worldIn.getBlockState(blockpos);
+			Block block = iblockstate.getBlock();
 			boolean flag1 = false;
 
 			if (block instanceof BlockMemoryPistonExtension) {
@@ -282,105 +281,22 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 			}
 
 			if (!flag1
-				&& !block.isAir(worldIn, blockpos)
-				&& ((canPush(block, worldIn, blockpos,
+				&& !block.isAir(iblockstate, worldIn, blockpos)
+				&& ((func_185646_a(iblockstate, worldIn, blockpos,
 					enumfacing.getOpposite(), false)))
-				&& (block.getMobilityFlag() == 0 || block instanceof BlockMemoryPistonBase)) {
+				&& (block.getMobilityFlag(iblockstate) == EnumPushReaction.NORMAL || block instanceof BlockMemoryPistonBase)) {
 				this.doMove(worldIn, pos, enumfacing, false);
 			}
 
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
-					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D,
-				"tile.piston.in", 0.5F, worldIn.rand
-					.nextFloat() * 0.15F + 0.6F);
+			worldIn.playSound((EntityPlayer)null, pos, SoundEvents.block_piston_contract,
+				SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F);
 		}
 
 		return true;
 	}
 
 	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		IBlockState iblockstate = worldIn
-			.getBlockState(pos);
-
-		if (iblockstate.getBlock() == this
-			&& ((Boolean) iblockstate.getValue(EXTENDED))
-				.booleanValue()) {
-			float f = 0.25F;
-			EnumFacing enumfacing = (EnumFacing) iblockstate
-				.getValue(FACING);
-
-			if (enumfacing != null) {
-				switch (enumfacing) {
-				case DOWN:
-					this.setBlockBounds(0.0F, 0.25F, 0.0F,
-						1.0F, 1.0F, 1.0F);
-					break;
-				case UP:
-					this.setBlockBounds(0.0F, 0.0F, 0.0F,
-						1.0F, 0.75F, 1.0F);
-					break;
-				case NORTH:
-					this.setBlockBounds(0.0F, 0.0F, 0.25F,
-						1.0F, 1.0F, 1.0F);
-					break;
-				case SOUTH:
-					this.setBlockBounds(0.0F, 0.0F, 0.0F,
-						1.0F, 1.0F, 0.75F);
-					break;
-				case WEST:
-					this.setBlockBounds(0.25F, 0.0F, 0.0F,
-						1.0F, 1.0F, 1.0F);
-					break;
-				case EAST:
-					this.setBlockBounds(0.0F, 0.0F, 0.0F,
-						0.75F, 1.0F, 1.0F);
-				}
-			}
-		} else {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F,
-				1.0F, 1.0F);
-		}
-	}
-
-	@Override
-	/**
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F,
-			1.0F);
-	}
-
-	@Override
-	/**
-	 * Add all collision boxes of this Block to the list that intersect with the given mask.
-	 *  
-	 * @param collidingEntity the Entity colliding with this Block
-	 */
-	public void addCollisionBoxesToList(World worldIn,
-		BlockPos pos, IBlockState state,
-		AxisAlignedBB mask, List<AxisAlignedBB> list,
-		Entity collidingEntity) {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F,
-			1.0F);
-		super.addCollisionBoxesToList(worldIn, pos, state,
-			mask, list, collidingEntity);
-	}
-
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(
-		World worldIn, BlockPos pos, IBlockState state) {
-		this.setBlockBoundsBasedOnState(worldIn, pos);
-		return super.getCollisionBoundingBox(worldIn, pos,
-			state);
-	}
-
-	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
@@ -393,17 +309,17 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 		World worldIn, BlockPos clickedBlock,
 		EntityLivingBase entityIn) {
 		if (MathHelper.abs((float) entityIn.posX
-			- (float) clickedBlock.getX()) < 2.0F
+			- clickedBlock.getX()) < 2.0F
 			&& MathHelper.abs((float) entityIn.posZ
-				- (float) clickedBlock.getZ()) < 2.0F) {
+				- clickedBlock.getZ()) < 2.0F) {
 			double d0 = entityIn.posY
-				+ (double) entityIn.getEyeHeight();
+				+ entityIn.getEyeHeight();
 
-			if (d0 - (double) clickedBlock.getY() > 2.0D) {
+			if (d0 - clickedBlock.getY() > 2.0D) {
 				return EnumFacing.UP;
 			}
 
-			if ((double) clickedBlock.getY() - d0 > 0.0D) {
+			if (clickedBlock.getY() - d0 > 0.0D) {
 				return EnumFacing.DOWN;
 			}
 		}
@@ -411,9 +327,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 		return entityIn.getHorizontalFacing().getOpposite();
 	}
 
-	public static boolean canPush(Block blockIn,
-		World worldIn, BlockPos pos, EnumFacing direction,
-		boolean allowDestroy) {
+	public static boolean func_185646_a(IBlockState state, World worldIn, BlockPos pos, EnumFacing direction, boolean p_185646_4_) {
 		if (!worldIn.getWorldBorder().contains(pos)) {
 			return false;
 		} else if (pos.getY() >= 0
@@ -421,34 +335,28 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 			if (pos.getY() < worldIn.getHeight()
 				&& (direction != EnumFacing.UP || pos
 					.getY() != worldIn.getHeight() - 1)) {
-				if (!(blockIn instanceof BlockMemoryPistonBase)
-					&& blockIn != Blocks.piston
-					&& blockIn != Blocks.sticky_piston) {
-					if (blockIn.getBlockHardness(worldIn,
-						pos) == -1.0F
-						&& (pos.getY() < 2)) {
+				Block block = state.getBlock();
+				if (!(block instanceof BlockMemoryPistonBase)
+					&& block != Blocks.piston
+					&& block != Blocks.sticky_piston) {
+					if (state.getMobilityFlag() == EnumPushReaction.BLOCK && pos.getY() < 2) {
+						return false;
+					}
+					if (state.getMobilityFlag() == EnumPushReaction.BLOCK && block != Blocks.bedrock) {
 						return false;
 					}
 					
-					if (blockIn.getMobilityFlag() == 2 && blockIn != Blocks.bedrock) {
-						return false;
-					}
-
-					if (blockIn.getMobilityFlag() == 1) {
-						if (!allowDestroy) {
-							return false;
-						}
-
+					if (state.getMobilityFlag() == EnumPushReaction.DESTROY) {
 						return true;
-					} 
-				} else if (((Boolean) worldIn
-					.getBlockState(pos).getValue(EXTENDED))
+					}
+				} else if (worldIn
+					.getBlockState(pos).getValue(EXTENDED)
 					.booleanValue()) {
 					return false;
 				} else
 					return true;
 
-				return !(blockIn.hasTileEntity(worldIn
+				return !(block.hasTileEntity(worldIn
 					.getBlockState(pos)));
 			} else {
 				return false;
@@ -490,7 +398,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 				: direction.getOpposite();
 
 			for (int j = list1.size() - 1; j >= 0; --j) {
-				BlockPos blockpos = (BlockPos) list1.get(j);
+				BlockPos blockpos = list1.get(j);
 				Block block = worldIn.getBlockState(
 					blockpos).getBlock();
 				// With our change to how snowballs are dropped this needs to
@@ -508,14 +416,14 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 			}
 
 			for (int k = list.size() - 1; k >= 0; --k) {
-				BlockPos blockpos2 = (BlockPos) list.get(k);
+				BlockPos blockpos2 = list.get(k);
 				IBlockState iblockstate = worldIn
 					.getBlockState(blockpos2);
 				Block block1 = iblockstate.getBlock();
 				block1.getMetaFromState(iblockstate);
 				worldIn.setBlockToAir(blockpos2);
 				blockpos2 = blockpos2.offset(enumfacing);
-				te = (TileEntityMemoryPiston) BlockMemoryPistonMoving
+				te = BlockMemoryPistonMoving
 					.newTileEntity(iblockstate, direction,
 						extending, false);
 				worldIn
@@ -536,12 +444,12 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 			if (extending) {
 				IBlockState iblockstate1 = isOff ? MazeTowers.BlockMemoryPistonHeadOff
 					.getDefaultState().withProperty(
-						BlockMemoryPistonExtension.FACING,
+						BlockDirectional.FACING,
 						direction)
 					: MazeTowers.BlockMemoryPistonHead
 						.getDefaultState()
 						.withProperty(
-							BlockMemoryPistonExtension.FACING,
+							BlockDirectional.FACING,
 							direction);
 				IBlockState iblockstate2 = isOff ? MazeTowers.BlockMemoryPistonExtensionOff
 					.getDefaultState().withProperty(
@@ -553,7 +461,7 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 							direction);
 				worldIn.getTileEntity(pos).getTileData()
 					.setInteger("pushCount", list.size());
-				te = (TileEntityMemoryPiston) BlockMemoryPistonMoving
+				te = BlockMemoryPistonMoving
 					.newTileEntity(iblockstate1, direction,
 						true, false);
 				worldIn.setBlockState(blockpos1,
@@ -565,12 +473,12 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 
 			for (int l = list1.size() - 1; l >= 0; --l) {
 				worldIn.notifyNeighborsOfStateChange(
-					(BlockPos) list1.get(l), ablock[i++]);
+					list1.get(l), ablock[i++]);
 			}
 
 			for (int i1 = list.size() - 1; i1 >= 0; --i1) {
 				worldIn.notifyNeighborsOfStateChange(
-					(BlockPos) list.get(i1), ablock[i++]);
+					list.get(i1), ablock[i++]);
 			}
 
 			if (extending) {
@@ -599,26 +507,15 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 
 	@Override
 	/**
-	 * Possibly modify the given BlockState before rendering it on an Entity (Minecarts, Endermen, ...)
-	 */
-	@SideOnly(Side.CLIENT)
-	public IBlockState getStateForEntityRender(
-		IBlockState state) {
-		return this.getDefaultState().withProperty(FACING,
-			EnumFacing.UP);
-	}
-
-	@Override
-	/**
 	 * Convert the BlockState into the correct metadata value
 	 */
 	public int getMetaFromState(IBlockState state) {
 		int i = 0;
 		i = i
-			| ((EnumFacing) state.getValue(FACING))
+			| state.getValue(FACING)
 				.getIndex();
 
-		if (((Boolean) state.getValue(EXTENDED))
+		if (state.getValue(EXTENDED)
 			.booleanValue()) {
 			i |= 8;
 		}
@@ -627,9 +524,8 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] {
-			FACING, EXTENDED });
+	protected BlockStateContainer createBlockState() {
+		return (new BlockStateContainer.Builder(this)).add(FACING).add(EXTENDED).build();
 	}
 
 	@Override
@@ -641,8 +537,8 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 	@Override
 	public boolean onBlockActivated(World worldIn,
 		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
+		EntityPlayer playerIn, EnumHand hand, ItemStack heldItem,
+		EnumFacing side, float hitX, float hitY, float hitZ) {
 		boolean isExtended;
 		EnumFacing facing;
 		IBlockState offState = MazeTowers.BlockMemoryPistonOff
@@ -656,13 +552,13 @@ public class BlockMemoryPistonBase extends BlockVendorTradeable implements
 				isExtended = state
 					.getValue(BlockMemoryPistonBase.EXTENDED));
 		if (!isExtended) {
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
-					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D, "random.click",
-				0.3F, 0.5F);
+			worldIn.playSound(
+				pos.getX() + 0.5D, pos.getY() + 0.5D,
+				pos.getZ() + 0.5D, SoundEvents.block_stone_pressplate_click_on,
+				SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 			worldIn.setBlockState(pos, offState);
 		}
+		
 		/*
 		 * if (isExtended) { BlockPos headPos = pos.offset(facing); IBlockState
 		 * offStateHead = worldIn.getBlockState(headPos); if

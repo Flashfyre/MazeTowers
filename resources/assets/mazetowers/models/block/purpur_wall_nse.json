@@ -1,7 +1,0 @@
-{
-    "parent": "block/wall_nse",
-    "textures": {
-        "wall": "blocks/purpur_block",
-		"top": "blocks/purpur_block"
-    }
-}

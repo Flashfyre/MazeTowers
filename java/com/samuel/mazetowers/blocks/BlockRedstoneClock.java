@@ -1,51 +1,55 @@
 package com.samuel.mazetowers.blocks;
 
-import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.tileentities.TileEntityMazeTowerThreshold;
-import com.samuel.mazetowers.tileentities.TileEntityRedstoneClock;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEntityProvider {
+import com.samuel.mazetowers.items.ItemBlockRedstoneClock;
+import com.samuel.mazetowers.tileentity.TileEntityRedstoneClock;
+
+public class BlockRedstoneClock extends Block implements ITileEntityProvider {
 	
+	public static AxisAlignedBB AABB =
+		new AxisAlignedBB(0.0675F, 0.0F, 0.0675F, 0.9325F, 0.125F, 0.9325F);
 	public static final PropertyInteger POWER = PropertyInteger.create("power", 0, 15);
 	private final boolean inverted;
 	
 	public BlockRedstoneClock(boolean inverted) {
-		super(Material.circuits, 1, 5, 9, 10, 100);
+		super(Material.circuits);
 		this.inverted = inverted;
-		this.setBlockBounds(0.0675F, 0.0F, 0.0675F, 0.9325F, 0.125F, 0.9325F);
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 	
 	@Override
-	public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
-        return ((Integer)state.getValue(POWER)).intValue();
+	public int getWeakPower(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+        return state.getValue(POWER).intValue();
+    }
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        return AABB;
     }
 
     public void updatePower(World worldIn, BlockPos pos)  {
         IBlockState iblockstate = worldIn.getBlockState(pos);
-        int i = MazeTowers.TextureRedstoneClock.getRedstonePower();
+        int i = ItemBlockRedstoneClock.getRedstonePower();
 
         if (this.inverted)
             i = 15 - i;
 
-        if (((Integer)iblockstate.getValue(POWER)).intValue() != i)
+        if (iblockstate.getValue(POWER).intValue() != i)
             worldIn.setBlockState(pos, iblockstate.withProperty(POWER, Integer.valueOf(i)), 3);
     }
     
@@ -53,7 +57,7 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
     /**
      * Can this block provide power. Only wire currently seems to have this change based on its state.
      */
-    public boolean canProvidePower() {
+    public boolean canProvidePower(IBlockState state) {
         return true;
     }
     
@@ -69,10 +73,10 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
 		}
 	}
 
-	private static boolean canBePlacedOn(World worldIn,
-		BlockPos pos) {
-		return World.doesBlockHaveSolidTopSurface(worldIn, pos);
-	}
+    private boolean canBePlacedOn(World worldIn, BlockPos pos)
+    {
+        return worldIn.getBlockState(pos).isFullyOpaque();
+    }
     
     public boolean getInverted() {
 		return inverted;
@@ -88,12 +92,12 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
     /**
      * Used to determine ambient occlusion and culling when rebuilding chunks for render
      */
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
     	return false;
     }
     
     @Override
-    public boolean isFullCube() {
+    public boolean isFullCube(IBlockState state) {
     	return false;
     }
 	
@@ -101,8 +105,8 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
 	 /**
      * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
-    public int getRenderType() {
-        return 2;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
     }
 	
 	@Override
@@ -118,11 +122,11 @@ public class BlockRedstoneClock extends BlockVendorTradeable implements ITileEnt
      * Convert the BlockState into the correct metadata value
      */
     public int getMetaFromState(IBlockState state) {
-        return ((Integer)state.getValue(POWER)).intValue();
+        return state.getValue(POWER).intValue();
     }
 
 	@Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, new IProperty[] { POWER });
+    protected BlockStateContainer createBlockState() {
+        return (new BlockStateContainer.Builder(this)).add(POWER).build();
     }
 }

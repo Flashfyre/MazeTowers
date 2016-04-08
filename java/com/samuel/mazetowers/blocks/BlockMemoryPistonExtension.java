@@ -4,38 +4,56 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.BlockPistonExtension;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.init.ModBlocks;
 
-public class BlockMemoryPistonExtension extends Block {
+public class BlockMemoryPistonExtension extends BlockDirectional {
 
-	public static final PropertyDirection FACING = PropertyDirection
-		.create("facing");
-	public static final PropertyBool SHORT = PropertyBool
-		.create("short");
+	
+	public static final PropertyEnum<BlockPistonExtension.EnumPistonType> TYPE =
+		PropertyEnum.<BlockPistonExtension.EnumPistonType>create("type",
+		BlockPistonExtension.EnumPistonType.class);
+    public static final PropertyBool SHORT = PropertyBool.create("short");
+    protected static final AxisAlignedBB PISTON_EXTENSION_EAST_AABB = new AxisAlignedBB(0.75D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_EXTENSION_WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.25D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_EXTENSION_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.75D, 1.0D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_EXTENSION_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.25D);
+    protected static final AxisAlignedBB PISTON_EXTENSION_UP_AABB = new AxisAlignedBB(0.0D, 0.75D, 0.0D, 1.0D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_EXTENSION_DOWN_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D);
+    protected static final AxisAlignedBB field_185636_C = new AxisAlignedBB(0.375D, -0.25D, 0.375D, 0.625D, 0.75D, 0.625D);
+    protected static final AxisAlignedBB field_185638_D = new AxisAlignedBB(0.375D, 0.25D, 0.375D, 0.625D, 1.25D, 0.625D);
+    protected static final AxisAlignedBB field_185640_E = new AxisAlignedBB(0.375D, 0.375D, -0.25D, 0.625D, 0.625D, 0.75D);
+    protected static final AxisAlignedBB field_185642_F = new AxisAlignedBB(0.375D, 0.375D, 0.25D, 0.625D, 0.625D, 1.25D);
+    protected static final AxisAlignedBB field_185644_G = new AxisAlignedBB(-0.25D, 0.375D, 0.375D, 0.75D, 0.625D, 0.625D);
+    protected static final AxisAlignedBB field_185645_I = new AxisAlignedBB(0.25D, 0.375D, 0.375D, 1.25D, 0.625D, 0.625D);
+
 
 	public BlockMemoryPistonExtension(String unlocalizedName) {
 		super(Material.piston);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(SHORT, Boolean.valueOf(false)));
-		this.setStepSound(soundTypePiston);
+		this.setStepSound(SoundType.STONE);
 		this.setHardness(0.5F);
 		setUnlocalizedName(unlocalizedName);
 	}
@@ -44,7 +62,7 @@ public class BlockMemoryPistonExtension extends Block {
 	public void onBlockHarvested(World worldIn,
 		BlockPos pos, IBlockState state, EntityPlayer player) {
 		if (player.capabilities.isCreativeMode) {
-			EnumFacing enumfacing = (EnumFacing) state
+			EnumFacing enumfacing = state
 				.getValue(FACING);
 
 			if (enumfacing != null) {
@@ -66,15 +84,15 @@ public class BlockMemoryPistonExtension extends Block {
 	public void breakBlock(World worldIn, BlockPos pos,
 		IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
-		EnumFacing enumfacing = ((EnumFacing) state
-			.getValue(FACING)).getOpposite();
+		EnumFacing enumfacing = state
+			.getValue(FACING).getOpposite();
 		pos = pos.offset(enumfacing);
 		IBlockState iblockstate1 = worldIn
 			.getBlockState(pos);
 
 		if (iblockstate1.getBlock() instanceof BlockMemoryPistonBase
-			&& ((Boolean) iblockstate1
-				.getValue(BlockMemoryPistonBase.EXTENDED))
+			&& iblockstate1
+				.getValue(BlockMemoryPistonBase.EXTENDED)
 				.booleanValue()) {
 			iblockstate1.getBlock().dropBlockAsItem(
 				worldIn, pos, iblockstate1, 0);
@@ -83,14 +101,40 @@ public class BlockMemoryPistonExtension extends Block {
 	}
 
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	    switch (state.getValue(FACING)) {
+	        case DOWN:
+	        default:
+	            return PISTON_EXTENSION_DOWN_AABB;
+	        case UP:
+	            return PISTON_EXTENSION_UP_AABB;
+	        case NORTH:
+	            return PISTON_EXTENSION_NORTH_AABB;
+	        case SOUTH:
+	            return PISTON_EXTENSION_SOUTH_AABB;
+	        case WEST:
+	            return PISTON_EXTENSION_WEST_AABB;
+	        case EAST:
+	            return PISTON_EXTENSION_EAST_AABB;
+	    }
+	}
+	
+	@Override
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos,
+		AxisAlignedBB p_185477_4_, List<AxisAlignedBB> p_185477_5_, Entity p_185477_6_) {
+        addCollisionBoxToList(pos, p_185477_4_, p_185477_5_, state.getBoundingBox(worldIn, pos));
+        addCollisionBoxToList(pos, p_185477_4_, p_185477_5_, this.func_185633_i(state));
+    }
 
 	@Override
 	public boolean canPlaceBlockAt(World worldIn,
@@ -114,84 +158,39 @@ public class BlockMemoryPistonExtension extends Block {
 	public int quantityDropped(Random random) {
 		return 0;
 	}
-
+	
+	private AxisAlignedBB func_185633_i(IBlockState p_185633_1_)
+    {
+        /*switch ((EnumFacing)p_185633_1_.getValue(FACING))
+        {
+            case DOWN:
+            default:
+                return field_185638_D;
+            case UP:
+                return field_185636_C;
+            case NORTH:
+                return field_185642_F;
+            case SOUTH:
+                return field_185640_E;
+            case WEST:
+                return field_185645_I;
+            case EAST:
+                return field_185644_G;
+        }*/
+		return new AxisAlignedBB(
+			0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+    }
+	
 	@Override
 	/**
-	 * Add all collision boxes of this Block to the list that intersect with the given mask.
-	 *  
-	 * @param collidingEntity the Entity colliding with this Block
-	 */
-	public void addCollisionBoxesToList(World worldIn,
-		BlockPos pos, IBlockState state,
-		AxisAlignedBB mask, List list,
-		Entity collidingEntity) {
-		this.applyHeadBounds(state);
-		super.addCollisionBoxesToList(worldIn, pos, state,
-			mask, list, collidingEntity);
-		this.applyCoreBounds(state);
-		super.addCollisionBoxesToList(worldIn, pos, state,
-			mask, list, collidingEntity);
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F,
-			1.0F);
-	}
-
-	private void applyCoreBounds(IBlockState state) {
-		float f = 0.25F;
-		float f1 = 0.375F;
-		float f2 = 0.625F;
-		float f3 = 0.25F;
-		float f4 = 0.75F;
-
-		switch ((EnumFacing) state.getValue(FACING)) {
-		case DOWN:
-			this.setBlockBounds(0.375F, 0.25F, 0.375F,
-				0.625F, 1.0F, 0.625F);
-			break;
-		case UP:
-			this.setBlockBounds(0.375F, 0.0F, 0.375F,
-				0.625F, 0.75F, 0.625F);
-			break;
-		case NORTH:
-			this.setBlockBounds(0.25F, 0.375F, 0.25F,
-				0.75F, 0.625F, 1.0F);
-			break;
-		case SOUTH:
-			this.setBlockBounds(0.25F, 0.375F, 0.0F, 0.75F,
-				0.625F, 0.75F);
-			break;
-		case WEST:
-			this.setBlockBounds(0.375F, 0.25F, 0.25F,
-				0.625F, 0.75F, 1.0F);
-			break;
-		case EAST:
-			this.setBlockBounds(0.0F, 0.375F, 0.25F, 0.75F,
-				0.625F, 0.75F);
-		}
-	}
-
-	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		this.applyHeadBounds(worldIn.getBlockState(pos));
-	}
-
-	public void applyHeadBounds(IBlockState state) {
-		/*
-		 * float f = 0.25F; EnumFacing enumfacing =
-		 * (EnumFacing)state.getValue(FACING);
-		 * 
-		 * if (enumfacing != null) { switch (enumfacing) { case DOWN:
-		 * this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F); break; case
-		 * UP: this.setBlockBounds(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F); break;
-		 * case NORTH: this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
-		 * break; case SOUTH: this.setBlockBounds(0.0F, 0.0F, 0.75F, 1.0F, 1.0F,
-		 * 1.0F); break; case WEST: this.setBlockBounds(0.0F, 0.0F, 0.0F, 0.25F,
-		 * 1.0F, 1.0F); break; case EAST: this.setBlockBounds(0.75F, 0.0F, 0.0F,
-		 * 1.0F, 1.0F, 1.0F); } }
-		 */
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
-			0.0F);
-	}
+     * Checks if an IBlockState represents a block that is opaque and a full cube.
+     *  
+     * @param state The block state to check.
+     */
+    public boolean isFullyOpaque(IBlockState state)
+    {
+        return state.getValue(FACING) == EnumFacing.UP;
+    }
 
 	@Override
 	/**
@@ -199,7 +198,7 @@ public class BlockMemoryPistonExtension extends Block {
 	 */
 	public void onNeighborBlockChange(World worldIn,
 		BlockPos pos, IBlockState state, Block neighborBlock) {
-		EnumFacing enumfacing = (EnumFacing) state
+		EnumFacing enumfacing = state
 			.getValue(FACING);
 		BlockPos blockpos1 = pos.offset(enumfacing
 			.getOpposite());
@@ -217,10 +216,10 @@ public class BlockMemoryPistonExtension extends Block {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(
-		IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return true;
-	}
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
+    {
+        return true;
+    }
 
 	public static EnumFacing getFacing(int meta) {
 		int j = meta & 7;
@@ -228,11 +227,10 @@ public class BlockMemoryPistonExtension extends Block {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World worldIn, BlockPos pos) {
-		return MazeTowers.BlockMemoryPistonOff.getItem(
-			worldIn, pos);
-	}
+	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
+    {
+        return new ItemStack(ModBlocks.memoryPiston);
+    }
 
 	@Override
 	/**
@@ -250,15 +248,34 @@ public class BlockMemoryPistonExtension extends Block {
 	public int getMetaFromState(IBlockState state) {
 		byte b0 = 0;
 		int i = b0
-			| ((EnumFacing) state.getValue(FACING))
+			| state.getValue(FACING)
 				.getIndex();
 
 		return i;
 	}
+	
+	@Override
+	/**
+     * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withRotation(IBlockState state, Rotation rot)
+    {
+        return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
+    }
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] {
-			FACING, SHORT });
+    /**
+     * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
+    {
+        return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
+    }
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return (new BlockStateContainer.Builder(this)).add(FACING).add(SHORT).build();
 	}
 }

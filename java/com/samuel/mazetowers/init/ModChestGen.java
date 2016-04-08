@@ -6,18 +6,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraftforge.common.ChestGenHooks;
-
-import com.samuel.mazetowers.etc.MTUtils;
 
 public class ModChestGen {
 
-	public static ChestGenHooks[] chestContents;
+	//public static ChestGenHooks[] chestContents;
 	public static int[] totalWeights;
 
 	public static void initChestGen(Random rand, boolean refresh) {
-		chestContents = new ChestGenHooks[10];
+		/*chestContents = new ChestGenHooks[10];
 		for (int i = 1; i <= 10; i++) {
 			final int addToLimit = (int) Math.floor((i + 1) / 3);
 			chestContents[i - 1] = ChestGenHooks.getInfo("MazeTowerChest" + i);
@@ -28,7 +24,7 @@ public class ModChestGen {
 			chestContents[i - 1].setMin(1 + (int) Math.floor(addToLimit / 2)); // inclusive
 			chestContents[i - 1].setMax(4 + addToLimit); // exclusive
 		}
-		if (chestContents[0].getItems(rand).isEmpty() || refresh) {
+		if (chestContents[0].getItems(rand).isEmpty() || refresh) {*/
     		// TOOLS
     		// D: 10%
     		addItem(0, new ItemStack(Items.wooden_pickaxe, 1), 1,
@@ -245,8 +241,8 @@ public class ModChestGen {
     		addItem(8, new ItemStack(Items.golden_apple, 1), 1,
     			2, 12);
     		// S+: 5%
-    		addItem(9, new ItemStack(Items.bread, 1), 1,
-    			3, 25);
+    		addItem(9, new ItemStack(Items.bread, 1), 2,
+    			4, 25);
     		addItem(9, new ItemStack(Items.golden_apple, 1), 1,
     			3, 18);
     		addItem(9, new ItemStack(Items.golden_apple, 1, 1), 1,
@@ -307,7 +303,7 @@ public class ModChestGen {
     		addItem(3, new ItemStack(Items.arrow, 1), 2, 4, 150);
     		addItem(3, new ItemStack(Items.stick, 1), 3, 9,
     			50);
-    		addItem(3, new ItemStack(Items.leather, 1), 3, 9,
+    		addItem(3, new ItemStack(Items.leather, 1), 4, 8,
     			50);
     		addItem(3, new ItemStack(Item
     			.getItemFromBlock(Blocks.glass_pane), 1), 3, 9, 45);
@@ -368,11 +364,9 @@ public class ModChestGen {
     			1, 18);
     		addItem(4, new ItemStack(Item.getItemFromBlock(Blocks.coal_block), 1), 1,
     			1, 4);
-    		addItem(5, new ItemStack(Item.getItemFromBlock(ModBlocks.itemScanner), 1), 1,
-    			1, 1);
-    		// B+ 10.5%
+    		// B+: 10.5%
     		addItem(5, new ItemStack(Items.experience_bottle, 1), 1,
-    			3, 25);
+    			4, 25);
     		addItem(5, new ItemStack(Items.redstone, 1), 3,
     			9, 30);
     		addItem(5, new ItemStack(Items.gold_ingot, 1), 2,
@@ -389,7 +383,7 @@ public class ModChestGen {
     			1, 1);
     		// A: 10.5%
     		addItem(6, new ItemStack(Items.experience_bottle, 1), 1,
-    			4, 25);
+    			5, 25);
     		addItem(6, new ItemStack(Items.gold_ingot, 1), 3,
     			9, 25);
     		addItem(6, new ItemStack(Items.iron_ingot, 1), 2,
@@ -406,7 +400,7 @@ public class ModChestGen {
     			1, 1);
     		// A+ 7%
     		addItem(7, new ItemStack(Items.experience_bottle, 1), 2,
-    			5, 18);
+    			6, 18);
     		addItem(7, new ItemStack(Items.iron_ingot, 1), 3,
     			9, 25);
     		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 2, 9);
@@ -417,12 +411,10 @@ public class ModChestGen {
     		addItem(7, new ItemStack(Items.skull, 1, 1), 1, 1, 2);
     		// S: 5.25%
     		addItem(8, new ItemStack(Items.experience_bottle, 1), 3,
-    			6, 14);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 2, 4, 9);
+    			7, 14);
+    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 2, 4, 13);
     		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 3, 6);
     		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 2, 4);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(ModBlocks.itemScannerGold), 1), 1,
-    			1, 4);
     		addItem(8, new ItemStack(Items.diamond), 2, 4, 5);
     		addItem(8, new ItemStack(Items.emerald), 2, 4, 3);
     		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.iron_block)), 1, 1, 3);
@@ -431,12 +423,12 @@ public class ModChestGen {
     			1, 1);
     		// S+: 7%
     		addItem(9, new ItemStack(Items.experience_bottle, 1), 4,
-    			7, 12);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 3, 9, 14);
+    			8, 12);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 3, 9, 13);
     		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 3, 12);
     		addItem(9, new ItemStack(Items.skull, 1, 1), 1, 1, 6);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 3, 7);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.iron_block)), 1, 2, 6);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 2, 8);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.iron_block)), 1, 1, 6);
     		addItem(9, new ItemStack(Items.diamond), 3, 9, 5);
     		addItem(9, new ItemStack(Items.emerald), 3, 6, 4);
     		addItem(9, new ItemStack(Items.nether_star, 1), 1,
@@ -849,7 +841,8 @@ public class ModChestGen {
 		 * 5)); // Nether Star chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new ItemStack(Items.diamond_horse_armor,
 		 * 1), 1, 1, 5)); // Diamond Horse Armor
-		 */}
+		 */
+	//}
 
 	private static void addItem(int index, ItemStack item,
 		int minCount, int maxCount, int weightIn) {
@@ -868,10 +861,10 @@ public class ModChestGen {
 				weight = (int) (weightIn * 0.125);
 			}
 			
-			if (weight > 0)
+			/*if (weight > 0)
     			chestContents[d]
     				.addItem(new WeightedRandomChestContent(
-    					item, minCount, maxCount, weight));
+    					item, minCount, maxCount, weight));*/
 		}
 	}
 }

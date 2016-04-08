@@ -4,41 +4,29 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import scala.Char;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.init.ModChestGen;
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase;
 
 public class MTUtils {
 
@@ -50,13 +38,13 @@ public class MTUtils {
 
 	public static int getSurfaceY(World world, int x,
 		int z, int range, boolean isUnderwater) {
-		final int dimId = world.provider.getDimensionId(), minY = dimId != -1 ? !isUnderwater ? minYSurface
+		final int dimId = world.provider.getDimension(), minY = dimId != -1 ? !isUnderwater ? minYSurface
 			: minYWater
 			: minYNether;
 		int cy = minY;
 		boolean nextY = true;
 
-		for (; cy < 127; cy++) {
+		for (; cy < (dimId != -1 ? 127 : 100); cy++) {
 			nextY = false;
 			for (int cz = z - range; cz <= z + range; cz++) {
 				for (int cx = x - range; cx <= x + range; cx++) {
@@ -87,7 +75,7 @@ public class MTUtils {
 
 	public static int getGroundY(World world, int x, int y,
 		int z, int range, boolean isUnderwater) {
-		final int dimId = world.provider.getDimensionId(), minY = dimId != -1 ? !isUnderwater ? minYSurface
+		final int dimId = world.provider.getDimension(), minY = dimId != -1 ? !isUnderwater ? minYSurface
 			: minYWater
 			: minYNether;
 		int cy = y - 1;
@@ -152,21 +140,20 @@ public class MTUtils {
 			Items.enchanted_book);
 		//EnchantmentHelper.addRandomEnchantment(new Random(), stack, level);
 		Items.enchanted_book.addEnchantment(stack, new EnchantmentData(Enchantment
-			.getEnchantmentById(index), level));
+			.getEnchantmentByID(index), level));
 		return stack;
 	}
 	
 	public static void fillInventoryWithLoot(EntityPlayer player, int rarity) {
-		ChestGenHooks chestGen = ModChestGen.chestContents[rarity];
+		/*ChestGenHooks chestGen = ModChestGen.chestContents[rarity];
 		for (int i = 0; i < player.inventory.mainInventory.length; i++)
-			player.inventory.mainInventory[i] = chestGen.getOneItem(player.worldObj.rand);
+			player.inventory.mainInventory[i] = chestGen.getOneItem(player.worldObj.rand);*/
 	}
 	
 	public static ArrayList<String> getLootList(Random rand, int rarity) {
-		//final boolean isSizeSensitive = false;
-		final double iterations = 100000d;
-		final List<WeightedRandomChestContent> items;
 		ArrayList<String> lootList = new ArrayList<String>();
+		/*final double iterations = 100000d;
+		final List<WeightedRandomChestContent> items;
 		HashMap<WeightedRandomChestContent, Integer> itemCount =
 			new HashMap<WeightedRandomChestContent, Integer>();
 		ChestGenHooks chestGen = ModChestGen.chestContents[rarity];
@@ -272,7 +259,7 @@ public class MTUtils {
 		}
 		
 		lootList.add(totalWeightNoDupe + " (" + totalWeight + ")");
-		
+		*/
 		return lootList;
 	}
 
@@ -347,19 +334,19 @@ public class MTUtils {
 		if (fromDir != toDir) {
 			newMap[0][5][2] = stairsBlocks[dirMap[2]];
 			newMap[1][4][2] = stairsBlocks[dirMap[2]];
-			newMap[1][6][3] = torch[dirMap[3]];
+			newMap[1][6][2] = torch[dirMap[3]];
 			newMap[2][3][2] = stairsBlocks[dirMap[2]];
 			newMap[3][2][3] = stairsBlocks[dirMap[3]];
 			newMap[4][2][4] = stairsBlocks[dirMap[3]];
-			newMap[4][3][2] = torch[dirMap[0]];
+			newMap[4][2][2] = torch[dirMap[0]];
 			newMap[5][2][5] = stairsBlocks[dirMap[3]];
 			newMap[6][3][6] = stairsBlocks[dirMap[0]];
 			newMap[7][4][6] = stairsBlocks[dirMap[0]];
-			newMap[7][2][5] = torch[dirMap[1]];
+			newMap[7][2][6] = torch[dirMap[1]];
 			newMap[8][5][6] = stairsBlocks[dirMap[0]];
 			newMap[9][6][5] = stairsBlocks[dirMap[1]];
 			newMap[10][6][4] = stairsBlocks[dirMap[1]];
-			newMap[10][5][6] = torch[dirMap[2]];
+			newMap[10][6][6] = torch[dirMap[2]];
 			newMap[11][6][3] = stairsBlocks[dirMap[1]];
 		}
 
@@ -453,6 +440,7 @@ public class MTUtils {
 								|| block == Blocks.ladder
 								|| block == Blocks.glass
 								|| block == Blocks.web
+								|| block == Blocks.glass_pane
 								|| block instanceof BlockChest
 								|| block == Blocks.sea_lantern || block == Blocks.mob_spawner))));
 				}
@@ -529,5 +517,15 @@ public class MTUtils {
 		return ReflectionHelper.findMethod(clazz, instance,
 			ObfuscationReflectionHelper.remapFieldNames(
 				clazz.getName(), names), methodTypes);
+	}
+
+	public static int getCurrentSpectriteFrame(World worldIn) {
+		if (worldIn == null) {
+            return 0;
+		} else {
+        	float time = MathHelper.ceiling_float_int((((worldIn.getTotalWorldTime() >> 1) % 36)
+        		* 0.2777F) * 1000F) / 10000F;
+            return Math.round(time * 36);
+        }
 	}
 }

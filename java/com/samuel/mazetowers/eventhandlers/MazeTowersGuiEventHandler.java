@@ -2,16 +2,21 @@ package com.samuel.mazetowers.eventhandlers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.samuel.mazetowers.etc.IMazeTowerCapability;
+import com.samuel.mazetowers.etc.MazeTowerGuiProvider;
 import com.samuel.mazetowers.etc.PlayerMazeTower;
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase;
+import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase;
 
 public class MazeTowersGuiEventHandler {
 
@@ -21,30 +26,47 @@ public class MazeTowersGuiEventHandler {
 	private boolean isUnderground;
 	private float partialTicksCache = 0;
 	private int[] propOffsets = new int[] { 0, 0, 0 };
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
+	public void onAttachEntityCapabilities(AttachCapabilitiesEvent.Entity e) {
+		if (!e.getEntity().hasCapability(MazeTowerGuiProvider.gui, null) &&
+			e.getEntity() instanceof EntityPlayer)
+			e.addCapability(new ResourceLocation("MazeTowers:MazeTowerGui"),
+				new MazeTowerGuiProvider(new PlayerMazeTower.DefaultImpl((EntityPlayer) e.getEntity(), 0, false)));
+	}
 
 	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
 	public void onEntityConstructing(
 		EntityConstructing event) {
-		if (event.entity instanceof EntityPlayer
-			&& PlayerMazeTower
-				.get((EntityPlayer) event.entity) == null)
-			PlayerMazeTower
-				.register((EntityPlayer) event.entity);
+	}
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
+	public void onPlayerClone (
+		PlayerEvent.Clone event) {
+		IMazeTowerCapability mtc = event.getOriginal().getCapability(MazeTowerGuiProvider.gui, null);
+		EntityPlayer entityPlayer = event.getEntityPlayer();
+		if (entityPlayer.hasCapability(MazeTowerGuiProvider.gui, null) && event.isWasDeath()) {
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setEnabled(false);
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setFloor(mtc.getFloor());
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setIsUnderground(mtc.getIsUnderground());
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setTowerData(mtc.getTowerData());
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setTowerName(mtc.getTowerName());
+			entityPlayer.getCapability(MazeTowerGuiProvider.gui, null).setSpawnPos(mtc.getSpawnPos());
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
 	public void onRenderOverlay(RenderGameOverlayEvent e) {
-		if (e.type.name() == "TEXT") {
+		if (e.getType().name() == "TEXT") {
 			if (mc == null)
 				mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.thePlayer;
-			PlayerMazeTower props = PlayerMazeTower
-				.get(player);
+			IMazeTowerCapability props = player.getCapability(MazeTowerGuiProvider.gui, null);
 			if (props != null && props.getEnabled()) {
 				final int floor;
-				if (e.partialTicks != partialTicksCache
-					&& (int) ((partialTicksCache = e.partialTicks) * 5000) % 10 == 0) {
+				if (e.getPartialTicks() != partialTicksCache
+					&& (int) ((partialTicksCache = e.getPartialTicks()) * 5000) % 10 == 0) {
 					final int[] towerData = props.getTowerData();
 					final int posY;
 					final boolean isTowerArea = (player.chunkCoordX == towerData[0]
@@ -55,22 +77,21 @@ public class MazeTowersGuiEventHandler {
 						&& player.chunkCoordZ == towerData[2];
 					if (isTowerChunk) {
 						final String[] propNames = new String[] {
-							StatCollector
+							I18n
 								.translateToLocal("towerinfo.floor"),
-							StatCollector
+							I18n
 								.translateToLocal("towerinfo.difficulty"),
-							StatCollector
+							I18n
 								.translateToLocal("towerinfo.rarity") };
 						propOffsets = new int[] {
 							Integer
-								.valueOf(StatCollector
+								.valueOf(I18n
 									.translateToLocal("towerinfo.floor.offset")),
 							Integer
-								.valueOf(StatCollector
+								.valueOf(I18n
 									.translateToLocal("towerinfo.difficulty.offset")),
 							Integer
-								.valueOf(StatCollector
-									.translateToLocal("towerinfo.rarity.offset")) };
+								.valueOf(I18n.translateToLocal("towerinfo.rarity.offset")) };
 						final int minFloor = !isUnderground ? 1
 							: -(towerData[3] - 1), maxFloor = !isUnderground ? towerData[3] + 1
 							: 1;
@@ -103,7 +124,7 @@ public class MazeTowersGuiEventHandler {
 					} else
 						floor = props.getFloor();
 					// mc.thePlayer.addChatMessage(new
-					// ChatComponentText(String.valueOf(partialTicksCache)));
+					// TextComponentString(String.valueOf(partialTicksCache)));
 				} else
 					floor = props.getFloor();
 

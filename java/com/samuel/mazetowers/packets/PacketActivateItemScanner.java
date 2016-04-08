@@ -2,8 +2,8 @@ package com.samuel.mazetowers.packets;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -56,8 +56,8 @@ public class PacketActivateItemScanner implements IMessage {
 						.parseLong(message.text));
 					boolean isGold = (world.getBlockState(
 						pos).getBlock() instanceof BlockItemScannerGold);
-					((BlockItemScanner) (!isGold ? MazeTowers.BlockItemScanner
-						: MazeTowers.BlockItemScannerGold))
+					(!isGold ? MazeTowers.BlockItemScanner
+						: MazeTowers.BlockItemScannerGold)
 						.setStateBasedOnMatchResult(world,
 							pos, world.getBlockState(pos), true);
 				}

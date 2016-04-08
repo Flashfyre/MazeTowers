@@ -1,23 +1,20 @@
 package com.samuel.mazetowers.blocks;
 
-import com.samuel.mazetowers.init.ModItems;
-import com.samuel.mazetowers.tileentities.TileEntityExplosiveCreeperSkull;
-
 import net.minecraft.block.BlockSkull;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySkull;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.samuel.mazetowers.init.ModItems;
+import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
 
 public class BlockExplosiveCreeperSkull extends BlockSkull {
 	
@@ -32,18 +29,9 @@ public class BlockExplosiveCreeperSkull extends BlockSkull {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-    public Item getItem(World worldIn, BlockPos pos)
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
     {
-        return ModItems.explosive_creeper_skull;
-    }
-	
-	@Override
-	public int getDamageValue(World worldIn, BlockPos pos)
-    {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityExplosiveCreeperSkull ?
-        	((TileEntityExplosiveCreeperSkull)tileentity).getSkullType() :
-        	super.getDamageValue(worldIn, pos);
+        return new ItemStack(ModItems.explosive_creeper_skull);
     }
 	
 	@Override
@@ -52,7 +40,7 @@ public class BlockExplosiveCreeperSkull extends BlockSkull {
      */
     public String getLocalizedName()
     {
-        return StatCollector.translateToLocal(this.getUnlocalizedName() + ".name");
+        return I18n.translateToLocal(this.getUnlocalizedName() + ".name");
     }
 	
 	@Override
@@ -60,7 +48,7 @@ public class BlockExplosiveCreeperSkull extends BlockSkull {
 		 IBlockState state, int fortune) {
         java.util.List<ItemStack> ret = new java.util.ArrayList<ItemStack>();
         {
-            if (!((Boolean)state.getValue(NODROP)).booleanValue())
+            if (!state.getValue(NODROP).booleanValue())
             {
                 TileEntity tileentity = worldIn.getTileEntity(pos);
 

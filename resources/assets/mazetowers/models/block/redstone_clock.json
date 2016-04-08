@@ -1,7 +1,7 @@
 {
     "textures": {
 		"texture": "mazetowers:blocks/invisible",
-        "particle": "mazetowers:items/redstone_clock"
+        "particle": "mazetowers:items/redstone_clock/0"
     },
 	"elements": [
         {   "from": [ 0, 0, 0 ],

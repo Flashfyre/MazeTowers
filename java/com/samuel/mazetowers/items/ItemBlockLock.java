@@ -6,63 +6,48 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockLock;
-import com.samuel.mazetowers.etc.IMetaBlockName;
 import com.samuel.mazetowers.etc.MTUtils;
-import com.samuel.mazetowers.init.ModBlocks;
-import com.samuel.mazetowers.tileentities.TileEntityLock;
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
+import com.samuel.mazetowers.tileentity.TileEntityLock;
+import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
 
-public class ItemBlockLock extends ItemBlock {
+public class ItemBlockLock extends ItemBlockVendorTradableMeta {
 	
 	private int[] colors;
 
     public ItemBlockLock(Block block) {
-        super(block);
-        if (!(block instanceof IMetaBlockName))
-            throw new IllegalArgumentException(String.format("The given Block %s is not an instance of ISpecialBlockName!", block.getUnlocalizedName()));
+        super(block, 3, 0, 9, 500, 100, 2, 4);
         EnumDyeColor[][] dyeColors = EnumTowerType.getAllBeaconColors();
-        this.setMaxDamage(0);
-        this.setHasSubtypes(true);
+        setCreativeTab(MazeTowers.TabExtra);
+		setMaxStackSize(1);
 		colors = new int[dyeColors.length];
 		for (int t = 0; t < dyeColors.length; t++) {
 			float[] rgbMix = new float[3];
 			for (int c = 0; c < dyeColors[t].length; c++) {
-        		float[] rgb = EntitySheep.func_175513_a(dyeColors[t][c]);
+        		float[] rgb = EntitySheep.getDyeRgb(dyeColors[t][c]);
         		rgbMix[0] += rgb[0] / dyeColors[t].length;
         		rgbMix[1] += rgb[1] / dyeColors[t].length;
         		rgbMix[2] += rgb[2] / dyeColors[t].length;
 			}
 			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
-		setCreativeTab(MazeTowers.tabExtra);
-		setHasSubtypes(true);
-		setMaxStackSize(1);
-		setMaxDamage(0);
     }
     
-    @Override
     @SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack stack, int renderPass) {
+    public int getColorFromItemstack(ItemStack stack, int tintIndex) {
     	return colors[stack.getItemDamage()];
     }
 
-    @Override
-    public int getMetadata(int damage)
-    {
-        return damage;
-    }
-    
     @Override
     /**
      * Called when a Block is right-clicked with this Item
@@ -70,7 +55,8 @@ public class ItemBlockLock extends ItemBlock {
      * @param pos The block being right-clicked
      * @param side The side being right-clicked
      */
-    public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos,  EnumHand hand,
+    	EnumFacing side, float hitX, float hitY, float hitZ)
     {
         IBlockState iblockstate = worldIn.getBlockState(pos);
         Block block = iblockstate.getBlock();
@@ -82,11 +68,11 @@ public class ItemBlockLock extends ItemBlock {
 
         if (stack.stackSize == 0)
         {
-            return false;
+            return EnumActionResult.FAIL;
         }
         else if (!playerIn.canPlayerEdit(pos, side, stack))
         {
-            return false;
+        	return EnumActionResult.FAIL;
         }
         else if (worldIn.canBlockBePlaced(this.block, pos, false, side, (Entity)null, stack))
         {
@@ -96,27 +82,21 @@ public class ItemBlockLock extends ItemBlock {
             	
             if (placeBlockAt(stack, playerIn, worldIn, pos, side, hitX, hitY, hitZ, iblockstate1))
             {
-                worldIn.playSoundEffect((double)((float)pos.getX() + 0.5F),
-                	(double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F),
-                	this.block.stepSound.getPlaceSound(), (this.block.stepSound
-                	.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
+                worldIn.playSound(pos.getX() + 0.5F,
+                	pos.getY() + 0.5F, pos.getZ() + 0.5F,
+                	this.block.getStepSound().getPlaceSound(), SoundCategory.BLOCKS, (this.block.getStepSound()
+                	.getVolume() + 1.0F) / 2.0F, this.block.getStepSound().getPitch() * 0.8F, true);
                 TileEntityLock te = (TileEntityLock) worldIn.getTileEntity(pos);
                 te.setTypeIndex(stack.getItemDamage());
                 worldIn.setTileEntity(pos, te);
                 --stack.stackSize;
             }
 
-            return true;
+            return EnumActionResult.SUCCESS;
         }
         else
         {
-            return false;
+            return EnumActionResult.FAIL;
         }
-    }
-
-    @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName(stack) + "." +
-        	((IMetaBlockName)this.block).getSpecialName(stack);
     }
 }

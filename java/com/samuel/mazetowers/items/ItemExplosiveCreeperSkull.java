@@ -1,39 +1,36 @@
 package com.samuel.mazetowers.items;
 
 import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockSkull;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.mojang.authlib.GameProfile;
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockExplosiveCreeperSkull;
 import com.samuel.mazetowers.init.ModBlocks;
-import com.samuel.mazetowers.tileentities.TileEntityExplosiveCreeperSkull;
+import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
 
 public class ItemExplosiveCreeperSkull extends ItemArmor {
 	
 	public ItemExplosiveCreeperSkull()
     {
-		super(MazeTowers.EXPLOSIVE_CREEPER_HEAD, 4, 0);
+		super(MazeTowers.EXPLOSIVE_CREEPER_HEAD, 4, EntityEquipmentSlot.HEAD);
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 	
@@ -44,7 +41,7 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
 		boolean isLastLine = false;
 		String curLine;
 		while (!isLastLine) {
-			isLastLine = (curLine = StatCollector
+			isLastLine = (curLine = I18n
 				.translateToLocal(("iteminfo.explosive_creeper_skull_item.l" +
 				++lineCount))).endsWith("@");
 			list.add(!isLastLine ? curLine : curLine
@@ -59,29 +56,30 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
      * @param pos The block being right-clicked
      * @param side The side being right-clicked
      */
-    public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn,
+    	BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
     	Block skullBlock = ModBlocks.explosiveCreeperSkull;
-        if (worldIn.getBlockState(pos).getBlock().isReplaceable(worldIn, pos) && side != EnumFacing.DOWN)
+    	IBlockState state = worldIn.getBlockState(pos);
+        if (state.getBlock().isReplaceable(worldIn, pos) && side != EnumFacing.DOWN)
         {
             side = EnumFacing.UP;
             pos = pos.down();
         }
         if (side == EnumFacing.DOWN)
         {
-            return false;
+            return EnumActionResult.FAIL;
         }
         else
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            Block block = iblockstate.getBlock();
+            Block block = state.getBlock();
             boolean flag = block.isReplaceable(worldIn, pos);
 
             if (!flag)
             {
-                if (!worldIn.getBlockState(pos).getBlock().getMaterial().isSolid() &&
+                if (!state.getBlock().getMaterial(state).isSolid() &&
                 	!worldIn.isSideSolid(pos, side, true))  {
-                    return false;
+                    return EnumActionResult.FAIL;
                 }
 
                 pos = pos.offset(side);
@@ -89,24 +87,25 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
 
             if (!playerIn.canPlayerEdit(pos, side, stack))
             {
-                return false;
+                return EnumActionResult.FAIL;
             }
             else if (!skullBlock.canPlaceBlockAt(worldIn, pos))
             {
-                return false;
+                return EnumActionResult.FAIL;
             }
             else
             {
                 if (!worldIn.isRemote)
                 {
-                    if (!skullBlock.canPlaceBlockOnSide(worldIn, pos, side)) return false;
+                    if (!skullBlock.canPlaceBlockOnSide(worldIn, pos, side))
+                    	return EnumActionResult.FAIL;
                     worldIn.setBlockState(pos, skullBlock.getDefaultState()
-                    	.withProperty(BlockExplosiveCreeperSkull.FACING, side), 3);
+                    	.withProperty(BlockSkull.FACING, side), 3);
                     int i = 0;
 
                     if (side == EnumFacing.UP)
                     {
-                        i = MathHelper.floor_double((double)(playerIn.rotationYaw * 16.0F / 360.0F) + 0.5D) & 15;
+                        i = MathHelper.floor_double(playerIn.rotationYaw * 16.0F / 360.0F + 0.5D) & 15;
                     }
 
                     TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -121,7 +120,7 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
                     --stack.stackSize;
                 }
 
-                return true;
+                return EnumActionResult.SUCCESS;
             }
         }
     }
@@ -161,7 +160,8 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
      * @param entity The entity trying to equip the armor
      * @return True if the given ItemStack can be inserted in the slot
      */
-    public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
-    	return armorType == 0;
+    public boolean isValidArmor(ItemStack stack, EntityEquipmentSlot armorType,
+    	Entity entity) {
+    	return armorType == EntityEquipmentSlot.HEAD;
     }
 }

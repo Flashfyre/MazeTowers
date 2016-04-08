@@ -4,10 +4,12 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.BehaviorProjectileDispense;
 import net.minecraft.dispenser.IPosition;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.entities.EntityExplosiveArrow;
+import com.samuel.mazetowers.entity.EntityExplosiveArrow;
 
 public class ModDispenserBehavior {
 
@@ -15,17 +17,13 @@ public class ModDispenserBehavior {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(
 			MazeTowers.ItemExplosiveArrow,
 			new BehaviorProjectileDispense() {
-
 				@Override
-				/**
-				 * Return the projectile entity spawned by this dispense behavior.
-				 */
-				protected IProjectile getProjectileEntity(
-					World worldIn, IPosition position) {
+				protected IProjectile getProjectileEntity(World worldIn,
+						IPosition position, ItemStack stack) {
 					EntityExplosiveArrow entityarrow = new EntityExplosiveArrow(
 						worldIn, position.getX(), position
-							.getY(), position.getZ());
-					entityarrow.canBePickedUp = 0;
+						.getY(), position.getZ());
+					entityarrow.canBePickedUp = EntityArrow.PickupStatus.CREATIVE_ONLY;
 					return entityarrow;
 				}
 			});

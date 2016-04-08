@@ -1,7 +1,0 @@
-{
-    "parent": "block/wall_ne",
-    "textures": {
-        "wall": "blocks/stonebrick_mossy",
-		"top": "blocks/stonebrick_mossy"
-    }
-}

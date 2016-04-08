@@ -2,40 +2,91 @@ package com.samuel.mazetowers.proxy;
 
 import net.minecraft.block.material.MapColor;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.common.BiomeManager.BiomeEntry;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.*;
+import com.samuel.mazetowers.blocks.BlockChaoticSludge;
+import com.samuel.mazetowers.blocks.BlockExplosiveCreeperSkull;
+import com.samuel.mazetowers.blocks.BlockExtraDoor;
+import com.samuel.mazetowers.blocks.BlockExtraStairs;
+import com.samuel.mazetowers.blocks.BlockExtraWall;
+import com.samuel.mazetowers.blocks.BlockHiddenButton;
+import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
+import com.samuel.mazetowers.blocks.BlockItemScanner;
+import com.samuel.mazetowers.blocks.BlockItemScannerGold;
+import com.samuel.mazetowers.blocks.BlockLock;
+import com.samuel.mazetowers.blocks.BlockMazeTowerThreshold;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonBase;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonBaseOff;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonExtension;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonExtensionOff;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonMoving;
+import com.samuel.mazetowers.blocks.BlockMemoryPistonMovingOff;
+import com.samuel.mazetowers.blocks.BlockMineralChest;
+import com.samuel.mazetowers.blocks.BlockMineralChest.Type;
+import com.samuel.mazetowers.blocks.BlockRedstoneClock;
+import com.samuel.mazetowers.blocks.BlockSpecialMobSpawner;
+import com.samuel.mazetowers.blocks.BlockSpectrite;
+import com.samuel.mazetowers.blocks.BlockSpectriteOre;
+import com.samuel.mazetowers.blocks.BlockVendorSpawner;
 import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
+import com.samuel.mazetowers.etc.IMazeTowerCapability;
 import com.samuel.mazetowers.etc.ItemExtraTab;
 import com.samuel.mazetowers.etc.MaterialLogicSolid;
+import com.samuel.mazetowers.etc.PlayerMazeTower;
 import com.samuel.mazetowers.init.ModBlocks;
-import com.samuel.mazetowers.init.ModChestGen;
 import com.samuel.mazetowers.init.ModCrafting;
 import com.samuel.mazetowers.init.ModDispenserBehavior;
 import com.samuel.mazetowers.init.ModItems;
+import com.samuel.mazetowers.init.ModSounds;
 import com.samuel.mazetowers.init.ModTileEntities;
 import com.samuel.mazetowers.init.ModWorldGen;
-import com.samuel.mazetowers.items.*;
-import com.samuel.mazetowers.tileentities.*;
-import com.samuel.mazetowers.worldgen.WorldGenMazeTowers;
+import com.samuel.mazetowers.items.ItemChaoticSludgeBucket;
+import com.samuel.mazetowers.items.ItemColoredKey;
+import com.samuel.mazetowers.items.ItemDiamondRod;
+import com.samuel.mazetowers.items.ItemExplosiveArrow;
+import com.samuel.mazetowers.items.ItemExplosiveBow;
+import com.samuel.mazetowers.items.ItemExplosiveCreeperSkull;
+import com.samuel.mazetowers.items.ItemRAM;
+import com.samuel.mazetowers.items.ItemSpectriteArmor;
+import com.samuel.mazetowers.items.ItemSpectriteGem;
+import com.samuel.mazetowers.items.ItemSpectriteKey;
+import com.samuel.mazetowers.items.ItemSpectriteKeySword;
+import com.samuel.mazetowers.items.ItemSpectriteOrb;
+import com.samuel.mazetowers.items.ItemSpectritePickaxe;
+import com.samuel.mazetowers.items.ItemSpectriteSword;
+import com.samuel.mazetowers.tileentity.TileEntityCircuitBreaker;
+import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentity.TileEntityLock;
+import com.samuel.mazetowers.tileentity.TileEntityMazeTowerThreshold;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPistonMemory;
+import com.samuel.mazetowers.tileentity.TileEntityMineralChest;
+import com.samuel.mazetowers.tileentity.TileEntitySpecialMobSpawner;
+import com.samuel.mazetowers.tileentity.TileEntityWebSpiderSpawner;
+import com.samuel.mazetowers.world.WorldGenMazeTowers;
+import com.samuel.mazetowers.world.WorldGenSpectrite;
 
 public class CommonProxy {
 	
@@ -45,9 +96,33 @@ public class CommonProxy {
     }
 
 	public void preInit(FMLPreInitializationEvent e) {
-		MazeTowers.mazeTowers = new WorldGenMazeTowers();
-		MazeTowers.tabExtra = new ItemExtraTab(CreativeTabs.getNextID(), "extraTab");
+		MazeTowers.TabExtra = new ItemExtraTab(CreativeTabs.getNextID(), "extraTab");
+		MazeTowers.ItemPropertyGetterSpectrite = new IItemPropertyGetter() {
+			
+			public int curFrame = 0;
+			
+	        @Override
+	        @SideOnly(Side.CLIENT)
+	        public float apply(ItemStack stack, World worldIn, EntityLivingBase entityIn) {
+	            boolean flag = entityIn != null;
+	            Entity entity = flag ? entityIn : stack.getItemFrame();
+	            float value = 0.0F;
+	            
+	            if (worldIn == null && entity != null) {
+	                worldIn = entity.worldObj;
+	            }
 
+	            if (worldIn == null) {
+	                return 0.0F;
+	            } else {
+	            	float time = MathHelper.ceiling_float_int((((worldIn.getTotalWorldTime() >> 1) % 36)
+	            		* 0.2777F) * 1000F) / 10000F;
+	                curFrame = Math.round(time * 36);
+	                return time;
+	            }
+	        }
+	    };
+		
 		MazeTowers.FluidChaoticSludge = new Fluid(
 			"chaoticsludge", new ResourceLocation(
 				"mazetowers:blocks/chaotic_sludge_still"),
@@ -73,18 +148,22 @@ public class CommonProxy {
 		MazeTowers.BlockMemoryPistonExtensionOff = new BlockMemoryPistonMovingOff(
 			"memory_piston_extension_off");
 		(MazeTowers.BlockHiddenButton = new BlockHiddenButton()).setUnlocalizedName("quartz_button");
-		(MazeTowers.BlockIronChest = new BlockMineralChest(2))
+		(MazeTowers.BlockIronChest = new BlockMineralChest(Type.IRON))
     		.setUnlocalizedName("iron_chest");
-    	(MazeTowers.BlockGoldChest = new BlockMineralChest(3))
+    	(MazeTowers.BlockGoldChest = new BlockMineralChest(Type.GOLD))
     		.setUnlocalizedName("gold_chest");
-    	(MazeTowers.BlockDiamondChest = new BlockMineralChest(4))
+    	(MazeTowers.BlockDiamondChest = new BlockMineralChest(Type.DIAMOND))
     		.setUnlocalizedName("diamond_chest");
-    	(MazeTowers.BlockTrappedIronChest = new BlockMineralChest(5))
+    	(MazeTowers.BlockSpectriteChest = new BlockMineralChest(Type.SPECTRITE))
+			.setUnlocalizedName("spectrite_chest");
+    	(MazeTowers.BlockTrappedIronChest = new BlockMineralChest(Type.IRON_TRAPPED))
         	.setUnlocalizedName("iron_chest_trapped");
-        (MazeTowers.BlockTrappedGoldChest = new BlockMineralChest(6))
+        (MazeTowers.BlockTrappedGoldChest = new BlockMineralChest(Type.GOLD_TRAPPED))
         	.setUnlocalizedName("gold_chest_trapped");
-        (MazeTowers.BlockTrappedDiamondChest = new BlockMineralChest(7))
+        (MazeTowers.BlockTrappedDiamondChest = new BlockMineralChest(Type.DIAMOND_TRAPPED))
         	.setUnlocalizedName("diamond_chest_trapped");
+        (MazeTowers.BlockTrappedSpectriteChest = new BlockMineralChest(Type.SPECTRITE_TRAPPED))
+    		.setUnlocalizedName("spectrite_chest_trapped");
 		(MazeTowers.BlockPackedIceStairs = new BlockExtraStairs(
 			Blocks.packed_ice.getDefaultState()))
 			.setUnlocalizedName("packed_ice_stairs");
@@ -152,6 +231,11 @@ public class CommonProxy {
 			.setUnlocalizedName("redstone_clock_inverted");
 		(MazeTowers.BlockExplosiveCreeperSkull = new BlockExplosiveCreeperSkull())
 			.setUnlocalizedName("explosive_creeper_skull");
+		(MazeTowers.BlockSpectriteOre = new BlockSpectriteOre())
+			.setHardness(6.0F).setResistance(10.0F).setUnlocalizedName("spectrite_ore");
+		(MazeTowers.BlockSpectrite = new BlockSpectrite())
+			.setHardness(10.0F).setResistance(15.0F).setUnlocalizedName("spectrite_block")
+			.setCreativeTab(CreativeTabs.tabBlock);
 		(MazeTowers.BlockSpecialMobSpawner = new BlockSpecialMobSpawner())
 			.setUnlocalizedName("special_mob_spawner");
 		(MazeTowers.BlockVendorSpawner = new BlockVendorSpawner())
@@ -161,36 +245,61 @@ public class CommonProxy {
 		MazeTowers.FluidChaoticSludge
 			.setUnlocalizedName(MazeTowers.BlockChaoticSludge
 				.getUnlocalizedName());
-		(MazeTowers.ItemKey = new ItemKey()).setUnlocalizedName("key");
+		(MazeTowers.ItemColoredKey = new ItemColoredKey()).setUnlocalizedName("key");
+		(MazeTowers.ItemSpectriteKey = new ItemSpectriteKey()).setUnlocalizedName("spectrite_key");
+		(MazeTowers.ItemDiamondRod = new ItemDiamondRod())
+			.setUnlocalizedName("diamond_rod")
+			.setCreativeTab(CreativeTabs.tabMaterials);
 		(MazeTowers.ItemRAM = new ItemRAM()).setUnlocalizedName("ram");
 		(MazeTowers.ItemPrismarineDoor = new ItemDoor(
 			MazeTowers.BlockPrismarineDoor))
 			.setUnlocalizedName("prismarine_brick_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemQuartzDoor = new ItemDoor(
 			MazeTowers.BlockQuartzDoor))
 			.setUnlocalizedName("quartz_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemEndStoneDoor = new ItemDoor(
 			MazeTowers.BlockEndStoneDoor))
 			.setUnlocalizedName("end_stone_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemPurpurDoor = new ItemDoor(
 			MazeTowers.BlockPurpurDoor))
 			.setUnlocalizedName("purpur_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemObsidianDoor = new ItemDoor(
 			MazeTowers.BlockObsidianDoor))
 			.setUnlocalizedName("obsidian_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemBedrockDoor = new ItemDoor(
 			MazeTowers.BlockBedrockDoor))
 			.setUnlocalizedName("bedrock_door_item")
-			.setCreativeTab(MazeTowers.tabExtra);
+			.setCreativeTab(MazeTowers.TabExtra);
+		(MazeTowers.ItemSpectriteGem = new ItemSpectriteGem())
+			.setUnlocalizedName("spectrite_gem")
+			.setCreativeTab(CreativeTabs.tabMaterials);
+		MazeTowers.SPECTRITE_TOOL.setRepairItem(new ItemStack(MazeTowers.ItemSpectriteGem));
+		MazeTowers.SPECTRITE.customCraftingMaterial = MazeTowers.ItemSpectriteGem;
+		(MazeTowers.ItemSpectriteOrb = new ItemSpectriteOrb())
+			.setUnlocalizedName("spectrite_orb");
 		(MazeTowers.ItemExplosiveArrow = new ItemExplosiveArrow())
 			.setUnlocalizedName("explosive_arrow");
 		(MazeTowers.ItemExplosiveBow = new ItemExplosiveBow())
 			.setUnlocalizedName("explosive_bow");
+		(MazeTowers.ItemSpectritePickaxe = new ItemSpectritePickaxe())
+			.setUnlocalizedName("spectrite_pickaxe");
+		(MazeTowers.ItemSpectriteSword = new ItemSpectriteSword())
+			.setUnlocalizedName("spectrite_sword");
+		(MazeTowers.ItemSpectriteKeySword = new ItemSpectriteKeySword())
+			.setUnlocalizedName("spectrite_key_sword");
+		(MazeTowers.ItemSpectriteHelmet = new ItemSpectriteArmor(EntityEquipmentSlot.HEAD))
+			.setUnlocalizedName("spectrite_helmet");
+		(MazeTowers.ItemSpectriteChestplate = new ItemSpectriteArmor(EntityEquipmentSlot.CHEST))
+			.setUnlocalizedName("spectrite_chestplate");
+		(MazeTowers.ItemSpectriteLeggings = new ItemSpectriteArmor(EntityEquipmentSlot.LEGS))
+			.setUnlocalizedName("spectrite_leggings");
+		(MazeTowers.ItemSpectriteBoots = new ItemSpectriteArmor(EntityEquipmentSlot.FEET))
+			.setUnlocalizedName("spectrite_boots");
 		(MazeTowers.ItemExplosiveCreeperSkull = new ItemExplosiveCreeperSkull())
 			.setUnlocalizedName("explosive_creeper_skull_item");
 		(MazeTowers.ItemChaoticSludgeBucket = new ItemChaoticSludgeBucket())
@@ -205,6 +314,12 @@ public class CommonProxy {
 		MazeTowers.TileEntityMineralChest = new TileEntityMineralChest();
 		MazeTowers.TileEntitySpecialMobSpawner = new TileEntitySpecialMobSpawner();
 		MazeTowers.TileEntityWebSpiderSpawner = new TileEntityWebSpiderSpawner();
+		MazeTowers.mazeTowers = new WorldGenMazeTowers();
+		MazeTowers.spectrite = new WorldGenSpectrite();
+		CapabilityManager.INSTANCE.register(IMazeTowerCapability.class,
+			new PlayerMazeTower.DefaultImpl.Storage(),
+			PlayerMazeTower.DefaultImpl.class);
+		ModSounds.initSounds();
 		ModBlocks.createBlocks();
 		ModItems.createItems();
 		ModTileEntities.initTileEntities();

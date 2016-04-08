@@ -16,7 +16,7 @@ import com.samuel.mazetowers.blocks.BlockItemScanner;
 import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 import com.samuel.mazetowers.etc.ContainerItemScanner;
 import com.samuel.mazetowers.packets.PacketActivateItemScanner;
-import com.samuel.mazetowers.tileentities.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
 
 @SideOnly(Side.CLIENT)
 public class GuiItemScanner extends GuiContainer {
@@ -106,7 +106,7 @@ public class GuiItemScanner extends GuiContainer {
 		throws IOException {
 		if (button.id == 0) {
 			TileEntityItemScanner te = ((TileEntityItemScanner) this.scannerInv);
-			((BlockItemScanner) MazeTowers.BlockItemScanner)
+			MazeTowers.BlockItemScanner
 				.setStateBasedOnMatchResult(te.getWorld(),
 					te.getPos(), te.getWorld()
 						.getBlockState(te.getPos()), true);

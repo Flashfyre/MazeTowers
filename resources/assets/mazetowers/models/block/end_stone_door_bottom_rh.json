@@ -1,7 +1,7 @@
 {
     "parent": "block/door_bottom_rh",
     "textures": {
-        "bottom": "mazetowers:blocks/door_end_stone_lower",
-        "top": "mazetowers:blocks/door_end_stone_lower"
+        "bottom": "mazetowers:blocks/door_end_stone_brick_lower",
+        "top": "mazetowers:blocks/door_end_stone_brick_lower"
     }
 }

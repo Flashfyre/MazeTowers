@@ -2,11 +2,11 @@ package com.samuel.mazetowers.blocks;
 
 import java.util.Random;
 
-import com.samuel.mazetowers.MazeTowers;
-
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+
+import com.samuel.mazetowers.MazeTowers;
 
 public class BlockExtraStairs extends BlockStairs {
 
@@ -17,7 +17,7 @@ public class BlockExtraStairs extends BlockStairs {
 		if (modelState == Blocks.packed_ice
 			.getDefaultState())
 			this.slipperiness = 0.98F;
-		this.setCreativeTab(MazeTowers.tabExtra);
+		this.setCreativeTab(MazeTowers.TabExtra);
 	}
 
 	@Override

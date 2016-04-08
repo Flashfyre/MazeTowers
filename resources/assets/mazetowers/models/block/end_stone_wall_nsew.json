@@ -1,7 +1,0 @@
-{
-    "parent": "block/wall_nsew",
-    "textures": {
-        "wall": "blocks/end_stone",
-		"top": "blocks/end_stone"
-    }
-}

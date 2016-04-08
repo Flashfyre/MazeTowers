@@ -2,8 +2,8 @@ package com.samuel.mazetowers.packets;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -44,7 +44,7 @@ public class PacketDebugMessage implements IMessage {
 				@Override
 				public void run() {
 					Minecraft.getMinecraft().thePlayer
-						.addChatMessage(new ChatComponentText(
+						.addChatMessage(new TextComponentString(
 							message.text));
 				}
 			});

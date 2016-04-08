@@ -4,33 +4,48 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockButton;
-import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.UnlistedPropertyCopiedBlock;
 
-public class BlockHiddenButton extends BlockVendorTradeable {
+public class BlockHiddenButton extends Block {
 
+	protected static final AxisAlignedBB AABB_DOWN_OFF = new AxisAlignedBB(0.3125D, 0.875D, 0.375D, 0.6875D, 1.0D, 0.625D);
+    protected static final AxisAlignedBB AABB_UP_OFF = new AxisAlignedBB(0.3125D, 0.0D, 0.375D, 0.6875D, 0.125D, 0.625D);
+    protected static final AxisAlignedBB AABB_NORTH_OFF = new AxisAlignedBB(0.3125D, 0.375D, 0.875D, 0.6875D, 0.625D, 1.0D);
+    protected static final AxisAlignedBB AABB_SOUTH_OFF = new AxisAlignedBB(0.3125D, 0.375D, 0.0D, 0.6875D, 0.625D, 0.125D);
+    protected static final AxisAlignedBB AABB_WEST_OFF = new AxisAlignedBB(0.875D, 0.375D, 0.3125D, 1.0D, 0.625D, 0.6875D);
+    protected static final AxisAlignedBB AABB_EAST_OFF = new AxisAlignedBB(0.0D, 0.375D, 0.3125D, 0.125D, 0.625D, 0.6875D);
+    protected static final AxisAlignedBB AABB_DOWN_ON = new AxisAlignedBB(0.3125D, 0.9375D, 0.375D, 0.6875D, 1.0D, 0.625D);
+    protected static final AxisAlignedBB AABB_UP_ON = new AxisAlignedBB(0.3125D, 0.0D, 0.375D, 0.6875D, 0.0625D, 0.625D);
+    protected static final AxisAlignedBB AABB_NORTH_ON = new AxisAlignedBB(0.3125D, 0.375D, 0.9375D, 0.6875D, 0.625D, 1.0D);
+    protected static final AxisAlignedBB AABB_SOUTH_ON = new AxisAlignedBB(0.3125D, 0.375D, 0.0D, 0.6875D, 0.625D, 0.0625D);
+    protected static final AxisAlignedBB AABB_WEST_ON = new AxisAlignedBB(0.9375D, 0.375D, 0.3125D, 1.0D, 0.625D, 0.6875D);
+    protected static final AxisAlignedBB AABB_EAST_ON = new AxisAlignedBB(0.0D, 0.375D, 0.3125D, 0.0625D, 0.625D, 0.6875D);
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing");
 	public static final PropertyBool POWERED = PropertyBool
@@ -48,7 +63,7 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 	 */
 
 	public BlockHiddenButton() {
-		super(MazeTowers.solidCircuits, 1, 6, 9, 25, 250);
+		super(MazeTowers.solidCircuits);
 		IExtendedBlockState state = ((IExtendedBlockState) this.blockState
 			.getBaseState()).withProperty(COPIEDBLOCK,
 			Blocks.quartz_block.getDefaultState());
@@ -59,36 +74,33 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 		setTickRandomly(true);
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
-	public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.SOLID;
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.SOLID;
 	}
 
 	@Override
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public int getRenderType() {
-		return 3;
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		IProperty[] listedProperties = new IProperty[] {
-			FACING, POWERED };
-		IUnlistedProperty[] unlistedProperties = { COPIEDBLOCK };
-		return new ExtendedBlockState(this,
-			listedProperties, unlistedProperties);
+	protected BlockStateContainer createBlockState() {
+		return (new BlockStateContainer.Builder(this)).add(FACING).add(POWERED).add(COPIEDBLOCK).build();
 	}
 
 	@Override
@@ -118,7 +130,7 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 	public int getMetaFromState(IBlockState state) {
 		int i;
 
-		switch ((EnumFacing) state.getValue(FACING)) {
+		switch (state.getValue(FACING)) {
 		case EAST:
 			i = 2;
 			break;
@@ -138,18 +150,12 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 			i = 0;
 		}
 
-		if (((Boolean) state.getValue(POWERED))
+		if (state.getValue(POWERED)
 			.booleanValue()) {
 			i += 6;
 		}
 
 		return i;
-	}
-
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(
-		World worldIn, BlockPos pos, IBlockState state) {
-		return null;
 	}
 
 	@Override
@@ -181,22 +187,18 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 
 		return false;
 	}
-
-	protected static boolean func_181088_a(
-		World p_181088_0_, BlockPos p_181088_1_,
+	
+	protected static boolean func_181088_a(World p_181088_0_, BlockPos p_181088_1_,
 		EnumFacing p_181088_2_) {
-		return p_181088_2_ == EnumFacing.DOWN
-			&& World.doesBlockHaveSolidTopSurface(
-				p_181088_0_, p_181088_1_.down()) ? true
-			: p_181088_0_.isSideSolid(p_181088_1_
-				.offset(p_181088_2_), p_181088_2_
-				.getOpposite());
-	}
+        BlockPos blockpos = p_181088_1_.offset(p_181088_2_);
+        return p_181088_0_.getBlockState(blockpos).isSideSolid(p_181088_0_, blockpos, p_181088_2_.getOpposite());
+    }
 
 	/**
 	 * Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World worldIn,
 		BlockPos pos, EnumFacing facing, float hitX,
 		float hitY, float hitZ, int meta,
@@ -218,7 +220,7 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 		BlockPos pos, IBlockState state, Block neighborBlock) {
 		if (this.checkForDrop(worldIn, pos, state)
 			&& !func_181088_a(worldIn, pos,
-				((EnumFacing) state.getValue(FACING))
+				state.getValue(FACING)
 					.getOpposite())) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
@@ -237,97 +239,70 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 	}
 
 	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		this.updateBlockBounds(worldIn.getBlockState(pos));
-	}
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        EnumFacing enumfacing = state.getValue(FACING);
+        boolean flag = state.getValue(POWERED).booleanValue();
 
-	private void updateBlockBounds(IBlockState state) {
-		EnumFacing enumfacing = (EnumFacing) state
-			.getValue(FACING);
-		boolean flag = ((Boolean) state.getValue(POWERED))
-			.booleanValue();
-		float f = 0.25F;
-		float f1 = 0.375F;
-		float f2 = (float) (flag ? 1 : 2) / 16.0F;
-		float f3 = 0.125F;
-		float f4 = 0.1875F;
-
-		switch (enumfacing) {
-		case EAST:
-			this.setBlockBounds(0.0F, 0.375F, 0.3125F, f2,
-				0.625F, 0.6875F);
-			break;
-		case WEST:
-			this.setBlockBounds(1.0F - f2, 0.375F, 0.3125F,
-				1.0F, 0.625F, 0.6875F);
-			break;
-		case SOUTH:
-			this.setBlockBounds(0.3125F, 0.375F, 0.0F,
-				0.6875F, 0.625F, f2);
-			break;
-		case NORTH:
-			this.setBlockBounds(0.3125F, 0.375F, 1.0F - f2,
-				0.6875F, 0.625F, 1.0F);
-			break;
-		case UP:
-			this.setBlockBounds(0.3125F, 0.0F, 0.375F,
-				0.6875F, 0.0F + f2, 0.625F);
-			break;
-		case DOWN:
-			this.setBlockBounds(0.3125F, 1.0F - f2, 0.375F,
-				0.6875F, 1.0F, 0.625F);
-		}
-	}
+        switch (enumfacing)
+        {
+            case EAST:
+                return flag ? AABB_EAST_ON : AABB_EAST_OFF;
+            case WEST:
+                return flag ? AABB_WEST_ON : AABB_WEST_OFF;
+            case SOUTH:
+                return flag ? AABB_SOUTH_ON : AABB_SOUTH_OFF;
+            case NORTH:
+            default:
+                return flag ? AABB_NORTH_ON : AABB_NORTH_OFF;
+            case UP:
+                return flag ? AABB_UP_ON : AABB_UP_OFF;
+            case DOWN:
+                return flag ? AABB_DOWN_ON : AABB_DOWN_OFF;
+        }
+    }
 
 	@Override
-	public boolean onBlockActivated(World worldIn,
-		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
-		if (((Boolean) state.getValue(POWERED))
-			.booleanValue()) {
-			return true;
-		} else {
-			worldIn.setBlockState(pos, state.withProperty(
-				POWERED, Boolean.valueOf(true)), 3);
-			worldIn.markBlockRangeForRenderUpdate(pos, pos);
-			worldIn.playSoundEffect(
-				(double) pos.getX() + 0.5D, (double) pos
-					.getY() + 0.5D,
-				(double) pos.getZ() + 0.5D, "random.click",
-				0.3F, 0.6F);
-			this.notifyNeighbors(worldIn, pos,
-				(EnumFacing) state.getValue(FACING));
-			worldIn.scheduleUpdate(pos, this, this
-				.tickRate(worldIn));
-			return true;
-		}
-	}
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+        if (state.getValue(POWERED).booleanValue())
+        {
+            return true;
+        }
+        else
+        {
+            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(true)), 3);
+            worldIn.markBlockRangeForRenderUpdate(pos, pos);
+            //this.func_185615_a(playerIn, worldIn, pos);
+            this.notifyNeighbors(worldIn, pos, state.getValue(FACING));
+            worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+            return true;
+        }
+    }
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos,
 		IBlockState state) {
-		if (((Boolean) state.getValue(POWERED))
+		if (state.getValue(POWERED)
 			.booleanValue()) {
 			this.notifyNeighbors(worldIn, pos,
-				(EnumFacing) state.getValue(FACING));
+				state.getValue(FACING));
 		}
 
 		super.breakBlock(worldIn, pos, state);
 	}
 
 	@Override
-	public int isProvidingWeakPower(IBlockAccess worldIn,
-		BlockPos pos, IBlockState state, EnumFacing side) {
-		return ((Boolean) state.getValue(POWERED))
+	public int getWeakPower(IBlockState state, IBlockAccess worldIn,
+		BlockPos pos, EnumFacing side) {
+		return state.getValue(POWERED)
 			.booleanValue() ? 15 : 0;
 	}
 
 	@Override
-	public int isProvidingStrongPower(IBlockAccess worldIn,
-		BlockPos pos, IBlockState state, EnumFacing side) {
-		return !((Boolean) state.getValue(POWERED))
+	public int getStrongPower(IBlockState state, IBlockAccess worldIn,
+		BlockPos pos, EnumFacing side) {
+		return !state.getValue(POWERED)
 			.booleanValue() ? 0
 			: (state.getValue(FACING) == side ? 15 : 0);
 	}
@@ -336,7 +311,7 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 	/**
 	 * Can this block provide power. Only wire currently seems to have this change based on its state.
 	 */
-	public boolean canProvidePower() {
+	public boolean canProvidePower(IBlockState state) {
 		return true;
 	}
 
@@ -349,38 +324,18 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 	}
 
 	@Override
-	public void updateTick(World worldIn, BlockPos pos,
-		IBlockState state, Random rand) {
-		if (!worldIn.isRemote) {
-			if (((Boolean) state.getValue(POWERED))
-				.booleanValue()) {
-				worldIn.setBlockState(pos, state
-					.withProperty(POWERED, Boolean
-						.valueOf(false)));
-				this.notifyNeighbors(worldIn, pos,
-					(EnumFacing) state.getValue(FACING));
-				worldIn.playSoundEffect(
-					(double) pos.getX() + 0.5D,
-					(double) pos.getY() + 0.5D,
-					(double) pos.getZ() + 0.5D,
-					"random.click", 0.3F, 0.5F);
-				worldIn.markBlockRangeForRenderUpdate(pos,
-					pos);
-			}
-		}
-	}
-
-	@Override
-	/**
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		float f = 0.1875F;
-		float f1 = 0.125F;
-		float f2 = 0.125F;
-		this.setBlockBounds(0.5F - f, 0.5F - f1, 0.5F - f2,
-			0.5F + f, 0.5F + f1, 0.5F + f2);
-	}
+	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    {
+        if (!worldIn.isRemote)
+        {
+            if (state.getValue(POWERED).booleanValue())
+            {
+                worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(false)));
+                this.notifyNeighbors(worldIn, pos, state.getValue(FACING));
+                worldIn.markBlockRangeForRenderUpdate(pos, pos);
+            }
+        }
+    }
 
 	@Override
 	/**
@@ -396,6 +351,26 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 		worldIn.notifyNeighborsOfStateChange(pos
 			.offset(facing.getOpposite()), this);
 	}
+	
+	@Override
+	/**
+     * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withRotation(IBlockState state, Rotation rot)
+    {
+        return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
+    }
+
+	@Override
+    /**
+     * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
+    {
+        return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
+    }
 
 	@Override
 	/**
@@ -435,7 +410,7 @@ public class BlockHiddenButton extends BlockVendorTradeable {
 		final IBlockState normal = Blocks.quartz_block
 			.getStateFromMeta(3);
 		EnumFacing facing = world.getBlockState(blockPos)
-			.getValue(BlockButton.FACING);
+			.getValue(BlockDirectional.FACING);
 		IBlockState connState = null;
 
 		if ((connState = world.getBlockState(blockPos

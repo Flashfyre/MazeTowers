@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "mazetowers:items/spectrite_sword/7"
+    }
+}

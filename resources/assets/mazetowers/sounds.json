@@ -1,8 +1,9 @@
 {
-	"door_locked": { "category": "block", "sounds": ["mazetowers:door_locked"] },
-	"door_unlock": { "category": "block", "sounds": ["mazetowers:door_unlock"] },
-	"correct": { "category": "block", "sounds": ["mazetowers:correct"] },
-	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"] },
-	"primed": { "category": "block", "sounds": ["mazetowers:primed"] },
-	"charge": { "category": "block", "sounds": ["mazetowers:charge"] }
+	"door_locked": { "category": "block", "sounds": ["mazetowers:door_locked"], "subtitle": "subtitle.door_locked" },
+	"door_unlock": { "category": "block", "sounds": ["mazetowers:door_unlock"], "subtitle": "subtitle.door_unlock" },
+	"correct": { "category": "block", "sounds": ["mazetowers:correct"], "subtitle": "subtitle.correct" },
+	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"], "subtitle": "subtitle.incorrect" },
+	"primed": { "category": "block", "sounds": ["mazetowers:primed"], "subtitle": "subtitle.primed" },
+	"charge": { "category": "block", "sounds": ["mazetowers:charge"], "subtitle": "subtitle.charge" },
+	"fatality": { "category": "block", "sounds": ["mazetowers:fatality1", "mazetowers:fatality2", "mazetowers:fatality3"], "subtitle": "subtitle.fatality" }
 }

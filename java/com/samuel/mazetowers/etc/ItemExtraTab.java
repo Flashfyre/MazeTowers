@@ -13,7 +13,8 @@ public final class ItemExtraTab extends CreativeTabs {
         super(par1, par2Str);
     }
 
-    @SideOnly(Side.CLIENT)
+    @Override
+	@SideOnly(Side.CLIENT)
     public Item getTabIconItem() {
         return Item.getItemFromBlock(MazeTowers.BlockStoneBrickWall);
     }

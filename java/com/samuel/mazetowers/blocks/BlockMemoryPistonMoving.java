@@ -7,22 +7,24 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
 
 public class BlockMemoryPistonMoving extends BlockContainer {
 
@@ -86,14 +88,14 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	 */
 	public void onBlockDestroyedByPlayer(World worldIn,
 		BlockPos pos, IBlockState state) {
-		BlockPos blockpos = pos.offset(((EnumFacing) state
-			.getValue(FACING)).getOpposite());
+		BlockPos blockpos = pos.offset(state
+			.getValue(FACING).getOpposite());
 		IBlockState iblockstate = worldIn
 			.getBlockState(blockpos);
 
 		if (iblockstate.getBlock() instanceof BlockMemoryPistonBase
-			&& ((Boolean) iblockstate
-				.getValue(BlockMemoryPistonBase.EXTENDED))
+			&& iblockstate
+				.getValue(BlockMemoryPistonBase.EXTENDED)
 				.booleanValue()) {
 			worldIn.setBlockToAir(blockpos);
 		}
@@ -103,20 +105,20 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
 	public boolean onBlockActivated(World worldIn,
 		BlockPos pos, IBlockState state,
-		EntityPlayer playerIn, EnumFacing side, float hitX,
-		float hitY, float hitZ) {
+		EntityPlayer playerIn, EnumHand hand, ItemStack stack,
+		EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote
 			&& worldIn.getTileEntity(pos) == null) {
 			worldIn.setBlockToAir(pos);
@@ -125,6 +127,15 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 			return false;
 		}
 	}
+	
+	@Override
+	/**
+     * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
+     */
+    public RayTraceResult collisionRayTrace(IBlockState blockState, World worldIn, BlockPos pos, Vec3d start, Vec3d end)
+    {
+        return null;
+    }
 
 	@Override
 	/**
@@ -153,18 +164,6 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 
 	@Override
 	/**
-	 * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
-	 *  
-	 * @param start The start vector
-	 * @param end The end vector
-	 */
-	public MovingObjectPosition collisionRayTrace(
-		World worldIn, BlockPos pos, Vec3 start, Vec3 end) {
-		return null;
-	}
-
-	@Override
-	/**
 	 * Called when a neighboring block changes.
 	 */
 	public void onNeighborBlockChange(World worldIn,
@@ -173,141 +172,39 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 			worldIn.getTileEntity(pos);
 		}
 	}
+	
+	@Override
+	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
+    {
+        return null;
+    }
+	
+	@Override
+	public AxisAlignedBB getSelectedBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
+    {
+        TileEntityMemoryPiston tileentitypiston = this.func_185589_c(worldIn, pos);
+        return tileentitypiston == null ? null : tileentitypiston.func_184321_a(worldIn, pos);
+    }
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(
-		World worldIn, BlockPos pos, IBlockState state) {
-		TileEntityMemoryPiston tileentitypiston = this
-			.getTileEntity(worldIn, pos);
-
-		if (tileentitypiston == null) {
-			return null;
-		} else {
-			float f = tileentitypiston.getProgress(0.0F);
-
-			if (tileentitypiston.isExtending()) {
-				f = 1.0F - f;
-			}
-
-			return this.getBoundingBox(worldIn, pos,
-				tileentitypiston.getPistonState(), f,
-				tileentitypiston.getFacing());
-		}
-	}
-
-	@Override
-	public void setBlockBoundsBasedOnState(
-		IBlockAccess worldIn, BlockPos pos) {
-		TileEntityMemoryPiston tileentitypiston = this
-			.getTileEntity(worldIn, pos);
-
-		if (tileentitypiston != null) {
-			IBlockState iblockstate = tileentitypiston
-				.getPistonState();
-			Block block = iblockstate.getBlock();
-
-			if (block == this
-				|| block.getMaterial() == Material.air) {
-				return;
-			}
-
-			float f = tileentitypiston.getProgress(0.0F);
-
-			if (tileentitypiston.isExtending()) {
-				f = 1.0F - f;
-			}
-
-			block.setBlockBoundsBasedOnState(worldIn, pos);
-
-			if (block instanceof BlockMemoryPistonBase) {
-				f = 0.0F;
-			}
-
-			EnumFacing enumfacing = tileentitypiston
-				.getFacing();
-			this.minX = block.getBlockBoundsMinX()
-				- (double) ((float) enumfacing
-					.getFrontOffsetX() * f);
-			this.minY = block.getBlockBoundsMinY()
-				- (double) ((float) enumfacing
-					.getFrontOffsetY() * f);
-			this.minZ = block.getBlockBoundsMinZ()
-				- (double) ((float) enumfacing
-					.getFrontOffsetZ() * f);
-			this.maxX = block.getBlockBoundsMaxX()
-				- (double) ((float) enumfacing
-					.getFrontOffsetX() * f);
-			this.maxY = block.getBlockBoundsMaxY()
-				- (double) ((float) enumfacing
-					.getFrontOffsetY() * f);
-			this.maxZ = block.getBlockBoundsMaxZ()
-				- (double) ((float) enumfacing
-					.getFrontOffsetZ() * f);
-		}
-	}
-
-	public AxisAlignedBB getBoundingBox(World worldIn,
-		BlockPos pos, IBlockState extendingBlock,
-		float progress, EnumFacing direction) {
-		if (extendingBlock.getBlock() != this
-			&& extendingBlock.getBlock().getMaterial() != Material.air) {
-			AxisAlignedBB axisalignedbb = extendingBlock
-				.getBlock().getCollisionBoundingBox(
-					worldIn, pos, extendingBlock);
-
-			if (axisalignedbb == null) {
-				return null;
-			} else {
-				double d0 = axisalignedbb.minX;
-				double d1 = axisalignedbb.minY;
-				double d2 = axisalignedbb.minZ;
-				double d3 = axisalignedbb.maxX;
-				double d4 = axisalignedbb.maxY;
-				double d5 = axisalignedbb.maxZ;
-
-				if (direction.getFrontOffsetX() < 0) {
-					d0 -= (double) ((float) direction
-						.getFrontOffsetX() * progress);
-				} else {
-					d3 -= (double) ((float) direction
-						.getFrontOffsetX() * progress);
-				}
-
-				if (direction.getFrontOffsetY() < 0) {
-					d1 -= (double) ((float) direction
-						.getFrontOffsetY() * progress);
-				} else {
-					d4 -= (double) ((float) direction
-						.getFrontOffsetY() * progress);
-				}
-
-				if (direction.getFrontOffsetZ() < 0) {
-					d2 -= (double) ((float) direction
-						.getFrontOffsetZ() * progress);
-				} else {
-					d5 -= (double) ((float) direction
-						.getFrontOffsetZ() * progress);
-				}
-
-				return new AxisAlignedBB(d0, d1, d2, d3,
-					d4, d5);
-			}
-		} else {
-			return null;
-		}
-	}
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        TileEntityMemoryPiston tileentitypiston = this.func_185589_c(source, pos);
+        return tileentitypiston != null ? tileentitypiston.func_184321_a(source, pos) : FULL_BLOCK_AABB;
+    }
+	
+	private TileEntityMemoryPiston func_185589_c(IBlockAccess p_185589_1_, BlockPos p_185589_2_)
+    {
+        TileEntity tileentity = p_185589_1_.getTileEntity(p_185589_2_);
+        return tileentity instanceof TileEntityMemoryPiston ?
+        	(TileEntityMemoryPiston)tileentity : null;
+    }
 
 	private static TileEntityMemoryPiston getTileEntity(
 		IBlockAccess worldIn, BlockPos pos) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity instanceof TileEntityMemoryPiston ?
 			(TileEntityMemoryPiston) tileentity : null;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World worldIn, BlockPos pos) {
-		return null;
 	}
 
 	@Override
@@ -326,15 +223,35 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	public int getMetaFromState(IBlockState state) {
 		int i = 0;
 		i = i
-			| ((EnumFacing) state.getValue(FACING))
+			| state.getValue(FACING)
 				.getIndex();
 
 		return i;
 	}
+	
+	@Override
+	/**
+     * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withRotation(IBlockState state, Rotation rot)
+    {
+        return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
+    }
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this,
+    /**
+     * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
+     * blockstate.
+     */
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
+    {
+        return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
+    }
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this,
 			new IProperty[] { FACING });
 	}
 
@@ -342,7 +259,7 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	public java.util.List<net.minecraft.item.ItemStack> getDrops(
 		IBlockAccess world, BlockPos pos,
 		IBlockState state, int fortune) {
-		TileEntityMemoryPiston tileentitypiston = this
+		TileEntityMemoryPiston tileentitypiston = BlockMemoryPistonMoving
 			.getTileEntity(world, pos);
 		if (tileentitypiston != null) {
 			IBlockState pushed = tileentitypiston

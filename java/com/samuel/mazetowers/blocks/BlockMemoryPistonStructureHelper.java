@@ -3,14 +3,16 @@ package com.samuel.mazetowers.blocks;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.EnumPushReaction;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import com.google.common.collect.Lists;
-import com.samuel.mazetowers.tileentities.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
 
 public class BlockMemoryPistonStructureHelper {
 	private final World world;
@@ -40,25 +42,26 @@ public class BlockMemoryPistonStructureHelper {
 
 	public boolean canMove(int pushCount) {
 		this.toMove.clear();
-		this.toDestroy.clear();
-		Block block = this.world.getBlockState(
-			this.blockToMove).getBlock();
+        this.toDestroy.clear();
+        IBlockState iblockstate = this.world.getBlockState(this.blockToMove);
 
-		if (!BlockMemoryPistonBase.canPush(block,
-			this.world, this.blockToMove,
-			this.moveDirection, false)) {
-			if (block.getMobilityFlag() != 1) {
-				return false;
-			} else {
-				this.toDestroy.add(this.blockToMove);
-				return true;
-			}
+        if (!BlockMemoryPistonBase.func_185646_a(iblockstate, this.world, this.blockToMove, this.moveDirection, false))
+        {
+            if (iblockstate.getMobilityFlag() != EnumPushReaction.DESTROY)
+            {
+                return false;
+            }
+            else
+            {
+                this.toDestroy.add(this.blockToMove);
+                return true;
+            }
 		} else if (!this.func_177251_a(this.blockToMove,
 			pushCount)) {
 			return false;
 		} else {
 			for (int i = 0; i < this.toMove.size(); ++i) {
-				BlockPos blockpos = (BlockPos) this.toMove
+				BlockPos blockpos = this.toMove
 					.get(i);
 
 				if (this.world.getBlockState(blockpos)
@@ -75,12 +78,13 @@ public class BlockMemoryPistonStructureHelper {
 
 	private boolean func_177251_a(BlockPos origin,
 		int pushCount) {
-		Block block = this.world.getBlockState(origin)
-			.getBlock();
+		
+		IBlockState iblockstate = this.world.getBlockState(origin);
+		Block block = iblockstate.getBlock();
 
-		if (block.isAir(world, origin)) {
+		if (block.isAir(iblockstate, world, origin)) {
 			return true;
-		} else if (!BlockMemoryPistonBase.canPush(block,
+		} else if (!BlockMemoryPistonBase.func_185646_a(iblockstate,
 			this.world, origin, this.moveDirection, false)) {
 			return true;
 		} else if (origin.equals(this.pistonPos)) {
@@ -101,13 +105,13 @@ public class BlockMemoryPistonStructureHelper {
 					: null;
 
 				while (i < pushCount
-					&& !(block = this.world.getBlockState(
+					&& !(block = (iblockstate = this.world.getBlockState(
 						blockpos = origin.offset(
 							this.moveDirection
 								.getOpposite(), i))
-						.getBlock()).isAir(world, blockpos)
-					&& (BlockMemoryPistonBase.canPush(
-						block, this.world, blockpos,
+						).getBlock()).isAir(iblockstate, world, blockpos)
+					&& (BlockMemoryPistonBase.func_185646_a(
+						iblockstate, this.world, blockpos,
 						this.moveDirection, false) || ((TileEntityMemoryPiston) world
 						.getTileEntity(this.pistonPos))
 						.isExtending())
@@ -144,7 +148,7 @@ public class BlockMemoryPistonStructureHelper {
 						this.func_177255_a(i1, k);
 
 						for (int l = 0; l <= k + i1; ++l) {
-							BlockPos blockpos2 = (BlockPos) this.toMove
+							BlockPos blockpos2 = this.toMove
 								.get(l);
 
 							if (this.world.getBlockState(
@@ -158,21 +162,21 @@ public class BlockMemoryPistonStructureHelper {
 						return true;
 					}
 
-					block = this.world.getBlockState(
-						blockpos1).getBlock();
+					iblockstate = this.world.getBlockState(blockpos1);
+					block = iblockstate.getBlock();
 
-					if (block.isAir(world, blockpos1)) {
+					if (block.isAir(iblockstate, world, blockpos1)) {
 						return true;
 					}
 
-					if (!BlockMemoryPistonBase.canPush(
-						block, this.world, blockpos1,
+					if (!BlockMemoryPistonBase.func_185646_a(
+						iblockstate, this.world, blockpos1,
 						this.moveDirection, true)
 						|| blockpos1.equals(this.pistonPos)) {
 						return false;
 					}
 
-					if (block.getMobilityFlag() == 1) {
+					if (iblockstate.getMobilityFlag() == EnumPushReaction.DESTROY) {
 						this.toDestroy.add(blockpos1);
 						return true;
 					}

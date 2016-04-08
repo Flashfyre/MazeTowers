@@ -1,11 +1,10 @@
 package com.samuel.mazetowers.eventhandlers;
 
-import java.io.IOException;
-
-import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.IRetexturableModel;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.samuel.mazetowers.etc.HiddenButtonModel;
@@ -23,9 +22,9 @@ public class ModelBakeEventHandler {
 
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
-		Object plateObj = event.modelRegistry
+		Object plateObj = event.getModelRegistry()
 			.getObject(HiddenPressurePlateWeightedModel.modelResourceLocationUp);
-		Object buttonObj = event.modelRegistry
+		Object buttonObj = event.getModelRegistry()
 			.getObject(HiddenPressurePlateWeightedModel.modelResourceLocationUp);
 		IBakedModel existingModel;
 		if (plateObj instanceof IBakedModel) {
@@ -33,24 +32,22 @@ public class ModelBakeEventHandler {
 			IRetexturableModel modelPlateDown = null;
 			existingModel = (IBakedModel) plateObj;
 			try {
-				modelPlateUp = (IRetexturableModel) event.modelLoader
-					.getModel(new ResourceLocation(
-						"block/heavy_pressure_plate_up"));
-				modelPlateDown = (IRetexturableModel) event.modelLoader
-					.getModel(new ResourceLocation(
-						"block/heavy_pressure_plate_down"));
-			} catch (IOException e) {
+				modelPlateUp = (IRetexturableModel) ModelLoaderRegistry
+					.getModel(new ResourceLocation("block/heavy_pressure_plate_up"));
+				modelPlateDown = (IRetexturableModel) ModelLoaderRegistry
+					.getModel(new ResourceLocation("block/heavy_pressure_plate_down"));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			HiddenPressurePlateWeightedModel customModelPlate = new HiddenPressurePlateWeightedModel(
 				modelPlateUp, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenPressurePlateWeightedModel.modelResourceLocationUp,
 					customModelPlate);
 			customModelPlate = new HiddenPressurePlateWeightedModel(
 				modelPlateDown, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenPressurePlateWeightedModel.modelResourceLocationDown,
 					customModelPlate);
@@ -70,108 +67,108 @@ public class ModelBakeEventHandler {
 			IRetexturableModel modelButtonNPressed = null;
 			existingModel = (IBakedModel) buttonObj;
 			try {
-				modelButtonU = (IRetexturableModel) event.modelLoader
+				modelButtonU = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_u"));
-				modelButtonD = (IRetexturableModel) event.modelLoader
+				modelButtonD = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_d"));
-				modelButtonE = (IRetexturableModel) event.modelLoader
+				modelButtonE = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_e"));
-				modelButtonW = (IRetexturableModel) event.modelLoader
+				modelButtonW = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_w"));
-				modelButtonS = (IRetexturableModel) event.modelLoader
+				modelButtonS = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_s"));
-				modelButtonN = (IRetexturableModel) event.modelLoader
+				modelButtonN = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_n"));
-				modelButtonUPressed = (IRetexturableModel) event.modelLoader
+				modelButtonUPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_u_pressed"));
-				modelButtonDPressed = (IRetexturableModel) event.modelLoader
+				modelButtonDPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_d_pressed"));
-				modelButtonEPressed = (IRetexturableModel) event.modelLoader
+				modelButtonEPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_e_pressed"));
-				modelButtonWPressed = (IRetexturableModel) event.modelLoader
+				modelButtonWPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_w_pressed"));
-				modelButtonSPressed = (IRetexturableModel) event.modelLoader
+				modelButtonSPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_s_pressed"));
-				modelButtonNPressed = (IRetexturableModel) event.modelLoader
+				modelButtonNPressed = (IRetexturableModel) ModelLoaderRegistry
 					.getModel(new ResourceLocation(
 						"mazetowers:block/quartz_button_n_pressed"));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			HiddenButtonModel customModelButton = new HiddenButtonModel(
 				modelButtonU, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationU,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonD, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationD,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonW, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationW,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonE, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationE,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonS, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationS,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonN, existingModel);
-			event.modelRegistry.putObject(
+			event.getModelRegistry().putObject(
 				HiddenButtonModel.modelResourceLocationN,
 				customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonUPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationUPressed,
 					customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonDPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationDPressed,
 					customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonEPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationEPressed,
 					customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonWPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationWPressed,
 					customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonSPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationSPressed,
 					customModelButton);
 			customModelButton = new HiddenButtonModel(
 				modelButtonNPressed, existingModel);
-			event.modelRegistry
+			event.getModelRegistry()
 				.putObject(
 					HiddenButtonModel.modelResourceLocationNPressed,
 					customModelButton);

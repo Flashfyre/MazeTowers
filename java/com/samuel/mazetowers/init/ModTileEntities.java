@@ -2,7 +2,19 @@ package com.samuel.mazetowers.init;
 
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import com.samuel.mazetowers.tileentities.*;
+import com.samuel.mazetowers.tileentity.TileEntityChaoticSludgeToxin;
+import com.samuel.mazetowers.tileentity.TileEntityCircuitBreaker;
+import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
+import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
+import com.samuel.mazetowers.tileentity.TileEntityLock;
+import com.samuel.mazetowers.tileentity.TileEntityMazeTowerThreshold;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
+import com.samuel.mazetowers.tileentity.TileEntityMemoryPistonMemory;
+import com.samuel.mazetowers.tileentity.TileEntityMineralChest;
+import com.samuel.mazetowers.tileentity.TileEntityRedstoneClock;
+import com.samuel.mazetowers.tileentity.TileEntitySpecialMobSpawner;
+import com.samuel.mazetowers.tileentity.TileEntityVendorSpawner;
+import com.samuel.mazetowers.tileentity.TileEntityWebSpiderSpawner;
 
 public class ModTileEntities {
 

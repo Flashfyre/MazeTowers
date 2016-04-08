@@ -1,0 +1,28 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "mazetowers:items/spectrite_sword/0"
+    },
+    "overrides": [
+        { "predicate": { "damage": 1.0 }, "model": "mazetowers:item/spectrite_sword" },
+        { "predicate": { "damage": 0.95 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_01" },
+        { "predicate": { "damage": 0.9 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_02" },
+        { "predicate": { "damage": 0.85 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_03" },
+        { "predicate": { "damage": 0.8 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_04" },
+        { "predicate": { "damage": 0.75 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_05" },
+        { "predicate": { "damage": 0.7 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_06" },
+        { "predicate": { "damage": 0.65 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_07" },
+        { "predicate": { "damage": 0.6 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_08" },
+        { "predicate": { "damage": 0.55 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_09" },
+        { "predicate": { "damage": 0.5 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_10" },
+        { "predicate": { "damage": 0.45 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_11" },
+        { "predicate": { "damage": 0.4 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_12" },
+        { "predicate": { "damage": 0.35 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_13" },
+        { "predicate": { "damage": 0.3 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_14" },
+        { "predicate": { "damage": 0.25 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_15" },
+        { "predicate": { "damage": 0.2 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_16" },
+        { "predicate": { "damage": 0.15 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_17" },
+        { "predicate": { "damage": 0.1 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_18" },
+        { "predicate": { "damage": 0.05 }, "model": "mazetowers:item/spectrite_sword/spectrite_sword_19" }
+    ]
+}
