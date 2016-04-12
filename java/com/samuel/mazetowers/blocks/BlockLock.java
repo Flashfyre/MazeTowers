@@ -119,7 +119,7 @@ public class BlockLock extends Block implements IMetaBlockName,
     			1, ((TileEntityLock) worldIn.getTileEntity(pos)).getTypeIndex())) ||
     			heldItem.getItem() == ModItems.key_spectrite ||
     			ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.spectrite_key_sword)));
-    		if (holdingKey) {
+    		if (!holdingKey) {
     			worldIn.playSound(hitX, hitY, hitZ, ModSounds.door_locked,
     				SoundCategory.BLOCKS, 1.0F, 1.0F, true);
     		} else {

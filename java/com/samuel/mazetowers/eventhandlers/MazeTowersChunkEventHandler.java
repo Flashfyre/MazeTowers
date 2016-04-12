@@ -24,9 +24,8 @@ public class MazeTowersChunkEventHandler {
 		// e.world.provider.getDimension());
 		World world = e.getWorld();
 		int dimId = world.provider.getDimension(),
-		towerChance = e.getRand().nextInt(dimId == 0 ? 32
-			: dimId == -1 ? 64 : 128);
-		if ((Math.abs(e.getChunkX()) % 8 == 0 && (Math.abs(e.getChunkZ()) % 8 == 0) &&
+		towerChance = dimId == 0 ? 8 : dimId == -1 ? 12 : 16;
+		if ((Math.abs(e.getChunkX()) % towerChance == 0 && (Math.abs(e.getChunkZ()) % towerChance == 0) &&
 			!e.isHasVillageGenerated()) && (dimId != 1 || e.getChunkX() != 0 || e.getChunkZ() != 0)) {
 			WorldGenMazeTowers mt = MazeTowers.mazeTowers;
 			int chunkIndex;

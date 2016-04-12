@@ -39,7 +39,10 @@ This mob contains many additional blocks and items to enhance the gameplay exper
 Walls made from Vanilla blocks that don't yet have their own wall type. There are walls for the following blocks: sandstone, red sandstone, stone brick, mossy stone brick, packed ice, prismarine bricks, quartz block, end stone, purpur block, obsidian, and bedrock.
 
 ### Extra Stairs **(Compatible with Texture Packs)**
-Walls made from Vanilla blocks that don't yet have their own stair type. There are stairs for the following blocks: packed ice, prismarine bricks, end stone bricks, obsidian and bedrock.
+Walls made from Vanilla blocks that don't yet have their own stair type. There are stairs for the following blocks: packed ice, mycelium, prismarine bricks, end stone bricks, obsidian and bedrock.
+
+### Extra Slabs **(Compatible with Texture Packs)**
+Slabs made from Vanilla blocks that don't yet have their own slab type. There are slabs for the following blocks: packed ice, mycelium, prismarine bricks, end stone bricks, obsidian and bedrock.
 
 ### Extra Doors
 Doors made from Vanilla blocks that don't yet have their own door type. There are doors for the following blocks: prismarine bricks, quartz block, end stone bricks, purpur block, obsidian, and bedrock.
@@ -138,5 +141,6 @@ A special creeper with the explosive power of a charged normal creeper. When cha
 ## What Still Needs to Be Done?
 
 * Chest loot list needs to be completed
+* All smelting recipes and missing crafting recipes need to be added
 * Possible additional features may be added depending on how much they enhance the gameplay
 * Block protection data corruption bug needs to be fixed

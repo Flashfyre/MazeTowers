@@ -25,30 +25,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockChaoticSludge;
-import com.samuel.mazetowers.blocks.BlockExplosiveCreeperSkull;
-import com.samuel.mazetowers.blocks.BlockExtraDoor;
-import com.samuel.mazetowers.blocks.BlockExtraStairs;
-import com.samuel.mazetowers.blocks.BlockExtraWall;
-import com.samuel.mazetowers.blocks.BlockHiddenButton;
-import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.blocks.BlockItemScanner;
-import com.samuel.mazetowers.blocks.BlockItemScannerGold;
-import com.samuel.mazetowers.blocks.BlockLock;
-import com.samuel.mazetowers.blocks.BlockMazeTowerThreshold;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonBase;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonBaseOff;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonExtension;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonExtensionOff;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonMoving;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonMovingOff;
-import com.samuel.mazetowers.blocks.BlockMineralChest;
+import com.samuel.mazetowers.blocks.*;
 import com.samuel.mazetowers.blocks.BlockMineralChest.Type;
-import com.samuel.mazetowers.blocks.BlockRedstoneClock;
-import com.samuel.mazetowers.blocks.BlockSpecialMobSpawner;
-import com.samuel.mazetowers.blocks.BlockSpectrite;
-import com.samuel.mazetowers.blocks.BlockSpectriteOre;
-import com.samuel.mazetowers.blocks.BlockVendorSpawner;
 import com.samuel.mazetowers.client.gui.GuiHandlerItemScanner;
 import com.samuel.mazetowers.etc.IMazeTowerCapability;
 import com.samuel.mazetowers.etc.ItemExtraTab;
@@ -61,30 +39,8 @@ import com.samuel.mazetowers.init.ModItems;
 import com.samuel.mazetowers.init.ModSounds;
 import com.samuel.mazetowers.init.ModTileEntities;
 import com.samuel.mazetowers.init.ModWorldGen;
-import com.samuel.mazetowers.items.ItemChaoticSludgeBucket;
-import com.samuel.mazetowers.items.ItemColoredKey;
-import com.samuel.mazetowers.items.ItemDiamondRod;
-import com.samuel.mazetowers.items.ItemExplosiveArrow;
-import com.samuel.mazetowers.items.ItemExplosiveBow;
-import com.samuel.mazetowers.items.ItemExplosiveCreeperSkull;
-import com.samuel.mazetowers.items.ItemRAM;
-import com.samuel.mazetowers.items.ItemSpectriteArmor;
-import com.samuel.mazetowers.items.ItemSpectriteGem;
-import com.samuel.mazetowers.items.ItemSpectriteKey;
-import com.samuel.mazetowers.items.ItemSpectriteKeySword;
-import com.samuel.mazetowers.items.ItemSpectriteOrb;
-import com.samuel.mazetowers.items.ItemSpectritePickaxe;
-import com.samuel.mazetowers.items.ItemSpectriteSword;
-import com.samuel.mazetowers.tileentity.TileEntityCircuitBreaker;
-import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
-import com.samuel.mazetowers.tileentity.TileEntityItemScanner;
-import com.samuel.mazetowers.tileentity.TileEntityLock;
-import com.samuel.mazetowers.tileentity.TileEntityMazeTowerThreshold;
-import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
-import com.samuel.mazetowers.tileentity.TileEntityMemoryPistonMemory;
-import com.samuel.mazetowers.tileentity.TileEntityMineralChest;
-import com.samuel.mazetowers.tileentity.TileEntitySpecialMobSpawner;
-import com.samuel.mazetowers.tileentity.TileEntityWebSpiderSpawner;
+import com.samuel.mazetowers.items.*;
+import com.samuel.mazetowers.tileentity.*;
 import com.samuel.mazetowers.world.WorldGenMazeTowers;
 import com.samuel.mazetowers.world.WorldGenSpectrite;
 
@@ -164,9 +120,15 @@ public class CommonProxy {
         	.setUnlocalizedName("diamond_chest_trapped");
         (MazeTowers.BlockTrappedSpectriteChest = new BlockMineralChest(Type.SPECTRITE_TRAPPED))
     		.setUnlocalizedName("spectrite_chest_trapped");
+        (MazeTowers.BlockExtraHalfSlab = new BlockExtraHalfSlab()).setUnlocalizedName("half_slab");
+        (MazeTowers.BlockExtraDoubleSlab = new BlockExtraDoubleSlab())
+    		.setUnlocalizedName("double_slab");
 		(MazeTowers.BlockPackedIceStairs = new BlockExtraStairs(
 			Blocks.packed_ice.getDefaultState()))
 			.setUnlocalizedName("packed_ice_stairs");
+		(MazeTowers.BlockMyceliumStairs = new BlockExtraStairs(
+			Blocks.mycelium.getDefaultState()))
+			.setUnlocalizedName("mycelium_stairs");
 		(MazeTowers.BlockPrismarineBrickStairs = new BlockExtraStairs(
 			Blocks.prismarine.getStateFromMeta(1)))
 			.setUnlocalizedName("prismarine_brick_stairs");
@@ -204,7 +166,7 @@ public class CommonProxy {
 			Blocks.end_stone))
 			.setUnlocalizedName("end_stone_wall");
 		(MazeTowers.BlockPurpurWall = new BlockExtraWall(
-			Blocks.end_stone))
+			Blocks.purpur_block))
 			.setUnlocalizedName("purpur_wall");
 		(MazeTowers.BlockObsidianWall = new BlockExtraWall(
 			Blocks.obsidian))

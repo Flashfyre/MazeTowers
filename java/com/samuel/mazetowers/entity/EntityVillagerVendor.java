@@ -168,8 +168,8 @@ public class EntityVillagerVendor extends EntityVillager {
 	
 	private int getRandomPrice(IVendorTradable item) {
 		
-		return IVendorTradable.minPrice == IVendorTradable.maxPrice ? IVendorTradable.minPrice :
-			rand.nextInt(IVendorTradable.maxPrice - IVendorTradable.minPrice) + IVendorTradable.minPrice;
+		return item.minPrice == item.maxPrice ? item.minPrice :
+			rand.nextInt(item.maxPrice - item.minPrice) + item.minPrice;
 	}
 	
 	public EnumTowerType getTowerType() {

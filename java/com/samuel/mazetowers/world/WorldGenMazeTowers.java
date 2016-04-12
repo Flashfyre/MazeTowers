@@ -32,6 +32,7 @@ import net.minecraft.block.BlockLever;
 import net.minecraft.block.BlockLever.EnumOrientation;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockRedstoneRepeater;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.block.BlockStairs;
@@ -61,6 +62,7 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -85,6 +87,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.google.common.collect.Multimap;
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockExtraDoor;
+import com.samuel.mazetowers.blocks.BlockExtraSlab;
 import com.samuel.mazetowers.blocks.BlockHiddenButton;
 import com.samuel.mazetowers.blocks.BlockItemScanner;
 import com.samuel.mazetowers.blocks.BlockLock;
@@ -481,7 +484,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		final EnumTowerType towerType;
 		final BlockPos pos;
 		final Block trapDoorBlock = Blocks.iron_trapdoor;
-		IBlockState ceilBlock = null, wallBlock = null, wallBlock_external = null, floorBlock = null, fenceBlock = null;
+		IBlockState ceilBlock = null, wallBlock = null, wallBlock_external = null,
+		wallBlock_corner = null, floorBlock = null, slabBlock = null, fenceBlock = null;
 		IBlockState[] stairsBlock = new IBlockState[4];
 		final EnumDyeColor[] dyeColorList, beaconGlassColorList;
 		final List<MazeTowerBase> towersList = towers[dimId + 1];
@@ -508,6 +512,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getDefaultState();
 				floorBlock = Blocks.stonebrick
 					.getStateFromMeta(3);
+				slabBlock = Blocks.stone_slab.getStateFromMeta(5);
 				stairsBlock = new IBlockState[] {
 					Blocks.stone_brick_stairs
 						.getStateFromMeta(0),
@@ -519,7 +524,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getDefaultState() };
 				if (biomeName.indexOf("Taiga") != -1) {
 					wallBlock_external = Blocks.stonebrick
-						.getStateFromMeta(2);
+						.getStateFromMeta(1);
 					fenceBlock = MazeTowers.BlockMossyStoneBrickWall
 						.getDefaultState();
 				} else
@@ -534,6 +539,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getStateFromMeta(2);
 				floorBlock = Blocks.quartz_block
 					.getStateFromMeta(1);
+				slabBlock = Blocks.stone_slab.getStateFromMeta(7);
 				stairsBlock = new IBlockState[] {
 					Blocks.quartz_stairs
 						.getStateFromMeta(0),
@@ -553,6 +559,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getDefaultState();
 				floorBlock = Blocks.obsidian
 					.getDefaultState();
+				slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.OBSIDIAN.ordinal());
 				stairsBlock = new IBlockState[] {
 					MazeTowers.BlockObsidianStairs
 						.getStateFromMeta(0),
@@ -573,6 +580,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getDefaultState();
 				floorBlock = Blocks.bedrock
 					.getDefaultState();
+				slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.BEDROCK.ordinal());
 				stairsBlock = new IBlockState[] {
 					MazeTowers.BlockBedrockStairs
 						.getStateFromMeta(0),
@@ -597,6 +605,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(1);
 					floorBlock = Blocks.planks
 						.getStateFromMeta(1);
+					slabBlock = Blocks.wooden_slab.getStateFromMeta(1);
 					stairsBlock = new IBlockState[] {
 						Blocks.spruce_stairs
 							.getStateFromMeta(0),
@@ -616,6 +625,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(2);
 					floorBlock = Blocks.planks
 						.getStateFromMeta(2);
+					slabBlock = Blocks.wooden_slab.getStateFromMeta(2);
 					stairsBlock = new IBlockState[] {
 						Blocks.birch_stairs
 							.getStateFromMeta(0),
@@ -635,6 +645,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(3);
 					floorBlock = Blocks.planks
 						.getStateFromMeta(3);
+					slabBlock = Blocks.wooden_slab.getStateFromMeta(3);
 					stairsBlock = new IBlockState[] {
 						Blocks.jungle_stairs
 							.getStateFromMeta(0),
@@ -654,6 +665,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(0);
 					floorBlock = Blocks.planks
 						.getStateFromMeta(4);
+					slabBlock = Blocks.wooden_slab.getStateFromMeta(4);
 					stairsBlock = new IBlockState[] {
 						Blocks.acacia_stairs
 							.getStateFromMeta(0),
@@ -675,6 +687,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(2);
 					floorBlock = Blocks.sandstone
 						.getStateFromMeta(2);
+					slabBlock = Blocks.stone_slab.getStateFromMeta(1);
 					stairsBlock = new IBlockState[] {
 						Blocks.sandstone_stairs
 							.getStateFromMeta(0),
@@ -697,6 +710,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(2);
 					floorBlock = Blocks.red_sandstone
 						.getStateFromMeta(2);
+					slabBlock = Blocks.stone_slab2.getDefaultState();
 					stairsBlock = new IBlockState[] {
 						Blocks.red_sandstone_stairs
 							.getStateFromMeta(0),
@@ -721,14 +735,15 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getDefaultState();
 					floorBlock = Blocks.packed_ice
 						.getDefaultState();
+					slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.PACKED_ICE.ordinal());
 					stairsBlock = new IBlockState[] {
-						Blocks.stone_brick_stairs
+						ModBlocks.packedIceStairs
 							.getStateFromMeta(0),
-						Blocks.stone_brick_stairs
+						ModBlocks.packedIceStairs
 							.getStateFromMeta(2),
-						Blocks.stone_brick_stairs
+						ModBlocks.packedIceStairs
 							.getStateFromMeta(1),
-						Blocks.stone_brick_stairs
+						ModBlocks.packedIceStairs
 							.getDefaultState() };
 					fenceBlock = MazeTowers.BlockPackedIceWall
 						.getDefaultState();
@@ -744,6 +759,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getDefaultState();
 					floorBlock = Blocks.planks
 						.getDefaultState();
+					slabBlock = Blocks.wooden_slab.getDefaultState();
 					stairsBlock = new IBlockState[] {
 						Blocks.oak_stairs
 							.getStateFromMeta(0),
@@ -769,14 +785,15 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(15);
 					floorBlock = Blocks.mycelium
 						.getDefaultState();
+					slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.MYCELIUM.ordinal());
 					stairsBlock = new IBlockState[] {
-						Blocks.stone_brick_stairs
+						ModBlocks.myceliumStairs
 							.getStateFromMeta(0),
-						Blocks.stone_brick_stairs
+						ModBlocks.myceliumStairs
 							.getStateFromMeta(2),
-						Blocks.stone_brick_stairs
+						ModBlocks.myceliumStairs
 							.getStateFromMeta(1),
-						Blocks.stone_brick_stairs
+						ModBlocks.myceliumStairs
 							.getDefaultState() };
 					fenceBlock = wallBlock;
 					towerType = isRed ? EnumTowerType.RED_MUSHROOM :
@@ -788,6 +805,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getStateFromMeta(1);
 					floorBlock = Blocks.planks
 						.getStateFromMeta(5);
+					slabBlock = Blocks.wooden_slab.getStateFromMeta(5);
 					stairsBlock = new IBlockState[] {
 						Blocks.dark_oak_stairs
 							.getStateFromMeta(0),
@@ -808,6 +826,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					wallBlock_external = Blocks.prismarine
 						.getStateFromMeta(1);
 					floorBlock = wallBlock_external;
+					slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.PRISMARINE_BRICK.ordinal());
 					stairsBlock = new IBlockState[] {
 						MazeTowers.BlockPrismarineBrickStairs
 							.getStateFromMeta(0),
@@ -828,6 +847,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						.getDefaultState();
 					floorBlock = Blocks.cobblestone
 						.getDefaultState();
+					slabBlock = Blocks.stone_slab.getStateFromMeta(3);
 					stairsBlock = new IBlockState[] {
 						Blocks.stone_stairs
 							.getStateFromMeta(0),
@@ -857,6 +877,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getDefaultState();
 				floorBlock = Blocks.netherrack
 					.getDefaultState();
+				slabBlock = Blocks.stone_slab.getStateFromMeta(6);
 				stairsBlock = new IBlockState[] {
 					Blocks.nether_brick_stairs
 						.getStateFromMeta(0),
@@ -877,6 +898,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
     					.getDefaultState();
     				floorBlock = Blocks.end_bricks
     					.getDefaultState();
+    				slabBlock = ModBlocks.extraSlabHalf.getStateFromMeta(BlockExtraSlab.EnumType.END_STONE_BRICK.ordinal());
     				stairsBlock = new IBlockState[] {
     					MazeTowers.BlockEndStoneStairs
     						.getStateFromMeta(0),
@@ -894,8 +916,11 @@ public class WorldGenMazeTowers implements IWorldGenerator {
     					.getDefaultState();
     				wallBlock = Blocks.purpur_pillar
     					.getDefaultState();
+    				wallBlock_external = Blocks.purpur_block.getDefaultState();
+    				wallBlock_corner = Blocks.purpur_pillar.getDefaultState();
     				floorBlock = Blocks.purpur_block
     					.getDefaultState();
+    				slabBlock = Blocks.purpur_slab.getDefaultState();
     				stairsBlock = new IBlockState[] {
     					Blocks.purpur_stairs
     						.getStateFromMeta(0),
@@ -913,6 +938,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 		if (wallBlock_external == null)
 			wallBlock_external = wallBlock;
+		if (wallBlock_corner == null)
+			wallBlock_corner = wallBlock_external;
 		difficulty = towerType.getBaseDifficulty();
 		rarity = towerType.getBaseRarity();
 		
@@ -922,8 +949,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 		long startTime = System.nanoTime(), endTime;
 		MazeTower newTower = new MazeTower(x, py, z,
-			ceilBlock, wallBlock, wallBlock_external,
-			floorBlock, fenceBlock, stairsBlock, isUnderground,
+			ceilBlock, wallBlock, wallBlock_external, wallBlock_corner,
+			floorBlock, slabBlock, fenceBlock, stairsBlock, isUnderground,
 			hasXEntrance, towerType, dimId + 1, towersList.size());
 		endTime = (System.nanoTime() - startTime) / 1000000;
 		MazeTowers.network.sendToDimension(
@@ -992,8 +1019,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				tower.removeMiniTowers(worldIn);
 				tower = new MazeTower(x, y, z,
 					tower.ceilBlock, tower.wallBlock,
-					tower.wallBlock_external,
-					tower.floorBlock, tower.fenceBlock,
+					tower.wallBlock_external, tower.wallBlock_corner,
+					tower.floorBlock, tower.slabBlock, tower.fenceBlock,
 					tower.stairsBlock, tower.isUnderground,
 					rand.nextBoolean(), tower.towerType, dimId, t);
 				tower.initPaths();
@@ -1099,9 +1126,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 
 		public int getRarity(int floor) {
-			return rarity
-				+ (int) Math
-					.floor((Math.min(floor, floors) - 1) / 5);
+			return rarity + (int) Math.floor((Math.min(floor, floors) - 1) / 5);
 		}
 
 		public String getInfoString() {
@@ -1118,9 +1143,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				rareStr += arrow + EnumLevel.getStringFromLevel(Math
 					.min(rarity + addToLevel, 9), true);
 			}
-			return String.format("%1$14s", diffStr)
-				+ TextFormatting.RESET + "/"
-				+ String.format("%1$-14s", rareStr);
+			return String.format(" %1$13s", diffStr)
+				+ TextFormatting.RESET + "  "
+				+ String.format("%1$-13s ", rareStr);
 		}
 
 		public Chunk getChunk(World worldIn) {
@@ -1185,14 +1210,14 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			RED_SANDSTONE("Red Sandstone"), COBBLESTONE("Cobblestone"),
 			STONE_BRICK("Stone Brick"), ICE("Ice"), RED_MUSHROOM("Red Mushroom"),
 			BROWN_MUSHROOM("Brown Mushroom"), NETHER_BRICK("Nether Brick"),
-			QUARTZ("Quartz"), PRISMARINE("Prismarine"), END_STONE_BRICK("End Stone Brick"),
+			/*BRICK("Brick"), */QUARTZ("Quartz"), PRISMARINE("Prismarine"), END_STONE_BRICK("End Stone Brick"),
 			OBSIDIAN("Obsidian"), PURPUR("Purpur"), BEDROCK("Bedrock");
 
 			private final String name;
 			private static final int[] baseDifficulty = new int[] {
-				0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6
+				0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, /*4, */4, 4, 5, 5, 6, 6
 			}, baseRarity = new int[] {
-				0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 5, 5, 3, 4, 5, 4, 5, 5, 6
+				0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 5, 5, 3, /*4, */4, 5, 4, 5, 5, 6
 			};
 			private static final BlockDoor ironDoor = (BlockDoor) Blocks.iron_door;
 			private static final BlockDoor[] doorBlocks = new BlockDoor[] {
@@ -1200,7 +1225,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				(BlockDoor) Blocks.birch_door, (BlockDoor) Blocks.jungle_door,
 				(BlockDoor) Blocks.acacia_door, (BlockDoor) Blocks.dark_oak_door,
 				ironDoor, ironDoor, ironDoor, ironDoor, ironDoor, ironDoor, ironDoor,
-				ironDoor, MazeTowers.BlockQuartzDoor, MazeTowers.BlockPrismarineDoor,
+				ironDoor, /*ironDoor, */MazeTowers.BlockQuartzDoor, MazeTowers.BlockPrismarineDoor,
 				MazeTowers.BlockEndStoneDoor, MazeTowers.BlockObsidianDoor,
 				MazeTowers.BlockPurpurDoor, MazeTowers.BlockBedrockDoor
 			};
@@ -1308,8 +1333,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		public final int exitX, exitZ;
 		public final Block doorBlock;
 		public IBlockState air;
-		public final IBlockState ceilBlock, wallBlock,
-		wallBlock_external, floorBlock, fenceBlock;
+		public final IBlockState ceilBlock, wallBlock, wallBlock_external,
+		wallBlock_corner, floorBlock, slabBlock, fenceBlock;
 		public final IBlockState[] stairsBlock;
 		private final EnumFacing entranceDir;
 		private final EnumDyeColor[] dyeColors,
@@ -1336,8 +1361,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		
 		private MazeTower(int x, int y, int z,
 			IBlockState ceilBlock, IBlockState wallBlock,
-			IBlockState wallBlock_external,
-			IBlockState floorBlock, IBlockState fenceBlock,
+			IBlockState wallBlock_external, IBlockState wallBlock_corner,
+			IBlockState floorBlock, IBlockState slabBlock, IBlockState fenceBlock,
 			IBlockState[] stairsBlocks, boolean isUnderground,
 			boolean hasXEntrance, EnumTowerType towerType,
 			int dimId, int towerIndex) {
@@ -1359,7 +1384,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			this.ceilBlock = ceilBlock;
 			this.wallBlock = wallBlock;
 			this.wallBlock_external = wallBlock_external;
+			this.wallBlock_corner = wallBlock_corner;
 			this.floorBlock = floorBlock;
+			this.slabBlock = slabBlock;
 			this.fenceBlock = fenceBlock;
 			this.stairsBlock = stairsBlocks;
 			this.doorBlock = towerType.getDoorBlock();
@@ -1528,10 +1555,10 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			for (y = 0; y < yLimit; y++) {
 				for (z = 0; z < xzLimit; z++) {
 					for (x = 0; x < xzLimit; x++) {
-						final boolean isEdge = x == 0
-							|| x == 15 || z == 0 || z == 15;
+						final boolean isEdge = x == 0 || x == 15 || z == 0 || z == 15,
+						isEdgeCorner = isEdge && ((x == 0 || x == 15) && (z == 0 || z == 15));
 						if (isEdge)
-							data[y][z][x] = wallBlock_external;
+							data[y][z][x] = !isEdgeCorner ? wallBlock_external : wallBlock_corner;
 						else if (y % 6 == 0 || y % 6 == 4
 							|| y == yLimit - 1 || x == 0
 							|| z == 0 || x == xzLimit - 1
@@ -2089,6 +2116,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					}
 				}
 			}
+			addTowerDecorations(worldIn);
 			final Path entrancePath = paths.get(0);
 			final EnumFacing entranceDir = entrancePath
 				.getDir();
@@ -2319,6 +2347,103 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					worldIn.setBlockState(pos2.up(3).offset(sideDirR), wallBlock_external, 2);
 					worldIn.setBlockState(pos2.up(3).offset(sideDirR, 2), fenceBlock, 2);
 					isFirstStair = false;
+				}
+			}
+		}
+		
+		private void addTowerDecorations(World worldIn) {
+			if (towerType == EnumTowerType.PURPUR) { 
+				buildFloorDecoration(worldIn, new int[] { 7, 8 }, new int[] { 1, 3, 5 },
+					stairsBlock[1], true);
+				buildFloorDecoration(worldIn, new int[] { -1, 0, 1, 4, 5, 10, 11, 14, 15, 16 }, new int[] { 5 },
+					stairsBlock[1].withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP), true);
+				buildFloorDecoration(worldIn, new int[] { 2, 3, 6, 9, 12, 13 }, new int[] { 5 },
+					stairsBlock[1], true);
+				buildFloorDecoration(worldIn, new int[] { -1, 16 }, new int[] { !isUnderground ? 6 : 4  },
+					Blocks.end_rod.getDefaultState(), false);
+			} else {
+				final int[] allCoords = new int[] { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+				oddCoords = new int[] { -1, 1, 3, 5, 7, 8, 10, 12, 14, 16 },
+				evenCoords = new int[] { 0, 2, 4, 6, 9, 11, 13, 15 },
+				midCoords = new int[] { 2, 6, 9, 13 };
+				boolean stairChance, stairChance2, stairChance3;
+				final int upperY;
+				stairChance = rand.nextBoolean();
+				stairChance2 = rand.nextBoolean();
+				upperY = stairChance2 ? 2 : 3;
+				IBlockState stateBottom = stairChance ? stairsBlock[1].withProperty(BlockStairs.HALF,
+					BlockStairs.EnumHalf.TOP) : slabBlock, stateTop = stairChance ? stairsBlock[1] :
+					slabBlock.withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.TOP);
+					
+				if (rand.nextBoolean()) {
+					buildFloorDecoration(worldIn, allCoords, new int[] { 1 }, stateBottom, stairChance);
+					buildFloorDecoration(worldIn, allCoords, new int[] { upperY }, stateTop, stairChance);
+				} else {
+					stairChance3 = rand.nextBoolean();
+					buildFloorDecoration(worldIn, oddCoords, new int[] { 1 }, stateBottom, stairChance);
+					buildFloorDecoration(worldIn, evenCoords, new int[] { 1 }, stateTop, stairChance);
+					buildFloorDecoration(worldIn, stairChance3 ? evenCoords : oddCoords, new int[] { upperY }, stateBottom, stairChance);
+					buildFloorDecoration(worldIn, stairChance3 ? oddCoords : evenCoords, new int[] { upperY }, stateTop, stairChance);
+				}
+				if (!stairChance2)
+					buildFloorDecoration(worldIn, allCoords, new int[] { 2 }, wallBlock_external, false);
+				else if (rand.nextBoolean()) {
+					if (rand.nextBoolean()) {
+						stairChance3 = rand.nextBoolean();
+						buildFloorDecoration(worldIn, oddCoords, new int[] { stairChance3 ? rand.nextBoolean() ? 0 : 3 : 0 },
+							fenceBlock, stairChance);
+						if (stairChance3)
+							buildFloorDecoration(worldIn, oddCoords, new int[] { 3 }, fenceBlock, stairChance);
+					} else {
+						buildFloorDecoration(worldIn, midCoords, new int[] { 0 }, stateBottom, stairChance);
+						buildFloorDecoration(worldIn, midCoords, new int[] { 3 }, stateTop, stairChance);
+					}
+				}
+					
+				stairChance = rand.nextBoolean();
+				buildFloorDecoration(worldIn, allCoords, new int[] { stairChance ? stairChance2 ? 3 : 4 : 5 },
+					stairsBlock[1].withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP), true);
+				if (!stairChance2)
+					buildFloorDecoration(worldIn, allCoords, new int[] { 4 }, wallBlock_external, false);
+				buildFloorDecoration(worldIn, allCoords, new int[] { stairChance ? 5 : stairChance2 ? 4 : 3 },
+					stairsBlock[1], true);
+			}
+		}
+		
+		private void buildFloorDecoration(World worldIn, int[] xzCoords, int[] yCoords,
+			IBlockState state, boolean rotateState) {
+			int ix = chunkX << 4, iz = chunkZ << 4;
+			IBlockState[] states = rotateState ? new IBlockState[] { state,
+				state.withRotation(Rotation.CLOCKWISE_180), state.withRotation(Rotation.COUNTERCLOCKWISE_90),
+				state.withRotation(Rotation.CLOCKWISE_90)
+			} : new IBlockState[] { state, state, state, state };
+			for (int f = 0; f <= floors; f++) {
+				for (int yCoord : yCoords) {
+					final int y = yCoord + f * 6;
+					if (y == (6 * floors) + 2 || y == (6 * floors) + 4)
+						continue;
+					for (int xz : xzCoords) {
+						for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+							int x, z;
+							if (dir == EnumFacing.NORTH) {
+								x = xz;
+								z = -1;
+							} else if (dir == EnumFacing.WEST) {
+								x = -1;
+								z = xz;
+							} else if (dir == EnumFacing.SOUTH) {
+								x = xz;
+								z = 16;
+							} else {
+								x = 16;
+								z = xz;
+							}
+							final BlockPos pos = getPosFromCoords(
+								ix, iz, x, y, z);
+							if (f != 0 || yCoord != 2)
+								worldIn.setBlockState(pos, states[dir.ordinal() - 2]);
+						}
+					}
 				}
 			}
 		}
@@ -2664,7 +2789,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private String getEntityNameForSpawn(int floor,
 			boolean isUnderwater) {
 			final boolean useSpecificMob = isUnderwater || ((isNetherTower ||
-				isMushroomTower) && rand.nextInt(3) == 0);
+				isMushroomTower || towerType == EnumTowerType.PURPUR) && rand.nextInt(3) == 0);
 			final int diffIndex = getDifficulty(floor), indexPart = (int) (diffIndex * 0.375);
 			String entityName;
 			
@@ -2673,6 +2798,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					entityName = "Guardian";
 				else if (isNetherTower)
 					entityName = "Skeleton";
+				else if (towerType == EnumTowerType.PURPUR)
+					entityName = "Shulker";
 				else
 					entityName = "MushroomCow";
 			} else {
@@ -3221,7 +3348,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			final boolean hasCornerLamps = rand.nextInt(3) == 0;
 			final int ix = tower.chunkX << 4, iz = tower.chunkZ << 4, difficulty = tower
 				.getDifficulty(floor), diffIndex = Math
-				.min(difficulty + dyeColorIndex, 9);
+				.min(difficulty + dyeColorIndex, 9), rarity = tower.getRarity(floor),
+				rarityIndex = Math.min(rarity + dyeColorIndex, 9);
 			final IBlockState air = Blocks.air
 				.getDefaultState(), glass = tower
 				.getColourBlockState(Blocks.stained_glass,
@@ -3232,10 +3360,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			if (!hasBeacon)
 				mineral = !hasShop ? null : ModBlocks.vendorSpawner
 					.getDefaultState().withProperty(BlockVendorSpawner.VISIBLE, false);
-			else if (diffIndex > 7)
+			else if (rarityIndex > 7)
+				mineral = ModBlocks.spectriteBlock.getDefaultState();
+			else if (rarityIndex > 5)
 				mineral = Blocks.diamond_block
 					.getDefaultState();
-			else if (diffIndex > 5)
+			else if (rarityIndex > 3)
 				mineral = Blocks.gold_block
 					.getDefaultState();
 			else
@@ -5285,12 +5415,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			Path toPath, EnumFacing dir, int distance,
 			int x, int y, int z) {
 			super(tower, fromPath, toPath, dir, distance,
-				x, y, z, xOffset = -1, zOffset = /*
-												  * rand.nextInt(toPath.distance
-												  * - 1) +
-												  */1, 1);
+				x, y, z, xOffset = -1, zOffset = 1, 1);
 			dirSign = (dirIndex % 2 == 0 ? -1 : 1);
-			boolean isLeft = false;// rand.nextBoolean();
+			boolean isLeft = rand.nextBoolean();
 			final IBlockState dispenser = Blocks.dispenser
 				.getDefaultState().withProperty(
 					BlockDispenser.FACING,

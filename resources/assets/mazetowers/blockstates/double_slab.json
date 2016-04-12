@@ -1,0 +1,16 @@
+{
+    "variants": {
+		"seamless=false,variant=packed_ice": { "model": "packed_ice" },
+        "seamless=true,variant=packed_ice": { "model": "packed_ice" },
+		"seamless=false,variant=mycelium": { "model": "mycelium" },
+        "seamless=true,variant=mycelium": { "model": "mycelium" },
+		"seamless=false,variant=prismarine_brick": { "model": "prismarine_bricks" },
+        "seamless=true,variant=prismarine_brick": { "model": "prismarine_bricks" },
+		"seamless=false,variant=end_stone_brick": { "model": "end_bricks" },
+        "seamless=true,variant=end_stone_brick": { "model": "end_bricks" },
+		"seamless=false,variant=obsidian": { "model": "obsidian" },
+        "seamless=true,variant=obsidian":    { "model": "obsidian" },
+        "seamless=false,variant=bedrock": { "model": "bedrock" },
+        "seamless=true,variant=bedrock":  { "model": "bedrock" }
+    }
+}

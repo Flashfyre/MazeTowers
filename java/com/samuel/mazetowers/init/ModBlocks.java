@@ -3,36 +3,8 @@ package com.samuel.mazetowers.init;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockChaoticSludge;
-import com.samuel.mazetowers.blocks.BlockExplosiveCreeperSkull;
-import com.samuel.mazetowers.blocks.BlockExtraDoor;
-import com.samuel.mazetowers.blocks.BlockExtraStairs;
-import com.samuel.mazetowers.blocks.BlockExtraWall;
-import com.samuel.mazetowers.blocks.BlockHiddenButton;
-import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.blocks.BlockItemScanner;
-import com.samuel.mazetowers.blocks.BlockItemScannerGold;
-import com.samuel.mazetowers.blocks.BlockLock;
-import com.samuel.mazetowers.blocks.BlockMazeTowerThreshold;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonBase;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonBaseOff;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonExtension;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonExtensionOff;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonMoving;
-import com.samuel.mazetowers.blocks.BlockMemoryPistonMovingOff;
-import com.samuel.mazetowers.blocks.BlockMineralChest;
-import com.samuel.mazetowers.blocks.BlockRedstoneClock;
-import com.samuel.mazetowers.blocks.BlockSpecialMobSpawner;
-import com.samuel.mazetowers.blocks.BlockSpectrite;
-import com.samuel.mazetowers.blocks.BlockSpectriteOre;
-import com.samuel.mazetowers.blocks.BlockVendorSpawner;
-import com.samuel.mazetowers.items.ItemBlockHiddenButton;
-import com.samuel.mazetowers.items.ItemBlockHiddenPressurePlateWeighted;
-import com.samuel.mazetowers.items.ItemBlockItemScanner;
-import com.samuel.mazetowers.items.ItemBlockLock;
-import com.samuel.mazetowers.items.ItemBlockMemoryPistonOff;
-import com.samuel.mazetowers.items.ItemBlockMeta;
-import com.samuel.mazetowers.items.ItemBlockRedstoneClock;
+import com.samuel.mazetowers.blocks.*;
+import com.samuel.mazetowers.items.*;
 
 public class ModBlocks {
 
@@ -53,7 +25,10 @@ public class ModBlocks {
 	public static BlockMineralChest mineralChestGoldTrapped;
 	public static BlockMineralChest mineralChestDiamondTrapped;
 	public static BlockMineralChest mineralChestSpectriteTrapped;
+	public static BlockExtraHalfSlab extraSlabHalf;
+	public static BlockExtraDoubleSlab extraSlabDouble;
 	public static BlockExtraStairs packedIceStairs;
+	public static BlockExtraStairs myceliumStairs;
 	public static BlockExtraStairs prismarineBrickStairs;
 	public static BlockExtraStairs endStoneStairs;
 	public static BlockExtraStairs obsidianStairs;
@@ -110,8 +85,16 @@ public class ModBlocks {
 			"memory_piston_extension");
 		GameRegistry.registerBlock(memoryPistonExtensionOff =
 			MazeTowers.BlockMemoryPistonExtensionOff, null, "memory_piston_extension_off");
+		extraSlabHalf = MazeTowers.BlockExtraHalfSlab;
+		extraSlabDouble = MazeTowers.BlockExtraDoubleSlab;
+		GameRegistry.registerBlock(extraSlabHalf, ItemBlockExtraSlab.class,
+			"half_slab", extraSlabHalf, extraSlabDouble, false);
+		GameRegistry.registerBlock(extraSlabDouble, null,
+			"double_slab", extraSlabHalf, extraSlabDouble, true);
 		GameRegistry.registerBlock(packedIceStairs = MazeTowers.BlockPackedIceStairs,
 			"packed_ice_stairs");
+		GameRegistry.registerBlock(myceliumStairs = MazeTowers.BlockMyceliumStairs,
+			"mycelium_stairs");
 		GameRegistry.registerBlock(prismarineBrickStairs = MazeTowers.BlockPrismarineBrickStairs,
 			"prismarine_brick_stairs");
 		GameRegistry.registerBlock(endStoneStairs = MazeTowers.BlockEndStoneStairs,

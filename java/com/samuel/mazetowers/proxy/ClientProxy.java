@@ -2,6 +2,7 @@ package com.samuel.mazetowers.proxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPressurePlateWeighted;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.blocks.BlockExtraSlab;
 import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
 import com.samuel.mazetowers.client.renderer.BlockRenderRegister;
 import com.samuel.mazetowers.client.renderer.EntityRenderRegister;
@@ -123,6 +125,13 @@ public class ClientProxy extends CommonProxy {
 			ModelLoader.setCustomModelResourceLocation(Item
 				.getItemFromBlock(MazeTowers.BlockLock), k,
 				new ModelResourceLocation("mazetowers:lock"));
+		}
+		for (int v = 0; v < BlockExtraSlab.EnumType.values().length; v++) {
+			final ModelResourceLocation mrl = new ModelResourceLocation("mazetowers:" +
+				MazeTowers.BlockExtraHalfSlab.getUnlocalizedName(v).substring(5));
+			ModelLoader.setCustomModelResourceLocation(Item
+				.getItemFromBlock(MazeTowers.BlockExtraHalfSlab), v,
+				mrl);
 		}
 		ModelLoader.setCustomModelResourceLocation(Item
 			.getItemFromBlock(MazeTowers.BlockSpectriteOre), 0,

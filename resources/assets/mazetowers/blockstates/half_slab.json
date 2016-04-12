@@ -1,0 +1,16 @@
+{
+    "variants": {
+		"half=bottom,variant=packed_ice": { "model": "mazetowers:half_slab_packed_ice" },
+        "half=top,variant=packed_ice": { "model": "mazetowers:upper_slab_packed_ice" },
+		"half=bottom,variant=mycelium": { "model": "mazetowers:half_slab_mycelium" },
+        "half=top,variant=mycelium": { "model": "mazetowers:upper_slab_mycelium" },
+		"half=bottom,variant=prismarine_brick": { "model": "mazetowers:half_slab_prismarine_brick" },
+        "half=top,variant=prismarine_brick": { "model": "mazetowers:upper_slab_prismarine_brick" },
+		"half=bottom,variant=end_stone_brick": { "model": "mazetowers:half_slab_end_stone_brick" },
+        "half=top,variant=end_stone_brick": { "model": "mazetowers:upper_slab_end_stone_brick" },
+		"half=bottom,variant=obsidian": { "model": "mazetowers:half_slab_obsidian" },
+        "half=top,variant=obsidian": { "model": "mazetowers:upper_slab_obsidian" },
+        "half=bottom,variant=bedrock": { "model": "mazetowers:half_slab_bedrock" },
+        "half=top,variant=bedrock": { "model": "mazetowers:upper_slab_bedrock" }
+    }
+}

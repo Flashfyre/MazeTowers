@@ -30,7 +30,10 @@ public class BlockRenderRegister {
 		reg(ModBlocks.mineralChestGoldTrapped, 0);
 		reg(ModBlocks.mineralChestDiamondTrapped, 0);
 		reg(ModBlocks.mineralChestSpectriteTrapped, 0);
+		//reg(ModBlocks.extraSlabHalf, 0);
+		reg(ModBlocks.extraSlabDouble, 0);
 		reg(ModBlocks.packedIceStairs, 0);
+		reg(ModBlocks.myceliumStairs, 0);
 		reg(ModBlocks.prismarineBrickStairs, 0);
 		reg(ModBlocks.endStoneStairs, 0);
 		reg(ModBlocks.obsidianStairs, 0);
