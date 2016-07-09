@@ -4,20 +4,7 @@ import net.minecraft.item.ItemDoor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.items.ItemChaoticSludgeBucket;
-import com.samuel.mazetowers.items.ItemColoredKey;
-import com.samuel.mazetowers.items.ItemDiamondRod;
-import com.samuel.mazetowers.items.ItemExplosiveArrow;
-import com.samuel.mazetowers.items.ItemExplosiveBow;
-import com.samuel.mazetowers.items.ItemExplosiveCreeperSkull;
-import com.samuel.mazetowers.items.ItemRAM;
-import com.samuel.mazetowers.items.ItemSpectriteArmor;
-import com.samuel.mazetowers.items.ItemSpectriteGem;
-import com.samuel.mazetowers.items.ItemSpectriteKey;
-import com.samuel.mazetowers.items.ItemSpectriteKeySword;
-import com.samuel.mazetowers.items.ItemSpectriteOrb;
-import com.samuel.mazetowers.items.ItemSpectritePickaxe;
-import com.samuel.mazetowers.items.ItemSpectriteSword;
+import com.samuel.mazetowers.items.*;
 
 public class ModItems {
 
@@ -30,14 +17,22 @@ public class ModItems {
 	public static ItemColoredKey key_colored = MazeTowers.ItemColoredKey;
 	public static ItemSpectriteKey key_spectrite = MazeTowers.ItemSpectriteKey;
 	public static ItemDiamondRod diamond_rod = MazeTowers.ItemDiamondRod;
+	public static ItemSpectriteRod spectrite_rod = MazeTowers.ItemSpectriteRod;
 	public static ItemRAM ram = MazeTowers.ItemRAM;
 	public static ItemSpectriteGem spectrite_gem = MazeTowers.ItemSpectriteGem;
 	public static ItemSpectriteOrb spectrite_orb = MazeTowers.ItemSpectriteOrb;
 	public static ItemExplosiveArrow explosive_arrow = MazeTowers.ItemExplosiveArrow;
 	public static ItemExplosiveBow explosive_bow = MazeTowers.ItemExplosiveBow;
+	public static ItemSpectriteShovel spectrite_shovel = MazeTowers.ItemSpectriteShovel;
+	public static ItemSpectriteShovelSpecial spectrite_shovel_special = MazeTowers.ItemSpectriteShovelSpecial;
 	public static ItemSpectritePickaxe spectrite_pickaxe = MazeTowers.ItemSpectritePickaxe;
+	public static ItemSpectritePickaxeSpecial spectrite_pickaxe_special = MazeTowers.ItemSpectritePickaxeSpecial;
+	public static ItemSpectriteAxe spectrite_axe = MazeTowers.ItemSpectriteAxe;
+	public static ItemSpectriteAxeSpecial spectrite_axe_special = MazeTowers.ItemSpectriteAxeSpecial;
 	public static ItemSpectriteSword spectrite_sword = MazeTowers.ItemSpectriteSword;
 	public static ItemSpectriteKeySword spectrite_key_sword = MazeTowers.ItemSpectriteKeySword;
+	public static ItemSpectriteSwordSpecial spectrite_sword_special = MazeTowers.ItemSpectriteSwordSpecial;
+	public static ItemSpectriteKeySwordSpecial spectrite_key_sword_special = MazeTowers.ItemSpectriteKeySwordSpecial;
 	public static ItemSpectriteArmor spectrite_helmet = MazeTowers.ItemSpectriteHelmet;
 	public static ItemSpectriteArmor spectrite_chestplate = MazeTowers.ItemSpectriteChestplate;
 	public static ItemSpectriteArmor spectrite_leggings = MazeTowers.ItemSpectriteLeggings;
@@ -61,6 +56,8 @@ public class ModItems {
 		GameRegistry.registerItem(key_colored, "key");
 		GameRegistry.registerItem(key_spectrite, "spectrite_key");
 		GameRegistry.registerItem(ram, "ram");
+		GameRegistry.registerItem(diamond_rod, "diamond_rod");
+		GameRegistry.registerItem(spectrite_rod, "spectrite_rod");
 		GameRegistry.registerItem(spectrite_gem,
 			"spectrite_gem");
 		GameRegistry.registerItem(spectrite_orb,
@@ -69,12 +66,26 @@ public class ModItems {
 			"explosive_arrow");
 		GameRegistry.registerItem(explosive_bow,
 			"explosive_bow");
+		GameRegistry.registerItem(spectrite_shovel,
+			"spectrite_shovel");
+		GameRegistry.registerItem(spectrite_shovel_special,
+			"spectrite_shovel_special");
 		GameRegistry.registerItem(spectrite_pickaxe,
 			"spectrite_pickaxe");
+		GameRegistry.registerItem(spectrite_pickaxe_special,
+			"spectrite_pickaxe_special");
+		GameRegistry.registerItem(spectrite_axe,
+			"spectrite_axe");
+		GameRegistry.registerItem(spectrite_axe_special,
+			"spectrite_axe_special");
 		GameRegistry.registerItem(spectrite_sword,
 			"spectrite_sword");
 		GameRegistry.registerItem(spectrite_key_sword,
 			"spectrite_key_sword");
+		GameRegistry.registerItem(spectrite_sword_special,
+			"spectrite_sword_special");
+		GameRegistry.registerItem(spectrite_key_sword_special,
+			"spectrite_key_sword_special");
 		GameRegistry.registerItem(spectrite_helmet,
 			"spectrite_helmet");
 		GameRegistry.registerItem(spectrite_chestplate,

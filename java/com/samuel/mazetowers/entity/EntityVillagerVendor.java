@@ -16,7 +16,7 @@ import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.etc.IVendorTradable;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.init.ModBlocks;
 import com.samuel.mazetowers.init.ModItems;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
@@ -77,8 +77,8 @@ public class EntityVillagerVendor extends EntityVillager {
        if (s != null && s.length() > 0)
        {
            TextComponentString TextComponentString = new TextComponentString(s);
-           TextComponentString.getChatStyle().setChatHoverEvent(this.getHoverEvent());
-           TextComponentString.getChatStyle().setInsertion(this.getUniqueID().toString());
+           TextComponentString.getStyle().setHoverEvent(this.getHoverEvent());
+           TextComponentString.getStyle().setInsertion(this.getUniqueID().toString());
            return TextComponentString;
        }
        else
@@ -103,8 +103,8 @@ public class EntityVillagerVendor extends EntityVillager {
            {
                TextComponentTranslation chatcomponenttranslation = new TextComponentTranslation(
             	   "entity.mazetowers.Villager." + s1, new Object[0]);
-               chatcomponenttranslation.getChatStyle().setChatHoverEvent(this.getHoverEvent());
-               chatcomponenttranslation.getChatStyle().setInsertion(this.getUniqueID().toString());
+               chatcomponenttranslation.getStyle().setHoverEvent(this.getHoverEvent());
+               chatcomponenttranslation.getStyle().setInsertion(this.getUniqueID().toString());
                return chatcomponenttranslation;
            }
            else
@@ -115,7 +115,7 @@ public class EntityVillagerVendor extends EntityVillager {
    }
 	
 	private void populateBuyingList() {
-		Field buyingList = MTUtils.findObfuscatedField(EntityVillager.class,
+		Field buyingList = MTHelper.findObfuscatedField(EntityVillager.class,
     		"buyingList", "field_70963_i");
     	buyingList.setAccessible(true);
     	try {
@@ -153,7 +153,7 @@ public class EntityVillagerVendor extends EntityVillager {
 			int tradeChance = buyItem.getVendorTradeChance(difficulty);
 			if (tradeChance == 1000 || (rand.nextInt(16) < 6 &&
 				rand.nextInt(1000) < tradeChance))
-				recipes.add(new MerchantRecipe(getTradeStack(stack, true), stack));
+				recipes.add(new MerchantRecipe(stack, getTradeStack(stack, true)));
 		}
 		
 		return recipes;
@@ -162,8 +162,8 @@ public class EntityVillagerVendor extends EntityVillager {
 	private ItemStack getTradeStack(ItemStack item, boolean isBuying) {
 		int itemPrice = getRandomPrice((IVendorTradable) item.getItem());
 		if (isBuying)
-			itemPrice = (int) Math.floor(itemPrice * (0.5 + (rand.nextInt(10) * 0.05)));
-		return new ItemStack(Items.emerald, itemPrice);
+			itemPrice = (int) Math.max(Math.floor(itemPrice * (0.5 + (rand.nextInt(10) * 0.05))), 1);
+		return new ItemStack(Items.EMERALD, itemPrice);
 	}
 	
 	private int getRandomPrice(IVendorTradable item) {

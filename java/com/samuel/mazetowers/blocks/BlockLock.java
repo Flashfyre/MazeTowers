@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.IMetaBlockName;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.init.ModItems;
 import com.samuel.mazetowers.init.ModSounds;
 import com.samuel.mazetowers.tileentity.TileEntityLock;
@@ -50,9 +50,9 @@ public class BlockLock extends Block implements IMetaBlockName,
 		PropertyEnum.<BlockDoor.EnumHingePosition>create("hinge",
 		BlockDoor.EnumHingePosition.class);
 	public static final SoundType LOCK = new SoundType(0.2F, 1.5F,
-		SoundEvents.block_stone_break, SoundEvents.block_stone_step,
-		SoundEvents.block_anvil_place, SoundEvents.block_anvil_hit,
-		SoundEvents.block_anvil_fall);
+		SoundEvents.BLOCK_STONE_BREAK, SoundEvents.BLOCK_STONE_STEP,
+		SoundEvents.BLOCK_ANVIL_PLACE, SoundEvents.BLOCK_ANVIL_HIT,
+		SoundEvents.BLOCK_ANVIL_FALL);
 	protected static final AxisAlignedBB AABB_EAST =
 		new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.125F, 1.0F, 1.0F);
 	protected static final AxisAlignedBB AABB_WEST =
@@ -64,9 +64,15 @@ public class BlockLock extends Block implements IMetaBlockName,
 	private int[] colors;
 	
 	public BlockLock() {
-		super(Material.iron);
+		super(Material.IRON);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING,
 			EnumFacing.NORTH).withProperty(HINGE, BlockDoor.EnumHingePosition.LEFT));
+		this.setSoundType(LOCK);
+		this.setBlockUnbreakable();
+		this.setCreativeTab(MazeTowers.TabExtra);
+	}
+	
+	public void initLockColors() {
 		EnumDyeColor[][] dyeColors = EnumTowerType.getAllBeaconColors();
 		colors = new int[dyeColors.length];
 		for (int t = 0; t < dyeColors.length; t++) {
@@ -77,11 +83,8 @@ public class BlockLock extends Block implements IMetaBlockName,
         		rgbMix[1] += rgb[1] / dyeColors[t].length;
         		rgbMix[2] += rgb[2] / dyeColors[t].length;
 			}
-			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
+			colors[t] = MTHelper.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
-		this.setStepSound(LOCK);
-		this.setBlockUnbreakable();
-		this.setCreativeTab(MazeTowers.TabExtra);
 	}
 	
 	@Override
@@ -118,15 +121,22 @@ public class BlockLock extends Block implements IMetaBlockName,
     			(ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.key_colored,
     			1, ((TileEntityLock) worldIn.getTileEntity(pos)).getTypeIndex())) ||
     			heldItem.getItem() == ModItems.key_spectrite ||
+    			ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.spectrite_key_sword_special)) ||
     			ItemStack.areItemStacksEqual(heldItem, new ItemStack(ModItems.spectrite_key_sword)));
     		if (!holdingKey) {
     			worldIn.playSound(hitX, hitY, hitZ, ModSounds.door_locked,
     				SoundCategory.BLOCKS, 1.0F, 1.0F, true);
     		} else {
+    			final BlockPos doorPos = pos.offset(state.getValue(BlockLock.FACING), -1).down();
+    			final IBlockState doorState = worldIn.getBlockState(doorPos);
     			worldIn.playSound(null, pos, ModSounds.door_unlock,
         			SoundCategory.BLOCKS, 1.0F, 1.0F);
-    			if (!MTUtils.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
+    			if (!MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
     				this.dropBlockAsItem(worldIn, pos, state, 0);
+    			if (worldIn.isBlockPowered(doorPos) || worldIn.isBlockPowered(doorPos.up())) {
+    				Block doorBlock = doorState.getBlock();
+    				((BlockDoor) doorBlock).toggleDoor(worldIn, doorPos, true);
+    			}
     			worldIn.setBlockToAir(pos);
     			return true;
     		}
@@ -189,8 +199,8 @@ public class BlockLock extends Block implements IMetaBlockName,
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state, World worldIn,
+		BlockPos pos, Block neighborBlock) {
 		if (!func_181088_a(worldIn, pos,
 			state.getValue(FACING).getOpposite())) {
 			if (this.checkForDrop(worldIn, pos, state))
@@ -201,7 +211,7 @@ public class BlockLock extends Block implements IMetaBlockName,
 
 	private boolean checkForDrop(World worldIn,
 		BlockPos pos, IBlockState state) {
-		return !MTUtils.getIsMazeTowerPos(worldIn.provider.getDimension(), pos) &&
+		return !MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos) &&
 			this.canPlaceBlockAt(worldIn, pos);
 	}
 	

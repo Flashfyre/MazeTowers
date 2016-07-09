@@ -78,9 +78,9 @@ public class WorldGenSpectrite implements IWorldGenerator {
 		private final IBlockState stateSurface = MazeTowers.BlockSpectriteOre.getDefaultState(),
 		stateNether = MazeTowers.BlockSpectriteOre.getStateFromMeta(1),
 		stateEnd = MazeTowers.BlockSpectriteOre.getStateFromMeta(2);
-	    private final Predicate<IBlockState> targetSurface = BlockStateMatcher.forBlock(Blocks.stone),
-	    targetNether = BlockStateMatcher.forBlock(Blocks.netherrack),
-	    targetEnd = BlockStateMatcher.forBlock(Blocks.end_stone);
+	    private final Predicate<IBlockState> targetSurface = BlockStateMatcher.forBlock(Blocks.STONE),
+	    targetNether = BlockStateMatcher.forBlock(Blocks.NETHERRACK),
+	    targetEnd = BlockStateMatcher.forBlock(Blocks.END_STONE);
 
 	    public WorldGenSpectriteMinable() { }
 

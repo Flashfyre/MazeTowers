@@ -35,7 +35,7 @@ public class BlockExtraSlab extends BlockSlab {
 	public static final PropertyEnum<EnumType> VARIANT = PropertyEnum.<EnumType>create("variant", EnumType.class);
 
 	public BlockExtraSlab() {
-		super(Material.rock);
+		super(Material.ROCK);
 		IBlockState blockState = this.blockState.getBaseState();
         if (!this.isDouble()) {
             blockState = blockState.withProperty(HALF, EnumBlockHalf.BOTTOM);
@@ -181,12 +181,12 @@ public class BlockExtraSlab extends BlockSlab {
 	}
 
     public static enum EnumType implements IStringSerializable {
-        PACKED_ICE(0, MapColor.iceColor, "packed_ice"),
-        MYCELIUM(1, MapColor.purpleColor, "mycelium"),
-        PRISMARINE_BRICK(2, MapColor.greenColor, "prismarine_brick"),
-        END_STONE_BRICK(3, MapColor.sandColor, "end_stone_brick"),
-        OBSIDIAN(4, MapColor.obsidianColor, "obsidian"),
-        BEDROCK(5, MapColor.grayColor, "bedrock");
+        PACKED_ICE(0, MapColor.ICE, "packed_ice"),
+        MYCELIUM(1, MapColor.PURPLE, "mycelium"),
+        PRISMARINE_BRICK(2, MapColor.GREEN, "prismarine_brick"),
+        END_STONE_BRICK(3, MapColor.SAND, "end_stone_brick"),
+        OBSIDIAN(4, MapColor.OBSIDIAN, "obsidian"),
+        BEDROCK(5, MapColor.GRAY, "bedrock");
 
         private static final EnumType[] META_LOOKUP = new EnumType[values().length];
         private final int meta;

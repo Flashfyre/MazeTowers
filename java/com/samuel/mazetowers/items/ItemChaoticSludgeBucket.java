@@ -9,6 +9,6 @@ public class ItemChaoticSludgeBucket extends UniversalBucket {
     {
     	super();
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.tabMisc);
+        setCreativeTab(CreativeTabs.MISC);
     }
 }

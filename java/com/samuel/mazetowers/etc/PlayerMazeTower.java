@@ -3,11 +3,14 @@ package com.samuel.mazetowers.etc;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class PlayerMazeTower {
 	
@@ -24,9 +27,7 @@ public class PlayerMazeTower {
 		private boolean isUnderground;
 		private boolean enabled;
 		private BlockPos spawnPos;
-	
-		// private BlockPos playerSpawnPos;
-		// private BlockPos spawnPos;
+		private int[][] mtBounds;
 	
 		public DefaultImpl(EntityPlayer player, int floor,
 			boolean enabled) {
@@ -42,6 +43,7 @@ public class PlayerMazeTower {
 			difficulty = 0;
 			rarity = 0;
 			towerName = null;
+			mtBounds = new int[0][6];
 			
 			if (world.provider.getDimension() == 0)
 				setSpawnPos(new BlockPos(getPlayerSpawnPos(
@@ -56,7 +58,7 @@ public class PlayerMazeTower {
 		}
 	
 		public BlockPos getPlayerSpawnPos(World worldIn,
-			EntityPlayer player) {;
+			EntityPlayer player) {
 			return player.playerLocation != null ? player.getBedLocation() : worldIn
 				.getSpawnPoint();
 		}
@@ -104,6 +106,11 @@ public class PlayerMazeTower {
 		public String getTowerName() {
 			return towerName;
 		}
+		
+		@Override
+		public int[][] getMTBounds() {
+			return mtBounds;
+		}
 	
 		@Override
 		public void setEnabled(boolean enabled) {
@@ -150,6 +157,11 @@ public class PlayerMazeTower {
 		public void setSpawnPos(BlockPos spawnPos) {
 			this.spawnPos = spawnPos;
 		}
+
+		@Override
+		public void setMTBounds(int[][] mtBounds) {
+			this.mtBounds = mtBounds;
+		}
 		
 		public static class Storage implements IStorage<IMazeTowerCapability> {
 			
@@ -163,6 +175,16 @@ public class PlayerMazeTower {
 					instance.getIsUnderground());
 				properties.setInteger("floor", instance.getFloor());
 				properties.setLong("spawnPos", instance.getSpawnPos().toLong());
+				
+				int[][] mtBounds = instance.getMTBounds();
+				NBTTagList mtBoundsList = new NBTTagList();
+				
+				for (int[] mtb : mtBounds) {
+					mtBoundsList.appendTag(new NBTTagIntArray(mtb));
+				}
+				
+				properties.setTag("mtBounds", mtBoundsList);
+				
 				return properties;
 			}
 
@@ -174,6 +196,15 @@ public class PlayerMazeTower {
 				instance.setIsUnderground(properties.getBoolean("isUnderground"));
 				instance.setFloor(properties.getInteger("floor"));
 				instance.setSpawnPos(BlockPos.fromLong(properties.getLong("spawnPos")));
+				
+				NBTTagList mtBoundsList = properties.getTagList("mtBounds", NBT.TAG_LIST);
+				int[][] mtBounds = new int[mtBoundsList.tagCount()][6];
+				
+				for (int b = 0; b < mtBoundsList.tagCount(); b++) {
+					mtBounds[b] = mtBoundsList.getIntArrayAt(b);
+				}
+				
+				instance.setMTBounds(mtBounds);
 			}
 		}
 	}

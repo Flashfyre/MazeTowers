@@ -21,17 +21,17 @@ public class BlockMemoryPistonBaseOff extends
 
 	public BlockMemoryPistonBaseOff() {
 		super();
-		this.setCreativeTab(CreativeTabs.tabRedstone);
+		this.setCreativeTab(CreativeTabs.REDSTONE);
 	}
 
 	@Override
 	/**
 	 * Called on both Client and Server when World#addBlockEvent is called
 	 */
-	public boolean onBlockEventReceived(World worldIn,
-		BlockPos pos, IBlockState state, int eventID,
+	public boolean eventReceived(IBlockState state,
+		World worldIn, BlockPos pos, int eventID,
 		int eventParam) {
-		EnumFacing enumfacing = state
+	EnumFacing enumfacing = state
 			.getValue(FACING);
 
 		if (!worldIn.isRemote) {
@@ -72,7 +72,7 @@ public class BlockMemoryPistonBaseOff extends
 				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
 				pos.getZ() + 0.5D,
-				SoundEvents.block_piston_extend, SoundCategory.BLOCKS,
+				SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS,
 				0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F, true);
 		} else if (eventID == 1) {
 			TileEntity tileentity1 = worldIn
@@ -109,7 +109,7 @@ public class BlockMemoryPistonBaseOff extends
 				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
 				pos.getZ() + 0.5D,
-				SoundEvents.block_piston_contract, SoundCategory.BLOCKS,
+				SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS,
 				0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F, true);
 		}
 		
@@ -137,7 +137,7 @@ public class BlockMemoryPistonBaseOff extends
 			worldIn.playSound(
 				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
-				pos.getZ() + 0.5D, SoundEvents.block_stone_button_click_on,
+				pos.getZ() + 0.5D, SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON,
 				SoundCategory.BLOCKS,
 				0.3F, 0.6F, true);
 			worldIn.setBlockState(pos, onState);

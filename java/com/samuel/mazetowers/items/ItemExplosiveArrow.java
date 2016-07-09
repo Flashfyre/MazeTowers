@@ -12,7 +12,7 @@ public class ItemExplosiveArrow extends Item {
 
 	public ItemExplosiveArrow() {
 		super();
-		this.setCreativeTab(CreativeTabs.tabCombat);
+		this.setCreativeTab(CreativeTabs.COMBAT);
 	}
 
 	@Override

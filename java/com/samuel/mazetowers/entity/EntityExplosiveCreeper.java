@@ -89,7 +89,7 @@ public class EntityExplosiveCreeper extends EntityCreeper {
 
             if (i > 0) {
             	if (this.timeSinceIgnited == 0)
-            		this.playSound(SoundEvents.entity_creeper_primed, 1.0F, 0.5F);
+            		this.playSound(SoundEvents.ENTITY_CREEPER_PRIMED, 1.0F, 0.5F);
             	else if (this.timeSinceIgnited == fuseTime - 15)
             		this.worldObj.playSound(null, getPosition(),
             			(!getPowered() ? ModSounds.primed : ModSounds.charge),
@@ -123,15 +123,15 @@ public class EntityExplosiveCreeper extends EntityCreeper {
 
         if (cause.getEntity() instanceof EntitySkeleton)
         {
-            int i = Item.getIdFromItem(Items.record_13);
-            int j = Item.getIdFromItem(Items.record_wait);
+            int i = Item.getIdFromItem(Items.RECORD_13);
+            int j = Item.getIdFromItem(Items.RECORD_WAIT);
             int k = i + this.rand.nextInt(j - i + 1);
             this.dropItem(Item.getItemById(k), 1);
         }
         else if (cause.getEntity() instanceof EntityCreeper && cause.getEntity() != this && ((EntityCreeper)cause.getEntity()).getPowered() && ((EntityCreeper)cause.getEntity()).isAIEnabled())
         {
-            ((EntityCreeper)cause.getEntity()).func_175493_co();
-            this.entityDropItem(new ItemStack(Items.skull, 1, 4), 0.0F);
+            ((EntityCreeper)cause.getEntity()).incrementDroppedSkulls();
+            this.entityDropItem(new ItemStack(Items.SKULL, 1, 4), 0.0F);
         }
     }
 	

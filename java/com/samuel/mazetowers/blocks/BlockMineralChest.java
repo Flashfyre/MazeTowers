@@ -77,7 +77,7 @@ public class BlockMineralChest extends BlockChest {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
-        return source.getBlockState(pos.north()).getBlock() == this ? field_185557_b : (source.getBlockState(pos.south()).getBlock() == this ? field_185558_c : (source.getBlockState(pos.west()).getBlock() == this ? field_185559_d : (source.getBlockState(pos.east()).getBlock() == this ? field_185560_e : field_185561_f)));
+    	return source.getBlockState(pos.north()).getBlock() == this ? NORTH_CHEST_AABB : (source.getBlockState(pos.south()).getBlock() == this ? SOUTH_CHEST_AABB : (source.getBlockState(pos.west()).getBlock() == this ? WEST_CHEST_AABB : (source.getBlockState(pos.east()).getBlock() == this ? EAST_CHEST_AABB : NOT_CONNECTED_AABB)));
     }
 
     @Override
@@ -390,9 +390,9 @@ public class BlockMineralChest extends BlockChest {
     /**
      * Called when a neighboring block changes.
      */
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state,
+    public void neighborChanged(IBlockState state,World worldIn, BlockPos pos,
     	Block neighborBlock) {
-        super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
+        super.neighborChanged(state, worldIn, pos, neighborBlock);
         TileEntity tileentity = worldIn.getTileEntity(pos);
 
         if (tileentity instanceof TileEntityMineralChest)
@@ -418,9 +418,9 @@ public class BlockMineralChest extends BlockChest {
                 playerIn.displayGUIChest(ilockablecontainer);
 
                 if (this.chestType.ordinal() < 4)
-                    playerIn.addStat(StatList.chestOpened);
+                    playerIn.addStat(StatList.CHEST_OPENED);
                 else
-                    playerIn.addStat(StatList.trappedChestTriggered);
+                    playerIn.addStat(StatList.TRAPPED_CHEST_TRIGGERED);
             }
 
             return true;

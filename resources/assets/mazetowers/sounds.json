@@ -5,5 +5,6 @@
 	"incorrect": { "category": "block", "sounds": ["mazetowers:incorrect"], "subtitle": "subtitle.incorrect" },
 	"primed": { "category": "block", "sounds": ["mazetowers:primed"], "subtitle": "subtitle.primed" },
 	"charge": { "category": "block", "sounds": ["mazetowers:charge"], "subtitle": "subtitle.charge" },
-	"fatality": { "category": "block", "sounds": ["mazetowers:fatality1", "mazetowers:fatality2", "mazetowers:fatality3"], "subtitle": "subtitle.fatality" }
+	"explosion": { "category": "block", "sounds": ["mazetowers:explode1", "mazetowers:explode2", "mazetowers:explode3"], "subtitle": "subtitle.explosion" },
+	"fatality": { "category": "block", "sounds": ["mazetowers:fatality"] }
 }

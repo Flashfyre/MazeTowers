@@ -21,7 +21,7 @@ public class ItemSpectriteOrb extends Item {
 	public ItemSpectriteOrb() {
 		this.setHasSubtypes(true);
 		this.setMaxDamage(0);
-		this.setCreativeTab(CreativeTabs.tabMaterials);
+		this.setCreativeTab(CreativeTabs.MATERIALS);
 		this.addPropertyOverride(new ResourceLocation("time"), MazeTowers.ItemPropertyGetterSpectrite);
 	}
 	
@@ -29,10 +29,10 @@ public class ItemSpectriteOrb extends Item {
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand)
     {
         worldIn.playSound((EntityPlayer)null, playerIn.posX, playerIn.posY, playerIn.posZ,
-        	SoundEvents.entity_experience_orb_pickup, SoundCategory.NEUTRAL, 0.5F, (itemRand.nextFloat() * 0.4F + 0.8F));
+        	SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.5F, (itemRand.nextFloat() * 0.4F + 0.8F));
         playerIn.getCooldownTracker().setCooldown(this, 300);
         
-        playerIn.addPotionEffect(new PotionEffect(MobEffects.regeneration, 200, 0));
+        playerIn.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 200, 0));
 
         return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
     }

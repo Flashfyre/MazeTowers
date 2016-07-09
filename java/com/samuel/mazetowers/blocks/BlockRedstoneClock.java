@@ -26,9 +26,9 @@ public class BlockRedstoneClock extends Block implements ITileEntityProvider {
 	private final boolean inverted;
 	
 	public BlockRedstoneClock(boolean inverted) {
-		super(Material.circuits);
+		super(Material.CIRCUITS);
 		this.inverted = inverted;
-		this.setCreativeTab(CreativeTabs.tabRedstone);
+		this.setCreativeTab(CreativeTabs.REDSTONE);
 	}
 	
 	@Override
@@ -65,8 +65,8 @@ public class BlockRedstoneClock extends Block implements ITileEntityProvider {
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (!this.canBePlacedOn(worldIn, pos.down())) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);

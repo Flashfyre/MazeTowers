@@ -60,7 +60,7 @@ public class ItemBlockRedstoneClock extends ItemBlockVendorTradable {
 
                     d0 = this.func_185087_a(worldIn, d0);
                     
-                    float time = MathHelper.func_188207_b((float)d0, 1.0F);
+                    float time = MathHelper.positiveModulo((float)d0, 1.0F);
                     curFrame = getCurrentFrame(time);
                     return time;
                 }

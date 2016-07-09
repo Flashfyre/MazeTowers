@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.blocks.BlockExtraDoor;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.init.ModSounds;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
 
@@ -41,7 +41,7 @@ public class ItemColoredKey extends ItemKey {
         		rgbMix[1] += rgb[1] / dyeColors[t].length;
         		rgbMix[2] += rgb[2] / dyeColors[t].length;
 			}
-			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
+			colors[t] = MTHelper.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
 		setHasSubtypes(true);
 	}

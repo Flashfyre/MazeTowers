@@ -1,6 +1,7 @@
 {
     "pools": [
         {
+			"name": "maze_tower_treasure_1",
             "rolls": {
                 "min": 1,
                 "max": 5
@@ -214,29 +215,17 @@
                 {
                     "type": "item",
                     "name": "minecraft:coal",
-                    "weight": 60,
+                    "weight": 80,
                     "functions": [
                         {
                             "function": "set_data",
-                            "data": 1
-                        },
-                        {
-                            "function": "set_count",
-                            "count": {
-                                "min": 1,
-                                "max": 2
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "item",
-                    "name": "minecraft:coal",
-                    "weight": 20,
-                    "functions": [
-                        {
-                            "function": "set_data",
-                            "data": 0
+                            "data": 1,
+							"conditions": [
+                                {
+                                    "condition": "minecraft:random_chance",
+									"chance": 0.75
+                                }
+                            ]
                         },
                         {
                             "function": "set_count",

@@ -1,6 +1,7 @@
 {
     "pools": [
         {
+			"name": "maze_tower_treasure_8",
             "rolls": 1,
             "entries": [
                 {

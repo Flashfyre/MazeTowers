@@ -12,13 +12,14 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.etc.IKeyItem;
 import com.samuel.mazetowers.init.ModSounds;
 
 public class ItemSpectriteKeySword extends ItemSpectriteSword implements IKeyItem {
 	
 	public ItemSpectriteKeySword() {
-		super();
+		super(MazeTowers.DIAMOND_SPECTRITE_TOOL);
 	}
 	
 	@Override

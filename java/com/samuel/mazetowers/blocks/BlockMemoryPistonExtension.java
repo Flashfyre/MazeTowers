@@ -49,11 +49,11 @@ public class BlockMemoryPistonExtension extends BlockDirectional {
 
 
 	public BlockMemoryPistonExtension(String unlocalizedName) {
-		super(Material.piston);
+		super(Material.PISTON);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(SHORT, Boolean.valueOf(false)));
-		this.setStepSound(SoundType.STONE);
+		this.setSoundType(SoundType.STONE);
 		this.setHardness(0.5F);
 		setUnlocalizedName(unlocalizedName);
 	}
@@ -196,8 +196,8 @@ public class BlockMemoryPistonExtension extends BlockDirectional {
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		EnumFacing enumfacing = state
 			.getValue(FACING);
 		BlockPos blockpos1 = pos.offset(enumfacing
@@ -208,9 +208,8 @@ public class BlockMemoryPistonExtension extends BlockDirectional {
 		if (!(iblockstate1.getBlock() instanceof BlockMemoryPistonBase)) {
 			worldIn.setBlockToAir(pos);
 		} else {
-			iblockstate1.getBlock().onNeighborBlockChange(
-				worldIn, blockpos1, iblockstate1,
-				neighborBlock);
+			iblockstate1.getBlock().neighborChanged(
+				iblockstate1, worldIn, blockpos1, neighborBlock);
 		}
 	}
 

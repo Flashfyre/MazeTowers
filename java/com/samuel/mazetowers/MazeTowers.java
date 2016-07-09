@@ -6,7 +6,9 @@ import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemDoor;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -43,7 +45,7 @@ import com.samuel.mazetowers.world.WorldGenSpectrite;
 public class MazeTowers {
 	public static final String MODNAME = "mazetowers";
 	public static final String MODID = "mazetowers";
-	public static final String VERSION = "0.7.1";
+	public static final String VERSION = "0.8.0";
 
 	@Mod.Instance
 	public static MazeTowers instance = new MazeTowers();
@@ -123,14 +125,22 @@ public class MazeTowers {
 	public static ItemColoredKey ItemColoredKey;
 	public static ItemSpectriteKey ItemSpectriteKey;
 	public static ItemDiamondRod ItemDiamondRod;
+	public static ItemSpectriteRod ItemSpectriteRod;
 	public static ItemRAM ItemRAM;
 	public static ItemSpectriteGem ItemSpectriteGem;
 	public static ItemSpectriteOrb ItemSpectriteOrb;
 	public static ItemExplosiveArrow ItemExplosiveArrow;
 	public static ItemExplosiveBow ItemExplosiveBow;
+	public static ItemSpectriteShovel ItemSpectriteShovel;
+	public static ItemSpectriteShovelSpecial ItemSpectriteShovelSpecial;
 	public static ItemSpectritePickaxe ItemSpectritePickaxe;
+	public static ItemSpectritePickaxeSpecial ItemSpectritePickaxeSpecial;
+	public static ItemSpectriteAxe ItemSpectriteAxe;
+	public static ItemSpectriteAxeSpecial ItemSpectriteAxeSpecial;
 	public static ItemSpectriteSword ItemSpectriteSword;
 	public static ItemSpectriteKeySword ItemSpectriteKeySword;
+	public static ItemSpectriteSwordSpecial ItemSpectriteSwordSpecial;
+	public static ItemSpectriteKeySwordSpecial ItemSpectriteKeySwordSpecial;
 	public static ItemSpectriteArmor ItemSpectriteHelmet;
 	public static ItemSpectriteArmor ItemSpectriteChestplate;
 	public static ItemSpectriteArmor ItemSpectriteLeggings;
@@ -141,15 +151,21 @@ public class MazeTowers {
 	public static MaterialLogicSolid solidCircuits;
 	public static ArmorMaterial EXPLOSIVE_CREEPER_HEAD = new EnumHelper()
 		.addArmorMaterial("explosive_creeper_head", "mazetowers:explosive_creeper_head",
-		0, new int[]{2, 0, 0, 0}, 25, SoundEvents.item_armor_equip_leather);
+		0, new int[]{2, 0, 0, 0}, 25, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 0);
+	
 	public static ArmorMaterial SPECTRITE = new EnumHelper()
 		.addArmorMaterial("spectrite", "mazetowers:spectrite_armor",
-		0, new int[]{3, 6, 8, 3}, 25, SoundEvents.item_armor_equip_diamond);
+		0, new int[]{3, 6, 8, 3}, 25, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 3);
+	public static ToolMaterial DIAMOND_SPECTRITE_TOOL = new EnumHelper()
+		.addToolMaterial("diamond_spectrite_tool", 3, 2400, 10.0F, 4.0F, 16);
 	public static ToolMaterial SPECTRITE_TOOL = new EnumHelper()
-		.addToolMaterial("spectrite_tool", 3, 4900, 12.0F, 4.0F, 21);
+		.addToolMaterial("spectrite_tool", 3, 3600, 12.0F, 5.0F, 21);
 	public static IItemPropertyGetter ItemPropertyGetterSpectrite;
+	public static ResourceLocation[] LootTables = new ResourceLocation[10];
+	public static boolean debugMode = true;
 	public static boolean enableMazeTowers = true;
 	public static boolean blockProtection = true;
+	public static boolean itemScannerPuzzles = true;
 
 	@SidedProxy(clientSide = "com.samuel.mazetowers.proxy.ClientProxy",
 		serverSide = "com.samuel.mazetowers.proxy.ServerProxy")
@@ -175,11 +191,12 @@ public class MazeTowers {
 		config.load();
 		saveConfig();
 		MinecraftForge.EVENT_BUS
-			.register(new MazeTowersChunkEventHandler());
-		MinecraftForge.EVENT_BUS
 			.register(new MazeTowersGeneralEventHandler());
 		MinecraftForge.EVENT_BUS
 			.register(new MazeTowersGuiEventHandler());
+		if (blockProtection)
+			MinecraftForge.EVENT_BUS
+				.register(new MazeTowersBlockProtectionEventHandler());
 		ModEntities.initEntities(this);
 		proxy.preInit(e);
 	}
@@ -200,6 +217,11 @@ public class MazeTowers {
 	}
 	
 	public void saveConfig() {
+		config.setCategoryRequiresMcRestart(Configuration.CATEGORY_GENERAL, true);
+		Property debugMode = config.get(
+			Configuration.CATEGORY_GENERAL,
+			I18n.translateToLocal("gui.debug_mode.name"), true,
+			I18n.translateToLocal("gui.debug_mode.desc"));
 		Property spawnMazeTowers = config.get(
 			Configuration.CATEGORY_GENERAL,
 			I18n.translateToLocal("gui.spawn_maze_towers.name"), true,
@@ -208,10 +230,17 @@ public class MazeTowers {
 			Configuration.CATEGORY_GENERAL, I18n.translateToLocal(
 			"gui.block_protection.name"), true,
 			I18n.translateToLocal("gui.block_protection.desc"));
+		Property itemScannerPuzzles = config.get(
+				Configuration.CATEGORY_GENERAL, I18n.translateToLocal(
+				"gui.item_scanner_puzzles.name"), true,
+				I18n.translateToLocal("gui.item_scanner_puzzles.desc"));
+		MazeTowers.debugMode = debugMode.getBoolean(true);
 		MazeTowers.enableMazeTowers = spawnMazeTowers
 			.getBoolean(true);
-		MazeTowers.enableMazeTowers = blockProtection
+		MazeTowers.blockProtection = blockProtection
 			.getBoolean(true);
+		MazeTowers.itemScannerPuzzles = itemScannerPuzzles
+				.getBoolean(true);
 		config.save();
 	}
 }

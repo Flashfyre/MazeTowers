@@ -108,11 +108,13 @@ public class TileEntityVendorSpawner extends TileEntity implements ITickable {
     }
 
 	@Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
     	super.writeToNBT(compound);
     	compound.setInteger("type", typeIndex);
     	compound.setInteger("specialProfessionId", specialProfessionId);
     	compound.setInteger("difficulty", difficulty);
+    	
+		return compound;
     }
 
 	@Override

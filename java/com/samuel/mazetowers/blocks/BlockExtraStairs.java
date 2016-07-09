@@ -14,7 +14,7 @@ public class BlockExtraStairs extends BlockStairs {
 
 	public BlockExtraStairs(IBlockState modelState) {
 		super(modelState);
-		if (modelState == Blocks.packed_ice
+		if (modelState == Blocks.PACKED_ICE
 			.getDefaultState())
 			this.slipperiness = 0.98F;
 		this.setCreativeTab(MazeTowers.TabExtra);

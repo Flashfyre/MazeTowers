@@ -127,9 +127,9 @@ public class CommandMazeTowers implements ICommand,
 					if (astring.length > 1 &&
 						astring[astring.length - 1].equals("inventory") ||
 						astring[astring.length - 2].equals("inventory"))
-						MTUtils.fillInventoryWithLoot((EntityPlayer) sender, rarity);
+						MTHelper.fillInventoryWithLoot((EntityPlayer) sender, rarity);
     				ArrayList<String> lootList =
-    					MTUtils.getLootList(sender.getEntityWorld().rand, rarity);
+    					MTHelper.getLootList(sender.getEntityWorld().rand, rarity);
     				for (String s : lootList)
     					sender.addChatMessage(new TextComponentString(
     						ChatFormatting.YELLOW + s));
@@ -138,7 +138,7 @@ public class CommandMazeTowers implements ICommand,
 				World world = sender.getEntityWorld();
 				BlockPos pos = sender.getPosition();
 				IBlockState state = world.getBlockState(pos);
-				world.setBlockState(pos, Blocks.end_portal.getDefaultState());
+				world.setBlockState(pos, Blocks.END_PORTAL.getDefaultState());
 			}
 			/*
 			 * if (astring[0].equals("tp") || astring[0].equals("warp")) {

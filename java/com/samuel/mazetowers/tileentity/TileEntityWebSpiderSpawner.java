@@ -34,7 +34,7 @@ public class TileEntityWebSpiderSpawner extends TileEntity
 			boolean isWeb = false;
 			IBlockState state;
 			if ((state = this.worldObj.getBlockState(pos)) != null
-				&& (isWeb = state.getBlock() == Blocks.web)) {
+				&& (isWeb = state.getBlock() == Blocks.WEB)) {
 				float posX, posY, posZ;
 				List list = worldObj.getEntitiesWithinAABB(
 					EntityPlayer.class, new AxisAlignedBB(

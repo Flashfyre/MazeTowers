@@ -1,5 +1,7 @@
 package com.samuel.mazetowers.blocks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -31,7 +33,7 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	public static final PropertyDirection FACING = BlockMemoryPistonExtension.FACING;
 
 	public BlockMemoryPistonMoving(String unlocalizedName) {
-		super(Material.piston);
+		super(Material.PISTON);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH));
 		this.setHardness(-1.0F);
@@ -159,15 +161,15 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 		BlockPos pos, IBlockState state, float chance,
 		int fortune) {
 		super.dropBlockAsItemWithChance(worldIn, pos,
-			state, chance, fortune);
+			state, 1, fortune);
 	}
 
 	@Override
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (!worldIn.isRemote) {
 			worldIn.getTileEntity(pos);
 		}
@@ -256,7 +258,7 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 	}
 
 	@Override
-	public java.util.List<net.minecraft.item.ItemStack> getDrops(
+	public List<net.minecraft.item.ItemStack> getDrops(
 		IBlockAccess world, BlockPos pos,
 		IBlockState state, int fortune) {
 		TileEntityMemoryPiston tileentitypiston = BlockMemoryPistonMoving
@@ -267,6 +269,6 @@ public class BlockMemoryPistonMoving extends BlockContainer {
 			return pushed.getBlock().getDrops(world, pos,
 				pushed, fortune);
 		}
-		return new java.util.ArrayList();
+		return new ArrayList();
 	}
 }

@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.tileentity.TileEntityLock;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase.EnumTowerType;
 
@@ -39,7 +39,7 @@ public class ItemBlockLock extends ItemBlockVendorTradableMeta {
         		rgbMix[1] += rgb[1] / dyeColors[t].length;
         		rgbMix[2] += rgb[2] / dyeColors[t].length;
 			}
-			colors[t] = MTUtils.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
+			colors[t] = MTHelper.RGBToInt(rgbMix[0], rgbMix[1], rgbMix[2]);
 		}
     }
     
@@ -84,8 +84,8 @@ public class ItemBlockLock extends ItemBlockVendorTradableMeta {
             {
                 worldIn.playSound(pos.getX() + 0.5F,
                 	pos.getY() + 0.5F, pos.getZ() + 0.5F,
-                	this.block.getStepSound().getPlaceSound(), SoundCategory.BLOCKS, (this.block.getStepSound()
-                	.getVolume() + 1.0F) / 2.0F, this.block.getStepSound().getPitch() * 0.8F, true);
+                	this.block.getSoundType().getPlaceSound(), SoundCategory.BLOCKS, (this.block.getSoundType()
+                	.getVolume() + 1.0F) / 2.0F, this.block.getSoundType().getPitch() * 0.8F, true);
                 TileEntityLock te = (TileEntityLock) worldIn.getTileEntity(pos);
                 te.setTypeIndex(stack.getItemDamage());
                 worldIn.setTileEntity(pos, te);

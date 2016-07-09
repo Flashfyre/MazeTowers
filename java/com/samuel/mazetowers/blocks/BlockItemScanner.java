@@ -54,7 +54,7 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 		super(material, mapColor);
 		this.setHardness(5.0F);
 		this.setTickRandomly(true);
-		this.setCreativeTab(CreativeTabs.tabRedstone);
+		this.setCreativeTab(CreativeTabs.REDSTONE);
 	}
 	
 	public BlockItemScanner(Material material) {
@@ -62,7 +62,7 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 	}
 	
 	public BlockItemScanner() {
-		this(Material.iron);
+		this(Material.IRON);
 	}
 	
 	@Override
@@ -163,8 +163,8 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (this.checkForDrop(worldIn, pos, state)
 			&& !func_181088_a(worldIn, pos,
 				state.getValue(FACING)
@@ -207,7 +207,7 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 						.getX() + 0.5D,
 						pos.getY() + 0.5D,
 						pos.getZ() + 0.5D,
-						SoundEvents.block_metal_pressplate_click_on,
+						SoundEvents.BLOCK_METAL_PRESSPLATE_CLICK_ON,
 						SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 					worldIn.setBlockState(pos, scanState);
 					worldIn.markBlockRangeForRenderUpdate(
@@ -280,7 +280,7 @@ public class BlockItemScanner extends Block implements ITileEntityProvider {
 					pos.getX() + 0.5D,
 					pos.getY() + 0.5D,
 					pos.getZ() + 0.5D,
-					SoundEvents.block_metal_pressplate_click_on,
+					SoundEvents.BLOCK_METAL_PRESSPLATE_CLICK_ON,
 					SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 				worldIn.markBlockRangeForRenderUpdate(pos,
 					pos);

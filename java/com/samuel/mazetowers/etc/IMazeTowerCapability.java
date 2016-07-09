@@ -20,6 +20,8 @@ public interface IMazeTowerCapability {
 
 	public String getTowerName();
 	
+	public int[][] getMTBounds();
+	
 	public void setSpawnPos(BlockPos fromLong);
 
 	public void setEnabled(boolean enabled);
@@ -34,4 +36,7 @@ public interface IMazeTowerCapability {
 	public void setTowerData(int[] towerData);
 
 	public void setTowerName(String towerName);
+
+	public void setMTBounds(int[][] mtBounds);
+	
 }

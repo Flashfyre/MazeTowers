@@ -11,11 +11,13 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -26,68 +28,13 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.init.ModBlocks;
 import com.samuel.mazetowers.world.WorldGenMazeTowers;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MiniTower;
 
 public class MazeTowersGeneralEventHandler {
-
-	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
-	public void onBreakBlock(BlockEvent.BreakEvent e) {
-		if (!e.getWorld().isRemote) {
-			if (MazeTowers.blockProtection &&
-				!e.getPlayer().capabilities.isCreativeMode) {
-    			int dimId = e.getWorld().provider.getDimension();
-    			EntityPlayer player = e.getPlayer();
-    			World world = player.getEntityWorld();
-    			BlockPos pos = e.getPos();
-    			List<MazeTowerBase> towers = MazeTowers.mazeTowers
-    				.getTowers(dimId);
-    			if (towers == null)
-    				return;
-    			Iterator towerIterator = towers.iterator();
-    			Chunk chunk = world
-    				.getChunkFromBlockCoords(e.getPos());
-    			while (towerIterator.hasNext()) {
-    				final MazeTowerBase tower = (MazeTowerBase) towerIterator
-    					.next();
-    				final Chunk towerChunk = tower
-    					.getChunk(world);
-    				if (chunk.equals(towerChunk)) {
-    					BitSet[][] blockBreakabilityData = tower
-    						.getBlockBreakabilityData();
-    					try {
-    						int[] coords = tower
-    							.getCoordsFromPos(pos);
-    						if (coords[0] == 0)
-    							coords[0] = blockBreakabilityData.length - 1;
-    						if (coords[0] >= 0
-    							&& coords[0] < blockBreakabilityData.length
-    							&& !blockBreakabilityData[coords[0]][coords[1]]
-    								.get(coords[2]))
-    							e.setCanceled(true);
-    					} catch (ArrayIndexOutOfBoundsException e_) {
-    						e_ = null;
-    					}
-    					break;
-    				} else if ((chunk.xPosition == towerChunk.xPosition + 1
-    					|| chunk.xPosition == towerChunk.xPosition - 1 || chunk.xPosition == towerChunk.xPosition)
-    					&& (chunk.zPosition == towerChunk.zPosition + 1
-    						|| chunk.zPosition == towerChunk.zPosition - 1 || chunk.zPosition == towerChunk.zPosition)) {
-    					for (MiniTower mt : tower
-    						.getMiniTowers()) {
-    						if (!mt.getPosBreakability(pos)) {
-    							e.setCanceled(true);
-    							return;
-    						}
-    					}
-    				}
-    			}
-    		}
-		}
-	}
 
 	@SubscribeEvent
 	public void OnHarvestDrops(HarvestDropsEvent e) {
@@ -96,7 +43,7 @@ public class MazeTowersGeneralEventHandler {
 				.getDimension() + 1;
 			Chunk chunk = e.getWorld()
 				.getChunkFromBlockCoords(e.getPos());
-			if (MTUtils.getIsMazeTowerPos(dimId - 1, e.getPos())) {
+			if (MTHelper.getIsMazeTowerPos(dimId - 1, e.getPos())) {
 				MazeTowerBase tower = MazeTowers.mazeTowers
 					.getTowerAtCoords(e.getWorld(),
 						chunk.xPosition, chunk.zPosition);
@@ -154,70 +101,6 @@ public class MazeTowersGeneralEventHandler {
             		}
         		}
     		}
-		}
-	}
-
-	@SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
-	public void onExplosionDetonate(
-		ExplosionEvent.Detonate e) {
-		if (!e.getWorld().isRemote && MazeTowers.blockProtection) {
-			Map<Chunk, List<BlockPos>> chunkBlocks = new HashMap<Chunk, List<BlockPos>>();
-			WorldGenMazeTowers mazeTowers = MazeTowers.mazeTowers;
-			for (BlockPos pos : e.getAffectedBlocks()) {
-				Chunk chunk = e.getWorld()
-					.getChunkFromBlockCoords(pos);
-				if (chunkBlocks.containsKey(chunk))
-					chunkBlocks.get(chunk).add(pos);
-				else {
-					List<BlockPos> posList = new ArrayList<BlockPos>();
-					posList.add(pos);
-					chunkBlocks.put(chunk, posList);
-				}
-			}
-			List<BlockPos> toRemove = new ArrayList<BlockPos>();
-			for (Chunk chunk : chunkBlocks.keySet()) {
-				MazeTowerBase tower = mazeTowers
-					.getTowerAtCoords(e.getWorld(),
-						chunk.xPosition, chunk.zPosition);
-				int[] coords = null;
-				if (tower != null) {
-					BitSet[][] blockBreakabilityData = tower
-						.getBlockBreakabilityData();
-					
-					if (blockBreakabilityData[0] == null)
-						return;
-
-					for (BlockPos pos : chunkBlocks
-						.get(chunk)) {
-						try {
-							coords = tower
-								.getCoordsFromPos(pos);
-							if (coords[0] == -6)
-								coords[0] = blockBreakabilityData.length - 1;
-							if (coords[0] >= 0 && coords[0] < blockBreakabilityData.length
-								&& !blockBreakabilityData[coords[0]][coords[1]].get(coords[2]))
-								toRemove.add(pos);
-						} catch (ArrayIndexOutOfBoundsException e1) {
-							e1 = null;
-						}
-					}
-				} else if ((tower = mazeTowers
-					.getTowerBesideCoords(e.getWorld(),
-						chunk.xPosition, chunk.zPosition)) != null) {
-					for (BlockPos pos : chunkBlocks
-						.get(chunk)) {
-						for (MiniTower mt : tower
-							.getMiniTowers()) {
-							if (!mt.getPosBreakability(pos)) {
-								toRemove.add(pos);
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			e.getAffectedBlocks().removeAll(toRemove);
 		}
 	}
 	

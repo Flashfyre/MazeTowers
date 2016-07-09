@@ -226,7 +226,7 @@ public class TileEntityMineralChest extends TileEntityChest
             }
 
             this.worldObj.playSound((EntityPlayer)null, d1, j + 0.5D, d2,
-            	SoundEvents.block_chest_open, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            	SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
 
         if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
@@ -264,7 +264,7 @@ public class TileEntityMineralChest extends TileEntityChest
                     d3 += 0.5D;
                 }
 
-                this.worldObj.playSound((EntityPlayer)null, d3, j + 0.5D, d0, SoundEvents.block_chest_close,
+                this.worldObj.playSound((EntityPlayer)null, d3, j + 0.5D, d0, SoundEvents.BLOCK_CHEST_CLOSE,
                 	SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
             }
 

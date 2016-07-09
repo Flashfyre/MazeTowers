@@ -20,7 +20,7 @@ public class TileEntityChaoticSludgeToxin extends
 
 	@Override
 	public void update() {
-		if (!this.worldObj.isRemote && tickCounter++ == 50) {
+		if (!this.worldObj.isRemote && tickCounter++ >= 50) {
 			float posX, posY, posZ;
 			List list = worldObj.getEntitiesWithinAABB(
 				EntityPlayer.class, new AxisAlignedBB(
@@ -45,35 +45,35 @@ public class TileEntityChaoticSludgeToxin extends
 					}
 
 					if (!entity
-						.isPotionActive(MobEffects.moveSlowdown))
+						.isPotionActive(MobEffects.SLOWNESS))
 						entity
 							.addPotionEffect(new PotionEffect(
-								MobEffects.moveSlowdown, 250, 0));
+								MobEffects.SLOWNESS, 250, 0));
 					else if (!entity
-						.isPotionActive(MobEffects.weakness))
+						.isPotionActive(MobEffects.WEAKNESS))
 						entity
 							.addPotionEffect(new PotionEffect(
-								MobEffects.weakness, 250, 0));
+								MobEffects.WEAKNESS, 250, 0));
 					else if (!entity
-						.isPotionActive(MobEffects.poison))
+						.isPotionActive(MobEffects.POISON))
 						entity
 							.addPotionEffect(new PotionEffect(
-								MobEffects.poison, 250, 0));
+								MobEffects.POISON, 250, 0));
 					else if (!entity
-						.isPotionActive(MobEffects.wither))
+						.isPotionActive(MobEffects.WITHER))
 						entity
 							.addPotionEffect(new PotionEffect(
-								MobEffects.wither, 250, 0));
+								MobEffects.WITHER, 250, 0));
 					else {
 						int amplifier = 0;
 						if (entity
-							.isPotionActive(MobEffects.blindness)) {
+							.isPotionActive(MobEffects.BLINDNESS)) {
 							amplifier = 1;
-							entity.removePotionEffect(MobEffects.blindness);
+							entity.removePotionEffect(MobEffects.BLINDNESS);
 						}
 						entity
 							.addPotionEffect(new PotionEffect(
-								MobEffects.blindness, 250, amplifier));
+								MobEffects.BLINDNESS, 250, amplifier));
 					}
 				}
 			}

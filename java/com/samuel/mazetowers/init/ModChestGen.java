@@ -25,312 +25,315 @@ public class ModChestGen {
 			chestContents[i - 1].setMax(4 + addToLimit); // exclusive
 		}
 		if (chestContents[0].getItems(rand).isEmpty() || refresh) {*/
+			if (!refresh) {
+				
+			}
     		// TOOLS
     		// D: 10%
-    		addItem(0, new ItemStack(Items.wooden_pickaxe, 1), 1,
+    		addItem(0, new ItemStack(Items.WOODEN_PICKAXE, 1), 1,
     			1, 25);
-    		addItem(0, new ItemStack(Items.wooden_axe, 1), 1,
+    		addItem(0, new ItemStack(Items.WOODEN_AXE, 1), 1,
     			1, 20);
-    		addItem(0, new ItemStack(Items.wooden_shovel, 1), 1,
+    		addItem(0, new ItemStack(Items.WOODEN_SHOVEL, 1), 1,
     			1, 20);
-    		addItem(0, new ItemStack(Items.wooden_hoe, 1), 1,
+    		addItem(0, new ItemStack(Items.WOODEN_HOE, 1), 1,
     			1, 20);
-    		addItem(0, new ItemStack(Items.wooden_sword, 1), 1,
+    		addItem(0, new ItemStack(Items.WOODEN_SWORD, 1), 1,
     			1, 15);
     		// D+: 7.5%
-    		addItem(1, new ItemStack(Items.wooden_pickaxe, 1), 1,
+    		addItem(1, new ItemStack(Items.WOODEN_PICKAXE, 1), 1,
     			1, 10);
-    		addItem(1, new ItemStack(Items.wooden_axe, 1), 1,
+    		addItem(1, new ItemStack(Items.WOODEN_AXE, 1), 1,
     			1, 8);
-    		addItem(1, new ItemStack(Items.wooden_shovel, 1), 1,
+    		addItem(1, new ItemStack(Items.WOODEN_SHOVEL, 1), 1,
     			1, 8);
-    		addItem(1, new ItemStack(Items.wooden_hoe, 1), 1,
+    		addItem(1, new ItemStack(Items.WOODEN_HOE, 1), 1,
     			1, 8);
-    		addItem(1, new ItemStack(Items.wooden_sword, 1), 1,
+    		addItem(1, new ItemStack(Items.WOODEN_SWORD, 1), 1,
     			1, 5);
-    		addItem(1, new ItemStack(Items.stone_pickaxe, 1), 1,
+    		addItem(1, new ItemStack(Items.STONE_PICKAXE, 1), 1,
     			1, 10);
-    		addItem(1, new ItemStack(Items.stone_axe, 1), 1,
+    		addItem(1, new ItemStack(Items.STONE_AXE, 1), 1,
     			1, 7);
-    		addItem(1, new ItemStack(Items.stone_shovel, 1), 1,
+    		addItem(1, new ItemStack(Items.STONE_SHOVEL, 1), 1,
     			1, 7);
-    		addItem(1, new ItemStack(Items.stone_hoe, 1), 1,
+    		addItem(1, new ItemStack(Items.STONE_HOE, 1), 1,
     			1, 7);
-    		addItem(1, new ItemStack(Items.stone_sword, 1), 1,
+    		addItem(1, new ItemStack(Items.STONE_SWORD, 1), 1,
     			1, 5);
     		// C: 7.5%
-    		addItem(2, new ItemStack(Items.stone_pickaxe, 1), 1,
+    		addItem(2, new ItemStack(Items.STONE_PICKAXE, 1), 1,
     			1, 20);
-    		addItem(2, new ItemStack(Items.stone_axe, 1), 1,
+    		addItem(2, new ItemStack(Items.STONE_AXE, 1), 1,
     			1, 15);
-    		addItem(2, new ItemStack(Items.stone_shovel, 1), 1,
+    		addItem(2, new ItemStack(Items.STONE_SHOVEL, 1), 1,
     			1, 15);
-    		addItem(2, new ItemStack(Items.stone_hoe, 1), 1,
+    		addItem(2, new ItemStack(Items.STONE_HOE, 1), 1,
     			1, 15);
-    		addItem(2, new ItemStack(Items.stone_sword, 1), 1,
+    		addItem(2, new ItemStack(Items.STONE_SWORD, 1), 1,
     			1, 10);
     		// C+: 5%
-    		addItem(3, new ItemStack(Items.stone_pickaxe, 1), 1,
+    		addItem(3, new ItemStack(Items.STONE_PICKAXE, 1), 1,
     			1, 8);
-    		addItem(3, new ItemStack(Items.stone_axe, 1), 1,
+    		addItem(3, new ItemStack(Items.STONE_AXE, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.stone_shovel, 1), 1,
+    		addItem(3, new ItemStack(Items.STONE_SHOVEL, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.stone_hoe, 1), 1,
+    		addItem(3, new ItemStack(Items.STONE_HOE, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.stone_sword, 1), 1,
+    		addItem(3, new ItemStack(Items.STONE_SWORD, 1), 1,
     			1, 3);
-    		addItem(3, new ItemStack(Items.golden_pickaxe, 1), 1,
+    		addItem(3, new ItemStack(Items.GOLDEN_PICKAXE, 1), 1,
     			1, 7);
-    		addItem(3, new ItemStack(Items.golden_axe, 1), 1,
+    		addItem(3, new ItemStack(Items.GOLDEN_AXE, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.golden_shovel, 1), 1,
+    		addItem(3, new ItemStack(Items.GOLDEN_SHOVEL, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.golden_hoe, 1), 1,
+    		addItem(3, new ItemStack(Items.GOLDEN_HOE, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.golden_sword, 1), 1,
+    		addItem(3, new ItemStack(Items.GOLDEN_SWORD, 1), 1,
     			1, 2);
     		//B: 5%
-    		addItem(4, new ItemStack(Items.golden_pickaxe, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_PICKAXE, 1), 1,
     			1, 15);
-    		addItem(4, new ItemStack(Items.golden_axe, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_AXE, 1), 1,
     			1, 10);
-    		addItem(4, new ItemStack(Items.golden_shovel, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_SHOVEL, 1), 1,
     			1, 10);
-    		addItem(4, new ItemStack(Items.golden_hoe, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_HOE, 1), 1,
     			1, 10);
-    		addItem(4, new ItemStack(Items.golden_sword, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_SWORD, 1), 1,
     			1, 5);
     		//B+: 5%
-    		addItem(5, new ItemStack(Items.golden_pickaxe, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_PICKAXE, 1), 1,
     			1, 8);
-    		addItem(5, new ItemStack(Items.golden_axe, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_AXE, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.golden_shovel, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_SHOVEL, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.golden_hoe, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_HOE, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.golden_sword, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_SWORD, 1), 1,
     			1, 3);
-    		addItem(5, new ItemStack(Items.iron_pickaxe, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_PICKAXE, 1), 1,
     			1, 7);
-    		addItem(5, new ItemStack(Items.iron_axe, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_AXE, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.iron_shovel, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_SHOVEL, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.iron_hoe, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_HOE, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.iron_sword, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_SWORD, 1), 1,
     			1, 2);
     		// A: 5%
-    		addItem(6, new ItemStack(Items.iron_pickaxe, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_PICKAXE, 1), 1,
     			1, 15);
-    		addItem(6, new ItemStack(Items.iron_axe, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_AXE, 1), 1,
     			1, 10);
-    		addItem(6, new ItemStack(Items.iron_shovel, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_SHOVEL, 1), 1,
     			1, 10);
-    		addItem(6, new ItemStack(Items.iron_hoe, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_HOE, 1), 1,
     			1, 10);
-    		addItem(6, new ItemStack(Items.iron_sword, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_SWORD, 1), 1,
     			1, 5);
     		// A+: 7.5%
-    		addItem(7, new ItemStack(Items.iron_pickaxe, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_PICKAXE, 1), 1,
     			1, 10);
-    		addItem(7, new ItemStack(Items.iron_axe, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_AXE, 1), 1,
     			1, 8);
-    		addItem(7, new ItemStack(Items.iron_shovel, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_SHOVEL, 1), 1,
     			1, 8);
-    		addItem(7, new ItemStack(Items.iron_hoe, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_HOE, 1), 1,
     			1, 8);
-    		addItem(7, new ItemStack(Items.iron_sword, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_SWORD, 1), 1,
     			1, 5);
-    		addItem(7, new ItemStack(Items.diamond_pickaxe, 1), 1,
+    		addItem(7, new ItemStack(Items.DIAMOND_PICKAXE, 1), 1,
     			1, 10);
-    		addItem(7, new ItemStack(Items.diamond_axe, 1), 1,
+    		addItem(7, new ItemStack(Items.DIAMOND_AXE, 1), 1,
     			1, 7);
-    		addItem(7, new ItemStack(Items.diamond_shovel, 1), 1,
+    		addItem(7, new ItemStack(Items.DIAMOND_SHOVEL, 1), 1,
     			1, 7);
-    		addItem(7, new ItemStack(Items.diamond_hoe, 1), 1,
+    		addItem(7, new ItemStack(Items.DIAMOND_HOE, 1), 1,
     			1, 7);
-    		addItem(7, new ItemStack(Items.diamond_sword, 1), 1,
+    		addItem(7, new ItemStack(Items.DIAMOND_SWORD, 1), 1,
     			1, 5);
     		// S: 7.5%
-    		addItem(8, new ItemStack(Items.diamond_pickaxe, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_PICKAXE, 1), 1,
     			1, 20);
-    		addItem(8, new ItemStack(Items.diamond_axe, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_AXE, 1), 1,
     			1, 15);
-    		addItem(8, new ItemStack(Items.diamond_shovel, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_SHOVEL, 1), 1,
     			1, 15);
-    		addItem(8, new ItemStack(Items.diamond_hoe, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_HOE, 1), 1,
     			1, 15);
-    		addItem(8, new ItemStack(Items.diamond_sword, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_SWORD, 1), 1,
     			1, 10);
     		// S+: 10%
-    		addItem(9, new ItemStack(Items.diamond_pickaxe, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_PICKAXE, 1), 1,
     			1, 25);
-    		addItem(9, new ItemStack(Items.diamond_axe, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_AXE, 1), 1,
     			1, 20);
-    		addItem(9, new ItemStack(Items.diamond_shovel, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_SHOVEL, 1), 1,
     			1, 20);
-    		addItem(9, new ItemStack(Items.diamond_hoe, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_HOE, 1), 1,
     			1, 20);
-    		addItem(9, new ItemStack(Items.diamond_sword, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_SWORD, 1), 1,
     			1, 15);
     		// FOOD
     		// D: 25%
-    		addItem(0, new ItemStack(Items.rotten_flesh, 1), 1,
+    		addItem(0, new ItemStack(Items.ROTTEN_FLESH, 1), 1,
     			2, 175);
-    		addItem(0, new ItemStack(Items.spider_eye, 1), 1,
+    		addItem(0, new ItemStack(Items.SPIDER_EYE, 1), 1,
     			2, 75);
     		// D+: 22.5%
-    		addItem(1, new ItemStack(Items.rotten_flesh, 1), 1,
+    		addItem(1, new ItemStack(Items.ROTTEN_FLESH, 1), 1,
     			4, 150);
-    		addItem(1, new ItemStack(Items.spider_eye, 1), 1,
+    		addItem(1, new ItemStack(Items.SPIDER_EYE, 1), 1,
     			3, 50);
-    		addItem(1, new ItemStack(Items.poisonous_potato, 1), 1,
+    		addItem(1, new ItemStack(Items.POISONOUS_POTATO, 1), 1,
     			1, 25);
     		// C: 20%
-    		addItem(2, new ItemStack(Items.rotten_flesh, 1), 1,
+    		addItem(2, new ItemStack(Items.ROTTEN_FLESH, 1), 1,
     			8, 100);
-    		addItem(2, new ItemStack(Items.poisonous_potato, 1), 1,
+    		addItem(2, new ItemStack(Items.POISONOUS_POTATO, 1), 1,
     			2, 50);
-    		addItem(2, new ItemStack(Items.spider_eye, 1), 2,
+    		addItem(2, new ItemStack(Items.SPIDER_EYE, 1), 2,
     			4, 25);
-    		addItem(2, new ItemStack(Items.potato, 1), 1,
+    		addItem(2, new ItemStack(Items.POTATO, 1), 1,
     			1, 25);
     		// C+: 17.5%
-    		addItem(3, new ItemStack(Items.poisonous_potato, 1), 1,
+    		addItem(3, new ItemStack(Items.POISONOUS_POTATO, 1), 1,
     			4, 75);
-    		addItem(3, new ItemStack(Items.potato, 1), 1,
+    		addItem(3, new ItemStack(Items.POTATO, 1), 1,
     			2, 50);
-    		addItem(3, new ItemStack(Items.melon, 1), 1,
+    		addItem(3, new ItemStack(Items.MELON, 1), 1,
     			1, 25);
-    		addItem(3, new ItemStack(Items.rotten_flesh, 1), 1,
+    		addItem(3, new ItemStack(Items.ROTTEN_FLESH, 1), 1,
     			16, 25);
     		// B: 15%
-    		addItem(4, new ItemStack(Items.potato, 1), 1,
+    		addItem(4, new ItemStack(Items.POTATO, 1), 1,
     			3, 75);
-    		addItem(4, new ItemStack(Items.melon, 1), 1,
+    		addItem(4, new ItemStack(Items.MELON, 1), 1,
     			2, 50);
-    		addItem(4, new ItemStack(Items.carrot, 1), 1,
+    		addItem(4, new ItemStack(Items.CARROT, 1), 1,
     			1, 25);
     		// B+: 12.5%
-    		addItem(5, new ItemStack(Items.melon, 1), 1,
+    		addItem(5, new ItemStack(Items.MELON, 1), 1,
     			3, 50);
-    		addItem(5, new ItemStack(Items.carrot, 1), 1,
+    		addItem(5, new ItemStack(Items.CARROT, 1), 1,
     			2, 38);
-    		addItem(5, new ItemStack(Items.apple, 1), 1,
+    		addItem(5, new ItemStack(Items.APPLE, 1), 1,
     			1, 12);
     		// A: 10%
-    		addItem(6, new ItemStack(Items.carrot, 1), 1,
+    		addItem(6, new ItemStack(Items.CARROT, 1), 1,
     			3, 50);
-    		addItem(6, new ItemStack(Items.apple, 1), 1,
+    		addItem(6, new ItemStack(Items.APPLE, 1), 1,
     			2, 38);
-    		addItem(6, new ItemStack(Items.bread, 1), 1,
+    		addItem(6, new ItemStack(Items.BREAD, 1), 1,
     			1, 12);
     		// A+: 7.5%
-    		addItem(7, new ItemStack(Items.apple, 1), 1,
+    		addItem(7, new ItemStack(Items.APPLE, 1), 1,
     			3, 45);
-    		addItem(7, new ItemStack(Items.bread, 1), 1,
+    		addItem(7, new ItemStack(Items.BREAD, 1), 1,
     			2, 23);
-    		addItem(7, new ItemStack(Items.golden_apple, 1), 1,
+    		addItem(7, new ItemStack(Items.GOLDEN_APPLE, 1), 1,
     			2, 7);
     		// S: 5%
-    		addItem(8, new ItemStack(Items.bread, 1), 1,
+    		addItem(8, new ItemStack(Items.BREAD, 1), 1,
     			3, 38);
-    		addItem(8, new ItemStack(Items.golden_apple, 1), 1,
+    		addItem(8, new ItemStack(Items.GOLDEN_APPLE, 1), 1,
     			2, 12);
     		// S+: 5%
-    		addItem(9, new ItemStack(Items.bread, 1), 2,
+    		addItem(9, new ItemStack(Items.BREAD, 1), 2,
     			4, 25);
-    		addItem(9, new ItemStack(Items.golden_apple, 1), 1,
+    		addItem(9, new ItemStack(Items.GOLDEN_APPLE, 1), 1,
     			3, 18);
-    		addItem(9, new ItemStack(Items.golden_apple, 1, 1), 1,
+    		addItem(9, new ItemStack(Items.GOLDEN_APPLE, 1, 1), 1,
     			1, 7);
     		// MISC
     		// D: 65%
-    		addItem(0, new ItemStack(Items.stick, 1), 1, 2, 175);
-    		addItem(0, new ItemStack(Items.feather, 1), 1, 2, 125);
-    		addItem(0, new ItemStack(Items.string, 1), 1, 2, 125);
-    		addItem(0, new ItemStack(Items.bone, 1), 1, 2, 75);
-    		addItem(0, new ItemStack(Items.paper, 1), 1, 2, 75);
-    		addItem(0, new ItemStack(Items.flint, 1), 1, 2, 75);
+    		addItem(0, new ItemStack(Items.STICK, 1), 1, 2, 175);
+    		addItem(0, new ItemStack(Items.FEATHER, 1), 1, 2, 125);
+    		addItem(0, new ItemStack(Items.STRING, 1), 1, 2, 125);
+    		addItem(0, new ItemStack(Items.BONE, 1), 1, 2, 75);
+    		addItem(0, new ItemStack(Items.PAPER, 1), 1, 2, 75);
+    		addItem(0, new ItemStack(Items.FLINT, 1), 1, 2, 75);
     		// D+: 65.125% 
-    		addItem(1, new ItemStack(Items.stick, 1), 2, 4, 100);
-    		addItem(1, new ItemStack(Items.feather, 1), 2, 4, 40);
-    		addItem(1, new ItemStack(Items.string, 1), 2, 4, 40);
-    		addItem(1, new ItemStack(Items.bone, 1), 2, 4, 25);
-    		addItem(1, new ItemStack(Items.paper, 1), 2, 4, 25);
-    		addItem(1, new ItemStack(Items.flint, 1), 2, 4, 25);
-    		addItem(1, new ItemStack(Items.gunpowder, 1), 1, 2,
+    		addItem(1, new ItemStack(Items.STICK, 1), 2, 4, 100);
+    		addItem(1, new ItemStack(Items.FEATHER, 1), 2, 4, 40);
+    		addItem(1, new ItemStack(Items.STRING, 1), 2, 4, 40);
+    		addItem(1, new ItemStack(Items.BONE, 1), 2, 4, 25);
+    		addItem(1, new ItemStack(Items.PAPER, 1), 2, 4, 25);
+    		addItem(1, new ItemStack(Items.FLINT, 1), 2, 4, 25);
+    		addItem(1, new ItemStack(Items.GUNPOWDER, 1), 1, 2,
     			125);
-    		addItem(1, new ItemStack(Items.leather, 1), 1, 2,
+    		addItem(1, new ItemStack(Items.LEATHER, 1), 1, 2,
     			125);
-    		addItem(1, new ItemStack(Items.coal, 1, 1), 1, 2, 60);
-    		addItem(1, new ItemStack(Items.coal, 1), 1, 2, 20);
+    		addItem(1, new ItemStack(Items.COAL, 1, 1), 1, 2, 60);
+    		addItem(1, new ItemStack(Items.COAL, 1), 1, 2, 20);
     		addItem(1, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass_pane), 1), 1, 2,
+    			.getItemFromBlock(Blocks.GLASS_PANE), 1), 1, 2,
     			35);
     		addItem(1, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass), 1), 1, 1, 30);
+    			.getItemFromBlock(Blocks.GLASS), 1), 1, 1, 30);
     		// C: 65%
-    		addItem(2, new ItemStack(Items.arrow, 1), 1, 2, 175);
-    		addItem(2, new ItemStack(Items.leather, 1), 2, 4,
+    		addItem(2, new ItemStack(Items.ARROW, 1), 1, 2, 175);
+    		addItem(2, new ItemStack(Items.LEATHER, 1), 2, 4,
     			100);
-    		addItem(2, new ItemStack(Items.gunpowder, 1), 2, 4,
+    		addItem(2, new ItemStack(Items.GUNPOWDER, 1), 2, 4,
     			75);
-    		addItem(2, new ItemStack(Items.stick, 1), 3, 9, 75);
-    		addItem(2, new ItemStack(Items.feather, 1), 3, 9, 10);
-    		addItem(2, new ItemStack(Items.string, 1), 3, 9, 10);
-    		addItem(2, new ItemStack(Items.bone, 1), 3, 9, 5);
-    		addItem(2, new ItemStack(Items.paper, 1), 3, 9, 5);
-    		addItem(2, new ItemStack(Items.flint, 1), 3, 9, 5);
+    		addItem(2, new ItemStack(Items.STICK, 1), 3, 9, 75);
+    		addItem(2, new ItemStack(Items.FEATHER, 1), 3, 9, 10);
+    		addItem(2, new ItemStack(Items.STRING, 1), 3, 9, 10);
+    		addItem(2, new ItemStack(Items.BONE, 1), 3, 9, 5);
+    		addItem(2, new ItemStack(Items.PAPER, 1), 3, 9, 5);
+    		addItem(2, new ItemStack(Items.FLINT, 1), 3, 9, 5);
     		addItem(2, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass_pane), 1), 2, 8, 70);
+    			.getItemFromBlock(Blocks.GLASS_PANE), 1), 2, 8, 70);
     		addItem(2, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass), 1), 2, 4, 45);
-    		addItem(2, new ItemStack(Items.coal, 1, 1), 2, 4, 65);
-    		addItem(2, new ItemStack(Items.coal, 1), 2, 4, 65);
-    		addItem(2, new ItemStack(Items.wheat, 1), 1, 2,
+    			.getItemFromBlock(Blocks.GLASS), 1), 2, 4, 45);
+    		addItem(2, new ItemStack(Items.COAL, 1, 1), 2, 4, 65);
+    		addItem(2, new ItemStack(Items.COAL, 1), 2, 4, 65);
+    		addItem(2, new ItemStack(Items.WHEAT, 1), 1, 2,
     			30);
-    		addItem(2, new ItemStack(Items.sugar, 1), 1, 2,
+    		addItem(2, new ItemStack(Items.SUGAR, 1), 1, 2,
     			20);
-    		addItem(2, new ItemStack(Items.bowl, 1), 1, 1,
+    		addItem(2, new ItemStack(Items.BOWL, 1), 1, 1,
     			20);
-    		addItem(2, new ItemStack(Items.egg, 1), 1, 2,
+    		addItem(2, new ItemStack(Items.EGG, 1), 1, 2,
     			10);
     		// C+: 67.5%
-    		addItem(3, new ItemStack(Items.arrow, 1), 2, 4, 150);
-    		addItem(3, new ItemStack(Items.stick, 1), 3, 9,
+    		addItem(3, new ItemStack(Items.ARROW, 1), 2, 4, 150);
+    		addItem(3, new ItemStack(Items.STICK, 1), 3, 9,
     			50);
-    		addItem(3, new ItemStack(Items.leather, 1), 4, 8,
+    		addItem(3, new ItemStack(Items.LEATHER, 1), 4, 8,
     			50);
     		addItem(3, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass_pane), 1), 3, 9, 45);
+    			.getItemFromBlock(Blocks.GLASS_PANE), 1), 3, 9, 45);
     		addItem(3, new ItemStack(Item
-    			.getItemFromBlock(Blocks.glass), 1), 3, 9, 45);
-    		addItem(3, new ItemStack(Items.gunpowder, 1), 3, 9,
+    			.getItemFromBlock(Blocks.GLASS), 1), 3, 9, 45);
+    		addItem(3, new ItemStack(Items.GUNPOWDER, 1), 3, 9,
     			35);
-    		addItem(3, new ItemStack(Items.glass_bottle, 1), 1, 4, 25);
-    		addItem(3, new ItemStack(Items.wheat, 1), 2, 4,
+    		addItem(3, new ItemStack(Items.GLASS_BOTTLE, 1), 1, 4, 25);
+    		addItem(3, new ItemStack(Items.WHEAT, 1), 2, 4,
     			50);
-    		addItem(3, new ItemStack(Items.sugar, 1), 2, 4,
+    		addItem(3, new ItemStack(Items.SUGAR, 1), 2, 4,
     			35);
-    		addItem(3, new ItemStack(Items.bowl, 1), 1, 2,
+    		addItem(3, new ItemStack(Items.BOWL, 1), 1, 2,
     			25);
-    		addItem(3, new ItemStack(Items.egg, 1), 2, 4,
+    		addItem(3, new ItemStack(Items.EGG, 1), 2, 4,
     			15);
-    		addItem(3, new ItemStack(Items.coal, 1), 3, 9, 30);
-    		addItem(3, new ItemStack(Items.coal, 1, 1), 3, 9, 10);
+    		addItem(3, new ItemStack(Items.COAL, 1), 3, 9, 30);
+    		addItem(3, new ItemStack(Items.COAL, 1, 1), 3, 9, 10);
     		// B: 66%
-    		addItem(4, new ItemStack(Items.arrow, 1), 4, 16, 125);
-    		addItem(4, new ItemStack(Items.wheat, 1), 3, 9,
+    		addItem(4, new ItemStack(Items.ARROW, 1), 4, 16, 125);
+    		addItem(4, new ItemStack(Items.WHEAT, 1), 3, 9,
     			30);
-    		addItem(4, new ItemStack(Items.sugar, 1), 3, 9,
+    		addItem(4, new ItemStack(Items.SUGAR, 1), 3, 9,
     			20);
-    		addItem(4, new ItemStack(Items.egg, 1), 3, 9,
+    		addItem(4, new ItemStack(Items.EGG, 1), 3, 9,
     			10);
-    		addItem(4, new ItemStack(Items.bowl, 1), 1, 3,
+    		addItem(4, new ItemStack(Items.BOWL, 1), 1, 3,
     			20);
     		// B+: 67.5%
     		// A: 68%
@@ -339,232 +342,232 @@ public class ModChestGen {
     		// S+ 41%
     		// RARE
     		// D+: 1.125%
-    		addItem(1, new ItemStack(Items.ender_pearl, 1), 1,
+    		addItem(1, new ItemStack(Items.ENDER_PEARL, 1), 1,
     			1, 12);
     		// C: 3.5%
-    		addItem(2, new ItemStack(Items.ender_pearl, 1), 1,
+    		addItem(2, new ItemStack(Items.ENDER_PEARL, 1), 1,
     			2, 28);
-    		addItem(2, new ItemStack(Items.experience_bottle, 1), 1,
+    		addItem(2, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 1,
     			1, 7);
     		// C+ 7%
-    		addItem(3, new ItemStack(Items.ender_pearl, 1), 1,
+    		addItem(3, new ItemStack(Items.ENDER_PEARL, 1), 1,
     			2, 35);
-    		addItem(3, new ItemStack(Items.experience_bottle, 1), 1,
+    		addItem(3, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 1,
     			2, 25);
-    		addItem(3, new ItemStack(Items.redstone, 1), 1,
+    		addItem(3, new ItemStack(Items.REDSTONE, 1), 1,
     			2, 10);
     		// B: 10.5%
-    		addItem(4, new ItemStack(Items.ender_pearl, 1), 2,
+    		addItem(4, new ItemStack(Items.ENDER_PEARL, 1), 2,
     			4, 34);
-    		addItem(4, new ItemStack(Items.experience_bottle, 1), 1,
+    		addItem(4, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 1,
     			3, 25);
-    		addItem(4, new ItemStack(Items.redstone, 1), 2,
+    		addItem(4, new ItemStack(Items.REDSTONE, 1), 2,
     			4, 23);
-    		addItem(4, new ItemStack(Items.gold_ingot, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLD_INGOT, 1), 1,
     			1, 18);
-    		addItem(4, new ItemStack(Item.getItemFromBlock(Blocks.coal_block), 1), 1,
+    		addItem(4, new ItemStack(Item.getItemFromBlock(Blocks.COAL_BLOCK), 1), 1,
     			1, 4);
     		// B+: 10.5%
-    		addItem(5, new ItemStack(Items.experience_bottle, 1), 1,
+    		addItem(5, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 1,
     			4, 25);
-    		addItem(5, new ItemStack(Items.redstone, 1), 3,
+    		addItem(5, new ItemStack(Items.REDSTONE, 1), 3,
     			9, 30);
-    		addItem(5, new ItemStack(Items.gold_ingot, 1), 2,
+    		addItem(5, new ItemStack(Items.GOLD_INGOT, 1), 2,
     			4, 20);
-    		addItem(5, new ItemStack(Items.iron_ingot, 1), 1,
+    		addItem(5, new ItemStack(Items.IRON_INGOT, 1), 1,
     			2, 10);
-    		addItem(5, new ItemStack(Items.ender_pearl, 1), 3,
+    		addItem(5, new ItemStack(Items.ENDER_PEARL, 1), 3,
     			9, 10);
-    		addItem(5, new ItemStack(Item.getItemFromBlock(Blocks.coal_block), 1), 1,
+    		addItem(5, new ItemStack(Item.getItemFromBlock(Blocks.COAL_BLOCK), 1), 1,
     			2, 8);
-    		addItem(5, new ItemStack(Items.diamond, 1), 1,
+    		addItem(5, new ItemStack(Items.DIAMOND, 1), 1,
     			1, 1);
-    		addItem(6, new ItemStack(Items.ender_eye, 1), 1,
+    		addItem(6, new ItemStack(Items.ENDER_EYE, 1), 1,
     			1, 1);
     		// A: 10.5%
-    		addItem(6, new ItemStack(Items.experience_bottle, 1), 1,
+    		addItem(6, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 1,
     			5, 25);
-    		addItem(6, new ItemStack(Items.gold_ingot, 1), 3,
+    		addItem(6, new ItemStack(Items.GOLD_INGOT, 1), 3,
     			9, 25);
-    		addItem(6, new ItemStack(Items.iron_ingot, 1), 2,
+    		addItem(6, new ItemStack(Items.IRON_INGOT, 1), 2,
     			4, 18);
-    		addItem(6, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 1, 15);
-    		addItem(6, new ItemStack(Item.getItemFromBlock(Blocks.coal_block), 1), 1, 3, 12);
-    		addItem(6, new ItemStack(Items.ender_pearl, 1), 4,
+    		addItem(6, new ItemStack(Item.getItemFromBlock(Blocks.REDSTONE_BLOCK)), 1, 1, 15);
+    		addItem(6, new ItemStack(Item.getItemFromBlock(Blocks.COAL_BLOCK), 1), 1, 3, 12);
+    		addItem(6, new ItemStack(Items.ENDER_PEARL, 1), 4,
     			16, 6);
-    		addItem(5, new ItemStack(Items.diamond, 1), 1,
+    		addItem(5, new ItemStack(Items.DIAMOND, 1), 1,
     			1, 3);
-    		addItem(6, new ItemStack(Items.ender_eye, 1), 1,
+    		addItem(6, new ItemStack(Items.ENDER_EYE, 1), 1,
     			2, 2);
-    		addItem(6, new ItemStack(Items.emerald, 1), 1,
+    		addItem(6, new ItemStack(Items.EMERALD, 1), 1,
     			1, 1);
     		// A+ 7%
-    		addItem(7, new ItemStack(Items.experience_bottle, 1), 2,
+    		addItem(7, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 2,
     			6, 18);
-    		addItem(7, new ItemStack(Items.iron_ingot, 1), 3,
+    		addItem(7, new ItemStack(Items.IRON_INGOT, 1), 3,
     			9, 25);
-    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 2, 9);
-    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 1, 6);
-    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 1, 2, 4);
-    		addItem(7, new ItemStack(Items.diamond, 1), 1, 2, 4);
-    		addItem(7, new ItemStack(Items.emerald, 1), 1, 2, 2);
-    		addItem(7, new ItemStack(Items.skull, 1, 1), 1, 1, 2);
+    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.REDSTONE_BLOCK)), 1, 2, 9);
+    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.GOLD_BLOCK)), 1, 1, 6);
+    		addItem(7, new ItemStack(Item.getItemFromBlock(Blocks.OBSIDIAN)), 1, 2, 4);
+    		addItem(7, new ItemStack(Items.DIAMOND, 1), 1, 2, 4);
+    		addItem(7, new ItemStack(Items.EMERALD, 1), 1, 2, 2);
+    		addItem(7, new ItemStack(Items.SKULL, 1, 1), 1, 1, 2);
     		// S: 5.25%
-    		addItem(8, new ItemStack(Items.experience_bottle, 1), 3,
+    		addItem(8, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 3,
     			7, 14);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 2, 4, 13);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 3, 6);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 2, 4);
-    		addItem(8, new ItemStack(Items.diamond), 2, 4, 5);
-    		addItem(8, new ItemStack(Items.emerald), 2, 4, 3);
-    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.iron_block)), 1, 1, 3);
-    		addItem(8, new ItemStack(Items.skull, 1, 1), 1, 1, 4);
-    		addItem(8, new ItemStack(Items.nether_star, 1), 1,
+    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.OBSIDIAN)), 2, 4, 13);
+    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.REDSTONE_BLOCK)), 1, 3, 6);
+    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.GOLD_BLOCK)), 1, 2, 4);
+    		addItem(8, new ItemStack(Items.DIAMOND), 2, 4, 5);
+    		addItem(8, new ItemStack(Items.EMERALD), 2, 4, 3);
+    		addItem(8, new ItemStack(Item.getItemFromBlock(Blocks.IRON_BLOCK)), 1, 1, 3);
+    		addItem(8, new ItemStack(Items.SKULL, 1, 1), 1, 1, 4);
+    		addItem(8, new ItemStack(Items.NETHER_STAR, 1), 1,
     			1, 1);
     		// S+: 7%
-    		addItem(9, new ItemStack(Items.experience_bottle, 1), 4,
+    		addItem(9, new ItemStack(Items.EXPERIENCE_BOTTLE, 1), 4,
     			8, 12);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.obsidian)), 3, 9, 13);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.redstone_block)), 1, 3, 12);
-    		addItem(9, new ItemStack(Items.skull, 1, 1), 1, 1, 6);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.gold_block)), 1, 2, 8);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.iron_block)), 1, 1, 6);
-    		addItem(9, new ItemStack(Items.diamond), 3, 9, 5);
-    		addItem(9, new ItemStack(Items.emerald), 3, 6, 4);
-    		addItem(9, new ItemStack(Items.nether_star, 1), 1,
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.OBSIDIAN)), 3, 9, 13);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.REDSTONE_BLOCK)), 1, 3, 12);
+    		addItem(9, new ItemStack(Items.SKULL, 1, 1), 1, 1, 6);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.GOLD_BLOCK)), 1, 2, 8);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.IRON_BLOCK)), 1, 1, 6);
+    		addItem(9, new ItemStack(Items.DIAMOND), 3, 9, 5);
+    		addItem(9, new ItemStack(Items.EMERALD), 3, 6, 4);
+    		addItem(9, new ItemStack(Items.NETHER_STAR, 1), 1,
     			1, 2);
-    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.diamond_block)), 1, 1, 1);
+    		addItem(9, new ItemStack(Item.getItemFromBlock(Blocks.DIAMOND_BLOCK)), 1, 1, 1);
     		addItem(9, new ItemStack(Item
-    			.getItemFromBlock(Blocks.beacon), 1), 1, 1, 1);
+    			.getItemFromBlock(Blocks.BEACON), 1), 1, 1, 1);
     		// ARMOUR
     		// D+: 3.75%
-    		addItem(1, new ItemStack(Items.leather_boots, 1), 1,
+    		addItem(1, new ItemStack(Items.LEATHER_BOOTS, 1), 1,
     			1, 12);
-    		addItem(1, new ItemStack(Items.leather_helmet, 1), 1,
+    		addItem(1, new ItemStack(Items.LEATHER_HELMET, 1), 1,
     			1, 11);
-    		addItem(1, new ItemStack(Items.leather_leggings, 1), 1,
+    		addItem(1, new ItemStack(Items.LEATHER_LEGGINGS, 1), 1,
     			1, 9);
-    		addItem(1, new ItemStack(Items.leather_chestplate, 1), 1,
+    		addItem(1, new ItemStack(Items.LEATHER_CHESTPLATE, 1), 1,
     			1, 6);
     		// C: 3.75%
-    		addItem(2, new ItemStack(Items.leather_boots, 1), 1,
+    		addItem(2, new ItemStack(Items.LEATHER_BOOTS, 1), 1,
     			1, 6);
-    		addItem(2, new ItemStack(Items.leather_helmet, 1), 1,
+    		addItem(2, new ItemStack(Items.LEATHER_HELMET, 1), 1,
     			1, 6);
-    		addItem(2, new ItemStack(Items.leather_leggings, 1), 1,
+    		addItem(2, new ItemStack(Items.LEATHER_LEGGINGS, 1), 1,
     			1, 5);
-    		addItem(2, new ItemStack(Items.leather_chestplate, 1), 1,
+    		addItem(2, new ItemStack(Items.LEATHER_CHESTPLATE, 1), 1,
     			1, 3);
-    		addItem(2, new ItemStack(Items.chainmail_boots, 1), 1,
+    		addItem(2, new ItemStack(Items.CHAINMAIL_BOOTS, 1), 1,
     			1, 6);
-    		addItem(2, new ItemStack(Items.chainmail_helmet, 1), 1,
+    		addItem(2, new ItemStack(Items.CHAINMAIL_HELMET, 1), 1,
     			1, 5);
-    		addItem(2, new ItemStack(Items.chainmail_leggings, 1), 1,
+    		addItem(2, new ItemStack(Items.CHAINMAIL_LEGGINGS, 1), 1,
     			1, 4);
-    		addItem(2, new ItemStack(Items.chainmail_chestplate, 1), 1,
+    		addItem(2, new ItemStack(Items.CHAINMAIL_CHESTPLATE, 1), 1,
     			1, 3);
     		// C+: 2.5%
-    		addItem(3, new ItemStack(Items.chainmail_boots, 1), 1,
+    		addItem(3, new ItemStack(Items.CHAINMAIL_BOOTS, 1), 1,
     			1, 9);
-    		addItem(3, new ItemStack(Items.chainmail_helmet, 1), 1,
+    		addItem(3, new ItemStack(Items.CHAINMAIL_HELMET, 1), 1,
     			1, 8);
-    		addItem(3, new ItemStack(Items.chainmail_leggings, 1), 1,
+    		addItem(3, new ItemStack(Items.CHAINMAIL_LEGGINGS, 1), 1,
     			1, 5);
-    		addItem(3, new ItemStack(Items.chainmail_chestplate, 1), 1,
+    		addItem(3, new ItemStack(Items.CHAINMAIL_CHESTPLATE, 1), 1,
     			1, 3);
     		// B: 2.5%
-    		addItem(4, new ItemStack(Items.chainmail_boots, 1), 1,
+    		addItem(4, new ItemStack(Items.CHAINMAIL_BOOTS, 1), 1,
     			1, 5);
-    		addItem(4, new ItemStack(Items.chainmail_helmet, 1), 1,
+    		addItem(4, new ItemStack(Items.CHAINMAIL_HELMET, 1), 1,
     			1, 4);
-    		addItem(4, new ItemStack(Items.chainmail_leggings, 1), 1,
+    		addItem(4, new ItemStack(Items.CHAINMAIL_LEGGINGS, 1), 1,
     			1, 3);
-    		addItem(4, new ItemStack(Items.chainmail_chestplate, 1), 1,
+    		addItem(4, new ItemStack(Items.CHAINMAIL_CHESTPLATE, 1), 1,
     			1, 2);
-    		addItem(4, new ItemStack(Items.golden_boots, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_BOOTS, 1), 1,
     			1, 4);
-    		addItem(4, new ItemStack(Items.golden_helmet, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_HELMET, 1), 1,
     			1, 4);
-    		addItem(4, new ItemStack(Items.golden_leggings, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_LEGGINGS, 1), 1,
     			1, 2);
-    		addItem(4, new ItemStack(Items.golden_chestplate, 1), 1,
+    		addItem(4, new ItemStack(Items.GOLDEN_CHESTPLATE, 1), 1,
     			1, 1);
     		// B+: 2.5%
-    		addItem(5, new ItemStack(Items.golden_boots, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_BOOTS, 1), 1,
     			1, 9);
-    		addItem(5, new ItemStack(Items.golden_helmet, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_HELMET, 1), 1,
     			1, 8);
-    		addItem(5, new ItemStack(Items.golden_leggings, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_LEGGINGS, 1), 1,
     			1, 5);
-    		addItem(5, new ItemStack(Items.golden_chestplate, 1), 1,
+    		addItem(5, new ItemStack(Items.GOLDEN_CHESTPLATE, 1), 1,
     			1, 3);
     		// A: 2.5%
-    		addItem(6, new ItemStack(Items.golden_boots, 1), 1,
+    		addItem(6, new ItemStack(Items.GOLDEN_BOOTS, 1), 1,
     			1, 5);
-    		addItem(6, new ItemStack(Items.golden_helmet, 1), 1,
+    		addItem(6, new ItemStack(Items.GOLDEN_HELMET, 1), 1,
     			1, 4);
-    		addItem(6, new ItemStack(Items.golden_leggings, 1), 1,
+    		addItem(6, new ItemStack(Items.GOLDEN_LEGGINGS, 1), 1,
     			1, 3);
-    		addItem(6, new ItemStack(Items.golden_chestplate, 1), 1,
+    		addItem(6, new ItemStack(Items.GOLDEN_CHESTPLATE, 1), 1,
     			1, 2);
-    		addItem(6, new ItemStack(Items.iron_boots, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_BOOTS, 1), 1,
     			1, 4);
-    		addItem(6, new ItemStack(Items.iron_helmet, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_HELMET, 1), 1,
     			1, 4);
-    		addItem(6, new ItemStack(Items.iron_leggings, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_LEGGINGS, 1), 1,
     			1, 2);
-    		addItem(6, new ItemStack(Items.iron_chestplate, 1), 1,
+    		addItem(6, new ItemStack(Items.IRON_CHESTPLATE, 1), 1,
     			1, 1);
     		// A+: 3.75%
-    		addItem(7, new ItemStack(Items.iron_boots, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_BOOTS, 1), 1,
     			1, 12);
-    		addItem(7, new ItemStack(Items.iron_helmet, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_HELMET, 1), 1,
     			1, 11);
-    		addItem(7, new ItemStack(Items.iron_leggings, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_LEGGINGS, 1), 1,
     			1, 9);
-    		addItem(7, new ItemStack(Items.iron_chestplate, 1), 1,
+    		addItem(7, new ItemStack(Items.IRON_CHESTPLATE, 1), 1,
     			1, 6);
     		// S: 3.75%
-    		addItem(8, new ItemStack(Items.iron_boots, 1), 1,
+    		addItem(8, new ItemStack(Items.IRON_BOOTS, 1), 1,
     			1, 6);
-    		addItem(8, new ItemStack(Items.iron_helmet, 1), 1,
+    		addItem(8, new ItemStack(Items.IRON_HELMET, 1), 1,
     			1, 6);
-    		addItem(8, new ItemStack(Items.iron_leggings, 1), 1,
+    		addItem(8, new ItemStack(Items.IRON_LEGGINGS, 1), 1,
     			1, 5);
-    		addItem(8, new ItemStack(Items.iron_chestplate, 1), 1,
+    		addItem(8, new ItemStack(Items.IRON_CHESTPLATE, 1), 1,
     			1, 3);
-    		addItem(8, new ItemStack(Items.diamond_boots, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_BOOTS, 1), 1,
     			1, 6);
-    		addItem(8, new ItemStack(Items.diamond_helmet, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_HELMET, 1), 1,
     			1, 5);
-    		addItem(8, new ItemStack(Items.diamond_leggings, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_LEGGINGS, 1), 1,
     			1, 4);
-    		addItem(8, new ItemStack(Items.diamond_chestplate, 1), 1,
+    		addItem(8, new ItemStack(Items.DIAMOND_CHESTPLATE, 1), 1,
     			1, 3);
     		// S+ 5%
-    		addItem(9, new ItemStack(Items.diamond_boots, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_BOOTS, 1), 1,
     			1, 15);
-    		addItem(9, new ItemStack(Items.diamond_helmet, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_HELMET, 1), 1,
     			1, 14);
-    		addItem(9, new ItemStack(Items.diamond_leggings, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_LEGGINGS, 1), 1,
     			1, 11);
-    		addItem(9, new ItemStack(Items.diamond_chestplate, 1), 1,
+    		addItem(9, new ItemStack(Items.DIAMOND_CHESTPLATE, 1), 1,
     			1, 10);
-    		addItem(2, new ItemStack(Items.enchanted_book, 1), 1, 1, 1);
-    		addItem(3, new ItemStack(Items.enchanted_book, 1), 1, 1, 3);
-    		addItem(4, new ItemStack(Items.enchanted_book, 1), 1, 1, 5);
-    		addItem(5, new ItemStack(Items.enchanted_book, 1), 1, 1, 10);
-    		addItem(6, new ItemStack(Items.enchanted_book, 1), 1, 1, 20);
-    		addItem(7, new ItemStack(Items.enchanted_book, 1), 1, 1, 40);
-    		addItem(8, new ItemStack(Items.enchanted_book, 1), 1, 1, 80);
-    		addItem(9, new ItemStack(Items.enchanted_book, 1), 1, 1, 160);
+    		addItem(2, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 1);
+    		addItem(3, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 3);
+    		addItem(4, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 5);
+    		addItem(5, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 10);
+    		addItem(6, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 20);
+    		addItem(7, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 40);
+    		addItem(8, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 80);
+    		addItem(9, new ItemStack(Items.ENCHANTED_BOOK, 1), 1, 1, 160);
 		}
 		/*
 		 * chestContents.addItem(new WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.tnt), 1), 1, 4, 15)); // TNT
 		 * chestContents.addItem(new WeightedRandomChestContent(new
-		 * ItemStack(Item.getItemFromBlock(Blocks.obsidian), 1), 1, 4, 10)); //
-		 * Obsidian chestContents.addItem(new WeightedRandomChestContent(new
+		 * ItemStack(Item.getItemFromBlock(Blocks.OBSIDIAN), 1), 1, 4, 10)); //
+		 * OBSIDIAN chestContents.addItem(new WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.glowstone), 1), 1, 6, 20)); //
 		 * Glowstone chestContents.addItem(new WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.iron_bars), 2), 1, 8, 15)); //
@@ -585,7 +588,7 @@ public class ModChestGen {
 		 * ItemStack(Item.getItemFromBlock(Blocks.anvil), 1, 2), 1, 1, 5)); //
 		 * Anvil (Very Damaged) chestContents.addItem(new
 		 * WeightedRandomChestContent(new
-		 * ItemStack(Item.getItemFromBlock(Blocks.redstone_block), 1), 1, 2,
+		 * ItemStack(Item.getItemFromBlock(Blocks.REDSTONE_BLOCK), 1), 1, 2,
 		 * 4)); // Block of Redstone chestContents.addItem(new
 		 * WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.slime_block), 1), 1, 2, 6));
@@ -703,8 +706,8 @@ public class ModChestGen {
 		 * chestContents_High.setMin(12); // inclusive
 		 * chestContents_High.setMax(21); // exclusive
 		 * chestContents_High.addItem(new WeightedRandomChestContent(new
-		 * ItemStack(Item.getItemFromBlock(Blocks.obsidian), 4), 1, 4, 10)); //
-		 * Obsidian chestContents_High.addItem(new
+		 * ItemStack(Item.getItemFromBlock(Blocks.OBSIDIAN), 4), 1, 4, 10)); //
+		 * OBSIDIAN chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.noteblock), 1), 1, 4, 10)); //
 		 * Note Block chestContents_High.addItem(new
@@ -712,7 +715,7 @@ public class ModChestGen {
 		 * ItemStack(Item.getItemFromBlock(Blocks.sticky_piston), 1), 1, 3, 7));
 		 * // Sticky Piston chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new
-		 * ItemStack(Item.getItemFromBlock(Blocks.diamond_block), 1), 1, 1, 3));
+		 * ItemStack(Item.getItemFromBlock(Blocks.DIAMOND_BLOCK), 1), 1, 1, 3));
 		 * // Block of Diamond chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.jukebox), 1), 1, 4, 10)); //
@@ -724,8 +727,8 @@ public class ModChestGen {
 		 * ItemStack(Item.getItemFromBlock(Blocks.emerald_block), 16), 1, 4,
 		 * 2)); // Block of Emerald chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new
-		 * ItemStack(Item.getItemFromBlock(Blocks.beacon), 1), 1, 2, 1)); //
-		 * Beacon chestContents_High.addItem(new WeightedRandomChestContent(new
+		 * ItemStack(Item.getItemFromBlock(Blocks.BEACON), 1), 1, 2, 1)); //
+		 * BEACON chestContents_High.addItem(new WeightedRandomChestContent(new
 		 * ItemStack(Item.getItemFromBlock(Blocks.skull), 1, 1), 1, 3, 3)); //
 		 * Head Block (Wither) chestContents_High.addItem(new
 		 * WeightedRandomChestContent(new

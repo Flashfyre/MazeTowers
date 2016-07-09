@@ -2,6 +2,8 @@ package com.samuel.mazetowers.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,7 +37,7 @@ public class ItemExplosiveBow extends ItemBow {
 
 	public ItemExplosiveBow() {
 		super();
-		this.setCreativeTab(CreativeTabs.tabCombat);
+		this.setCreativeTab(CreativeTabs.COMBAT);
 		this.setMaxDamage(0);
 		this.setMaxStackSize(1);
 		this.addPropertyOverride(new ResourceLocation("pull"), new IItemPropertyGetter()
@@ -108,13 +110,13 @@ public class ItemExplosiveBow extends ItemBow {
 		return EnumAction.BOW;
 	}
 	
-	private ItemStack func_185060_a(EntityPlayer player)
+    private ItemStack findAmmo(EntityPlayer player)
     {
-        if (this.func_185058_h_(player.getHeldItem(EnumHand.OFF_HAND)))
+        if (this.isArrow(player.getHeldItem(EnumHand.OFF_HAND)))
         {
             return player.getHeldItem(EnumHand.OFF_HAND);
         }
-        else if (this.func_185058_h_(player.getHeldItem(EnumHand.MAIN_HAND)))
+        else if (this.isArrow(player.getHeldItem(EnumHand.MAIN_HAND)))
         {
             return player.getHeldItem(EnumHand.MAIN_HAND);
         }
@@ -124,7 +126,7 @@ public class ItemExplosiveBow extends ItemBow {
             {
                 ItemStack itemstack = player.inventory.getStackInSlot(i);
 
-                if (this.func_185058_h_(itemstack))
+                if (this.isArrow(itemstack))
                 {
                     return itemstack;
                 }
@@ -133,9 +135,10 @@ public class ItemExplosiveBow extends ItemBow {
             return null;
         }
     }
+
 	
 	@Override
-	protected boolean func_185058_h_(ItemStack stack)
+	protected boolean isArrow(@Nullable ItemStack stack)
     {
         return stack != null &&
         	(stack.getItem() instanceof ItemArrow ||
@@ -147,7 +150,7 @@ public class ItemExplosiveBow extends ItemBow {
 		for (int i = 0; i < inventory.length; ++i)
         {
 			final Item arrowItem = inventory[i] == null ? null : inventory[i].getItem();
-            if (arrowItem == Items.arrow || arrowItem == ModItems.explosive_arrow)
+            if (arrowItem == Items.ARROW || arrowItem == ModItems.explosive_arrow)
             {
                 return inventory[i];
             }
@@ -167,8 +170,8 @@ public class ItemExplosiveBow extends ItemBow {
 		if (playerIn instanceof EntityPlayer) {
             EntityPlayer entityplayer = (EntityPlayer)playerIn;
             boolean flag = entityplayer.capabilities.isCreativeMode ||
-            	EnchantmentHelper.getEnchantmentLevel(Enchantments.infinity, stack) > 0;
-            ItemStack itemStack =  this.func_185060_a(entityplayer);
+            	EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, stack) > 0;
+            ItemStack itemStack =  this.findAmmo(entityplayer);
             int i = this.getMaxItemUseDuration(stack) - timeLeft;
             i = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(stack, worldIn, (EntityPlayer)playerIn, i, itemStack != null || flag);
             if (i < 0) return;
@@ -184,12 +187,12 @@ public class ItemExplosiveBow extends ItemBow {
             	ItemStack arrowStack;
                 if (itemStack == null)
                    	itemStack = arrowStack = new ItemStack(isExplosiveArrow ?
-                    	ModItems.explosive_arrow : Items.arrow);
+                    	ModItems.explosive_arrow : Items.ARROW);
                 else if (isExplosiveArrow && itemStack.getItem() != ModItems.explosive_arrow)
                 	arrowStack = new ItemStack(ModItems.explosive_arrow);
                 else
                 	arrowStack = itemStack;
-                float f = func_185059_b(i);
+                float f = getArrowVelocity(i);
 
                 if (f >= 0.1D)
                 {
@@ -205,31 +208,31 @@ public class ItemExplosiveBow extends ItemBow {
                 				playerIn);
                     	else {
                     		ItemArrow itemarrow = ((ItemArrow)(arrowStack.getItem() instanceof ItemArrow ?
-                    			arrowStack.getItem() : Items.arrow));
-                    		entityarrow = itemarrow.makeTippedArrow(worldIn, arrowStack, entityplayer);
+                    			arrowStack.getItem() : Items.ARROW));
+                    		entityarrow = itemarrow.createArrow(worldIn, arrowStack, entityplayer);
                     	}
-                    	entityarrow.func_184547_a(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, f * 3.0F, 1.0F);
+                    	entityarrow.setAim(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, f * 3.0F, 1.0F);
 
                         if (f == 1.0F)
                         {
                             entityarrow.setIsCritical(true);
                         }
 
-                        int j = EnchantmentHelper.getEnchantmentLevel(Enchantments.power, stack);
+                        int j = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, stack);
 
                         if (j > 0)
                         {
                             entityarrow.setDamage(entityarrow.getDamage() + j * 0.5D + 0.5D);
                         }
 
-                        int k = EnchantmentHelper.getEnchantmentLevel(Enchantments.punch, stack);
+                        int k = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, stack);
 
                         if (k > 0)
                         {
                             entityarrow.setKnockbackStrength(k);
                         }
 
-                        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.flame, stack) > 0)
+                        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, stack) > 0)
                         {
                             entityarrow.setFire(100);
                         }
@@ -238,13 +241,13 @@ public class ItemExplosiveBow extends ItemBow {
 
                         if (flag1)
                         {
-                            entityarrow.canBePickedUp = EntityArrow.PickupStatus.CREATIVE_ONLY;
+                            entityarrow.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
                         }
 
                         worldIn.spawnEntityInWorld(entityarrow);
                     }
 
-                    worldIn.playSound((EntityPlayer)null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundEvents.entity_arrow_shoot, SoundCategory.NEUTRAL, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+                    worldIn.playSound((EntityPlayer)null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
                     if (!flag1)
                     {
@@ -256,7 +259,7 @@ public class ItemExplosiveBow extends ItemBow {
                         }
                     }
 
-                    entityplayer.addStat(StatList.func_188057_b(this));
+                    entityplayer.addStat(StatList.getObjectUseStats(this));
                 }
             }
         }
@@ -270,7 +273,7 @@ public class ItemExplosiveBow extends ItemBow {
 		ItemStack itemStackIn, World worldIn,
 		EntityPlayer playerIn, EnumHand hand) {
 		
-		boolean flag = this.func_185060_a(playerIn) != null;
+		boolean flag = this.findAmmo(playerIn) != null;
 
         ActionResult<ItemStack> ret = net.minecraftforge.event.ForgeEventFactory
         	.onArrowNock(itemStackIn, worldIn, playerIn, hand, flag);

@@ -27,7 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Lists;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 
 public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
 	
@@ -178,7 +178,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
                         if (entityliving.worldObj.provider.getDimension() == -1 &&
                         	entityliving instanceof EntitySkeleton) {
                         	EntitySkeleton skeleton = (EntitySkeleton) entityliving;
-                        	Method setSize = MTUtils.findObfuscatedMethod(Entity.class,
+                        	Method setSize = MTHelper.findObfuscatedMethod(Entity.class,
                         		(Entity) skeleton, new String[] { "setSize", "func_70105_a" },
                         		float.class, float.class);
                         	setSize.setAccessible(true);
@@ -195,7 +195,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
             				}
                         } else if (getActualEntityName() == "ChargedCreeper") {
                         	EntityCreeper creeper = (EntityCreeper) entityliving;
-                        	Field POWERED = MTUtils.findObfuscatedField(EntityCreeper.class,
+                        	Field POWERED = MTHelper.findObfuscatedField(EntityCreeper.class,
                         		"POWERED", "field_184714_b");
                         	POWERED.setAccessible(true);
                         	try {
@@ -210,7 +210,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
                         } else
                         	AnvilChunkLoader.spawnEntity(entity, world);
                         
-                        world.playAuxSFX(2004, blockpos, 0);
+                        world.playBroadcastSound(2004, blockpos, 0);
 
                         if (entityliving != null)
                         {
@@ -243,10 +243,10 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
 
         if (!this.minecartToSpawn.isEmpty())
         {
-            this.func_184993_a(WeightedRandom.getRandomItem(this.getSpawnerWorld().rand, this.minecartToSpawn));
+            this.setNextSpawnData(WeightedRandom.getRandomItem(this.getSpawnerWorld().rand, this.minecartToSpawn));
         }
 
-        this.func_98267_a(1);
+        this.broadcastEvent(1);
     }
 
 	@Override
@@ -277,7 +277,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
             nbttagcompound.setString("mobID", this.mobID);
         }
 
-        this.func_184993_a(new WeightedSpawnerEntity(1, nbttagcompound));
+        this.setNextSpawnData(new WeightedSpawnerEntity(1, nbttagcompound));
 
         if (nbt.hasKey("MinSpawnDelay", 99))
         {
@@ -306,7 +306,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
     }
 
 	@Override
-    public void writeToNBT(NBTTagCompound nbt)
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
     {
         String s = this.getEntityNameToSpawn();
 
@@ -338,6 +338,8 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
 
             nbt.setTag("SpawnPotentials", nbttaglist);
         }
+        
+        return nbt;
     }
 
 
@@ -381,9 +383,9 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
     }
     
     @Override
-    public void func_184993_a(WeightedSpawnerEntity p_184993_1_)
+    public void setNextSpawnData(WeightedSpawnerEntity p_184993_1_)
     {
-    	super.func_184993_a(p_184993_1_);
+    	super.setNextSpawnData(p_184993_1_);
         this.randomEntity = p_184993_1_;
     }
 }

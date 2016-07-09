@@ -31,7 +31,7 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
 	public ItemExplosiveCreeperSkull()
     {
 		super(MazeTowers.EXPLOSIVE_CREEPER_HEAD, 4, EntityEquipmentSlot.HEAD);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
     }
 	
 	@Override

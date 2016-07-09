@@ -31,7 +31,7 @@ public class BlockSpectriteOre extends BlockOre implements IMetaBlockName {
 	public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 2);
 	
 	public BlockSpectriteOre() {
-		super(Material.rock.getMaterialMapColor());
+		super(Material.ROCK.getMaterialMapColor());
 		this.setHarvestLevel("pickaxe", 3);
 		this.setDefaultState(this.getBlockState().getBaseState());
 	}
@@ -94,9 +94,9 @@ public class BlockSpectriteOre extends BlockOre implements IMetaBlockName {
         	if (type == 0)
         		return this.blockResistance;
         	else if (type == 1)
-        		return Blocks.netherrack.getExplosionResistance(world, pos, exploder, explosion);
+        		return Blocks.NETHERRACK.getExplosionResistance(world, pos, exploder, explosion);
         	else
-        		return Blocks.end_stone.getExplosionResistance(world, pos, exploder, explosion);
+        		return Blocks.END_STONE.getExplosionResistance(world, pos, exploder, explosion);
         }
         return getExplosionResistance(exploder);
     }
@@ -109,8 +109,8 @@ public class BlockSpectriteOre extends BlockOre implements IMetaBlockName {
     {
     	int type = state.getValue(TYPE);
         return type == 0 ? this.blockMapColor : type == 1 ?
-        	Blocks.netherrack.getMapColor(Blocks.netherrack.getDefaultState()) :
-        	Blocks.end_stone.getMapColor(Blocks.end_stone.getDefaultState());
+        	Blocks.NETHERRACK.getMapColor(Blocks.NETHERRACK.getDefaultState()) :
+        	Blocks.END_STONE.getMapColor(Blocks.END_STONE.getDefaultState());
     }
     
     @Override

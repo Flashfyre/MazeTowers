@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Maps;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.items.ItemSpectriteArmor;
 
 @SideOnly(Side.CLIENT)
@@ -47,7 +47,7 @@ public class LayerSpectriteArmor extends LayerBipedArmor {
 	            domain = texture.substring(0, idx);
 	            texture = texture.substring(idx + 1);
 	        }
-	        int curFrame = MTUtils.getCurrentSpectriteFrame(entity.getEntityWorld());
+	        int curFrame = MTHelper.getCurrentSpectriteFrame(entity.getEntityWorld());
 	        String s1 = String.format("%s:textures/models/armor/%s/layer_%d%s/%d.png", domain, texture,
 	        	(isLegSlot(slot) ? 2 : 1), type == null ? "" : String.format("_%s", type), curFrame);
 	

@@ -24,7 +24,7 @@ public class TileEntityCircuitBreaker extends TileEntity
 			boolean isRedstone = false;
 			IBlockState state;
 			if ((state = this.worldObj.getBlockState(pos)) != null
-				&& (isRedstone = state.getBlock() == Blocks.redstone_wire)) {
+				&& (isRedstone = state.getBlock() == Blocks.REDSTONE_WIRE)) {
 				if (state
 					.getValue(BlockRedstoneWire.POWER) != 0) {
 					BlockPos belowPos = getPos().down();
@@ -54,7 +54,7 @@ public class TileEntityCircuitBreaker extends TileEntity
 					} else if (timer >= 50) {
 						timer = 0;
 						this.worldObj.setBlockState(pos,
-							Blocks.redstone_wire
+							Blocks.REDSTONE_WIRE
 								.getDefaultState());
 					}
 				}

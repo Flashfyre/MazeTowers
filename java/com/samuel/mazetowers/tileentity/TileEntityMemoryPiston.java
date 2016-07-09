@@ -141,7 +141,7 @@ public class TileEntityMemoryPiston extends TileEntity
 
                 if (entity.getPushReaction() != EnumPushReaction.IGNORE)
                 {
-                    if (this.pistonState.getBlock() == Blocks.slime_block)
+                    if (this.pistonState.getBlock() == Blocks.SLIME_BLOCK)
                     {
                         switch (enumfacing.getAxis())
                         {
@@ -383,7 +383,7 @@ public class TileEntityMemoryPiston extends TileEntity
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound) {
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
 		compound.setInteger("blockId", Block
 			.getIdFromBlock(this.pistonState.getBlock()));
@@ -393,5 +393,7 @@ public class TileEntityMemoryPiston extends TileEntity
 			.getIndex());
 		compound.setFloat("progress", this.lastProgress);
 		compound.setBoolean("extending", this.extending);
+		
+		return compound;
 	}
 }

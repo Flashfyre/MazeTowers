@@ -16,6 +16,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.BlockFluidClassic;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.init.ModBlocks;
@@ -36,7 +37,7 @@ public class BlockExtraDoor extends BlockDoor {
 
 	public BlockExtraDoor(String unlocalizedName,
 		float hardness, float resistance, int type) {
-		this(unlocalizedName, Material.rock, hardness,
+		this(unlocalizedName, Material.ROCK, hardness,
 			resistance, type);
 	}
 
@@ -45,7 +46,7 @@ public class BlockExtraDoor extends BlockDoor {
 		BlockPos pos) {
 
 		Block block = world.getBlockState(pos).getBlock();
-		if (block != this) {
+		if (block != this && !(block instanceof BlockFluidClassic)) {
 			return block.getLightValue(state, world, pos);
 		}
 
@@ -100,16 +101,16 @@ public class BlockExtraDoor extends BlockDoor {
 			pos);
 		worldIn.playSound(playerIn, blockpos1,
 			!state.getValue(OPEN)
-				.booleanValue() ? SoundEvents.block_iron_door_close
-				: SoundEvents.block_iron_door_open, SoundCategory.BLOCKS, 1.0F, 1.0F);
+				.booleanValue() ? SoundEvents.BLOCK_IRON_DOOR_CLOSE
+				: SoundEvents.BLOCK_IRON_DOOR_OPEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
 	}
 
 	/**
 	 * Called when a neighboring block changes.
 	 */
 	@Override
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (state.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER) {
 			BlockPos blockpos = pos.down();
 			IBlockState iblockstate = worldIn
@@ -118,8 +119,8 @@ public class BlockExtraDoor extends BlockDoor {
 			if (iblockstate.getBlock() != this) {
 				worldIn.setBlockToAir(pos);
 			} else if (neighborBlock != this) {
-				this.onNeighborBlockChange(worldIn,
-					blockpos, iblockstate, neighborBlock);
+				this.neighborChanged(iblockstate, worldIn,
+					blockpos, neighborBlock);
 			}
 		} else {
 			boolean flag1 = false;
@@ -208,9 +209,7 @@ public class BlockExtraDoor extends BlockDoor {
 							Boolean.valueOf((isScannerPowered || isPowered)
 							&& flag)), 2);
 						worldIn.markBlockRangeForRenderUpdate(pos, pos);
-						worldIn.playAuxSFXAtEntity(
-							(EntityPlayer) null,
-							isScannerPowered
+						worldIn.playBroadcastSound(isScannerPowered
 								|| isFrontPowered
 								|| isBackPowered ? 1003
 								: 1006, pos, 0);

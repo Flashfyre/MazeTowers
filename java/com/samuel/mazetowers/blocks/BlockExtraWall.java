@@ -39,9 +39,9 @@ public class BlockExtraWall extends Block {
 		this.setHardness(modelBlock.getBlockHardness(null, null, null));
 		this.setResistance(modelBlock
 			.getExplosionResistance(null, null, null, null) / 3.0F);
-		this.setStepSound(modelBlock.getStepSound());
+		this.setSoundType(modelBlock.getSoundType());
 		this.setCreativeTab(MazeTowers.TabExtra);
-		if (modelBlock == Blocks.packed_ice) {
+		if (modelBlock == Blocks.PACKED_ICE) {
 			this.slipperiness = 0.98F;
 			noDrop = true;
 		} else
@@ -101,11 +101,11 @@ public class BlockExtraWall extends Block {
 
 	public boolean canConnectTo(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
 		Block block = worldIn.getBlockState(pos).getBlock();
-		return block == Blocks.barrier ? false
+		return block == Blocks.BARRIER ? false
 			: (block != this && !(block instanceof BlockFenceGate) &&
 			(!(block instanceof BlockExtraWall) || !getWallCompatibility(block)) ?
 			(block.getMaterial(state).isOpaque() && block.isFullCube(state) ?
-			block.getMaterial(state) != Material.gourd : false) : true);
+			block.getMaterial(state) != Material.GOURD : false) : true);
 	}
 	
 	private boolean getWallCompatibility(Block block) {

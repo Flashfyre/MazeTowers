@@ -66,7 +66,7 @@ public class HiddenPressurePlateWeightedModel implements IBakedModel {
 	public List<BakedQuad> getQuads(IBlockState iBlockState,
 		EnumFacing side, long rand) {
 		IBakedModel retval = baseBakedModel;
-		IBlockState baseState = Blocks.heavy_weighted_pressure_plate
+		IBlockState baseState = Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE
 			.getStateFromMeta(iBlockState
 				.getValue(BlockPressurePlateWeighted.POWER) == 0 ? 0
 				: 1);

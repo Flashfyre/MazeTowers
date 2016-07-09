@@ -23,7 +23,7 @@ public class EntityExplosiveArrow extends EntityArrow {
     {
         super(worldIn, shooter);
         if (shooter instanceof EntityPlayer)
-			this.canBePickedUp = PickupStatus.CREATIVE_ONLY;
+			this.pickupStatus = PickupStatus.CREATIVE_ONLY;
     }
 
     public EntityExplosiveArrow(World worldIn, double x, double y, double z)

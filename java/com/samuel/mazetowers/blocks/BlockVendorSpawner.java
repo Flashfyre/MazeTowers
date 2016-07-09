@@ -33,7 +33,7 @@ public class BlockVendorSpawner extends Block implements ITileEntityProvider {
 		.create("visible");
 
 	public BlockVendorSpawner() {
-		super(Material.circuits);
+		super(Material.CIRCUITS);
 	}
 	
     @Override
@@ -56,8 +56,8 @@ public class BlockVendorSpawner extends Block implements ITileEntityProvider {
 		worldIn.playSound(
 			pos.getX() + 0.5D, pos.getY() + 0.5D,
 			pos.getZ() + 0.5D, isVisible ?
-			SoundEvents.block_metal_pressplate_click_off :
-			SoundEvents.block_metal_pressplate_click_on,
+			SoundEvents.BLOCK_METAL_PRESSPLATE_CLICK_OFF :
+			SoundEvents.BLOCK_METAL_PRESSPLATE_CLICK_ON,
 			SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 		worldIn.setBlockState(pos, state.withProperty(VISIBLE, !isVisible));
 		return true;

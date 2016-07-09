@@ -14,7 +14,7 @@ import com.samuel.mazetowers.entity.EntityExplosiveArrow;
 public class ModDispenserBehavior {
 
 	public static void initDispenserBehavior() {
-		BlockDispenser.dispenseBehaviorRegistry.putObject(
+		BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(
 			MazeTowers.ItemExplosiveArrow,
 			new BehaviorProjectileDispense() {
 				@Override
@@ -23,7 +23,7 @@ public class ModDispenserBehavior {
 					EntityExplosiveArrow entityarrow = new EntityExplosiveArrow(
 						worldIn, position.getX(), position
 						.getY(), position.getZ());
-					entityarrow.canBePickedUp = EntityArrow.PickupStatus.CREATIVE_ONLY;
+					entityarrow.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
 					return entityarrow;
 				}
 			});

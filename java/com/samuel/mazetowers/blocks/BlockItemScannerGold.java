@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 public class BlockItemScannerGold extends BlockItemScanner {
 
 	public BlockItemScannerGold() {
-		super(Material.iron, MapColor.goldColor);
+		super(Material.IRON, MapColor.GOLD);
 	}
 
 	@Override

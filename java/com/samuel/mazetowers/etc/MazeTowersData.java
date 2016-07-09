@@ -171,7 +171,7 @@ public class MazeTowersData extends WorldSavedData {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound) {
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagList spawnPosList = new NBTTagList();
 		NBTTagList isGeneratedList = new NBTTagList();
 		NBTTagList isUndergroundList = new NBTTagList();
@@ -309,6 +309,8 @@ public class MazeTowersData extends WorldSavedData {
 		compound.setTag("towerDataMini", towerDataMiniList);
 		compound.setTag("blockBreakabilityData", bbdList);
 		compound.setTag("blockBreakabilityDataMini", bbdmList);
+		
+		return compound;
 	}
 
 	public boolean[][] getIsGenerated() {

@@ -34,9 +34,11 @@ public class TileEntityLock extends TileEntity {
     }
 
 	@Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
     	super.writeToNBT(compound);
     	compound.setInteger("typeIndex", typeIndex);
+    	
+		return compound;
     }
 	
 	@Override
@@ -60,9 +62,21 @@ public class TileEntityLock extends TileEntity {
      * Allows for a specialized description packet to be created. This is often used to sync tile entity data from the
      * server to the client easily. For example this is used by signs to synchronise the text to be displayed.
      */
-    public Packet getDescriptionPacket()
+    public SPacketUpdateTileEntity getUpdatePacket()
     {
-        return new SPacketUpdateTileEntity(pos, 0, serializeNBT());
+        return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
+    }
+	
+	@Override
+	public NBTTagCompound getUpdateTag()
+    {
+        return writeToNBT(new NBTTagCompound());
+    }
+	
+	@Override
+	public boolean onlyOpsCanSetNbt()
+    {
+        return true;
     }
 	
 	@Override

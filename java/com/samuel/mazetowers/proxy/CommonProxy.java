@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.Fluid;
@@ -79,6 +80,11 @@ public class CommonProxy {
 	        }
 	    };
 		
+	    for (int t = 0; t < MazeTowers.LootTables.length; t++) {
+	    	MazeTowers.LootTables[t] = LootTableList.register(new ResourceLocation(
+    			MazeTowers.MODID, "maze_tower_treasure_" + t));
+	    }
+	    
 		MazeTowers.FluidChaoticSludge = new Fluid(
 			"chaoticsludge", new ResourceLocation(
 				"mazetowers:blocks/chaotic_sludge_still"),
@@ -87,7 +93,7 @@ public class CommonProxy {
 		FluidRegistry.registerFluid(MazeTowers.FluidChaoticSludge);
 		FluidRegistry.addBucketForFluid(MazeTowers.FluidChaoticSludge);
 		MazeTowers.solidCircuits = new MaterialLogicSolid(
-			MapColor.airColor);
+			MapColor.AIR);
 		(MazeTowers.BlockHiddenPressurePlateWeighted = new BlockHiddenPressurePlateWeighted())
 			.setUnlocalizedName("hidden_heavy_pressure_plate");
 		(MazeTowers.BlockItemScanner = new BlockItemScanner()).setUnlocalizedName("item_scanner");
@@ -124,55 +130,55 @@ public class CommonProxy {
         (MazeTowers.BlockExtraDoubleSlab = new BlockExtraDoubleSlab())
     		.setUnlocalizedName("double_slab");
 		(MazeTowers.BlockPackedIceStairs = new BlockExtraStairs(
-			Blocks.packed_ice.getDefaultState()))
+			Blocks.PACKED_ICE.getDefaultState()))
 			.setUnlocalizedName("packed_ice_stairs");
 		(MazeTowers.BlockMyceliumStairs = new BlockExtraStairs(
-			Blocks.mycelium.getDefaultState()))
+			Blocks.MYCELIUM.getDefaultState()))
 			.setUnlocalizedName("mycelium_stairs");
 		(MazeTowers.BlockPrismarineBrickStairs = new BlockExtraStairs(
-			Blocks.prismarine.getStateFromMeta(1)))
+			Blocks.PRISMARINE.getStateFromMeta(1)))
 			.setUnlocalizedName("prismarine_brick_stairs");
 		(MazeTowers.BlockEndStoneStairs = new BlockExtraStairs(
-			Blocks.end_stone.getDefaultState()))
+			Blocks.END_STONE.getDefaultState()))
 			.setUnlocalizedName("end_stone_stairs");
 		(MazeTowers.BlockObsidianStairs = new BlockExtraStairs(
-			Blocks.obsidian.getDefaultState()))
+			Blocks.OBSIDIAN.getDefaultState()))
 			.setUnlocalizedName("obsidian_stairs");
 		(MazeTowers.BlockBedrockStairs = new BlockExtraStairs(
-			Blocks.bedrock.getDefaultState()))
+			Blocks.BEDROCK.getDefaultState()))
 			.setUnlocalizedName("bedrock_stairs");
 		(MazeTowers.BlockSandstoneWall = new BlockExtraWall(
-			Blocks.sandstone))
+			Blocks.SANDSTONE))
 			.setUnlocalizedName("sandstone_wall");
 		(MazeTowers.BlockRedSandstoneWall = new BlockExtraWall(
-			Blocks.red_sandstone))
+			Blocks.RED_SANDSTONE))
 			.setUnlocalizedName("red_sandstone_wall");
 		(MazeTowers.BlockStoneBrickWall = new BlockExtraWall(
-			Blocks.stonebrick))
+			Blocks.STONEBRICK))
 			.setUnlocalizedName("stone_brick_wall");
 		(MazeTowers.BlockMossyStoneBrickWall = new BlockExtraWall(
-			Blocks.stonebrick))
+			Blocks.STONEBRICK))
 			.setUnlocalizedName("mossy_stone_brick_wall");
 		(MazeTowers.BlockPackedIceWall = new BlockExtraWall(
-			Blocks.packed_ice))
+			Blocks.PACKED_ICE))
 			.setUnlocalizedName("packed_ice_wall");
 		(MazeTowers.BlockPrismarineBrickWall = new BlockExtraWall(
-			Blocks.prismarine))
+			Blocks.PRISMARINE))
 			.setUnlocalizedName("prismarine_brick_wall");
 		(MazeTowers.BlockQuartzWall = new BlockExtraWall(
-			Blocks.quartz_block))
+			Blocks.QUARTZ_BLOCK))
 			.setUnlocalizedName("quartz_wall");
 		(MazeTowers.BlockEndStoneWall = new BlockExtraWall(
-			Blocks.end_stone))
+			Blocks.END_STONE))
 			.setUnlocalizedName("end_stone_wall");
 		(MazeTowers.BlockPurpurWall = new BlockExtraWall(
-			Blocks.purpur_block))
+			Blocks.PURPUR_BLOCK))
 			.setUnlocalizedName("purpur_wall");
 		(MazeTowers.BlockObsidianWall = new BlockExtraWall(
-			Blocks.obsidian))
+			Blocks.OBSIDIAN))
 			.setUnlocalizedName("obsidian_wall");
 		(MazeTowers.BlockBedrockWall = new BlockExtraWall(
-			Blocks.bedrock))
+			Blocks.BEDROCK))
 			.setUnlocalizedName("bedrock_wall");
 		MazeTowers.BlockPrismarineDoor = new BlockExtraDoor(
 			"prismarine_brick_door", 1.5F, 10.0F, 0);
@@ -197,7 +203,7 @@ public class CommonProxy {
 			.setHardness(6.0F).setResistance(10.0F).setUnlocalizedName("spectrite_ore");
 		(MazeTowers.BlockSpectrite = new BlockSpectrite())
 			.setHardness(10.0F).setResistance(15.0F).setUnlocalizedName("spectrite_block")
-			.setCreativeTab(CreativeTabs.tabBlock);
+			.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
 		(MazeTowers.BlockSpecialMobSpawner = new BlockSpecialMobSpawner())
 			.setUnlocalizedName("special_mob_spawner");
 		(MazeTowers.BlockVendorSpawner = new BlockVendorSpawner())
@@ -211,7 +217,10 @@ public class CommonProxy {
 		(MazeTowers.ItemSpectriteKey = new ItemSpectriteKey()).setUnlocalizedName("spectrite_key");
 		(MazeTowers.ItemDiamondRod = new ItemDiamondRod())
 			.setUnlocalizedName("diamond_rod")
-			.setCreativeTab(CreativeTabs.tabMaterials);
+			.setCreativeTab(CreativeTabs.MATERIALS);
+		(MazeTowers.ItemSpectriteRod = new ItemSpectriteRod())
+			.setUnlocalizedName("spectrite_rod")
+			.setCreativeTab(CreativeTabs.MATERIALS);
 		(MazeTowers.ItemRAM = new ItemRAM()).setUnlocalizedName("ram");
 		(MazeTowers.ItemPrismarineDoor = new ItemDoor(
 			MazeTowers.BlockPrismarineDoor))
@@ -239,7 +248,7 @@ public class CommonProxy {
 			.setCreativeTab(MazeTowers.TabExtra);
 		(MazeTowers.ItemSpectriteGem = new ItemSpectriteGem())
 			.setUnlocalizedName("spectrite_gem")
-			.setCreativeTab(CreativeTabs.tabMaterials);
+			.setCreativeTab(CreativeTabs.MATERIALS);
 		MazeTowers.SPECTRITE_TOOL.setRepairItem(new ItemStack(MazeTowers.ItemSpectriteGem));
 		MazeTowers.SPECTRITE.customCraftingMaterial = MazeTowers.ItemSpectriteGem;
 		(MazeTowers.ItemSpectriteOrb = new ItemSpectriteOrb())
@@ -248,12 +257,26 @@ public class CommonProxy {
 			.setUnlocalizedName("explosive_arrow");
 		(MazeTowers.ItemExplosiveBow = new ItemExplosiveBow())
 			.setUnlocalizedName("explosive_bow");
+		(MazeTowers.ItemSpectriteShovel = new ItemSpectriteShovel())
+			.setUnlocalizedName("spectrite_shovel");
+		(MazeTowers.ItemSpectriteShovelSpecial = new ItemSpectriteShovelSpecial())
+			.setUnlocalizedName("spectrite_shovel_special");
 		(MazeTowers.ItemSpectritePickaxe = new ItemSpectritePickaxe())
 			.setUnlocalizedName("spectrite_pickaxe");
+		(MazeTowers.ItemSpectritePickaxeSpecial = new ItemSpectritePickaxeSpecial())
+			.setUnlocalizedName("spectrite_pickaxe_special");
+		(MazeTowers.ItemSpectriteAxe = new ItemSpectriteAxe())
+			.setUnlocalizedName("spectrite_axe");
+		(MazeTowers.ItemSpectriteAxeSpecial = new ItemSpectriteAxeSpecial())
+			.setUnlocalizedName("spectrite_axe_special");
 		(MazeTowers.ItemSpectriteSword = new ItemSpectriteSword())
 			.setUnlocalizedName("spectrite_sword");
 		(MazeTowers.ItemSpectriteKeySword = new ItemSpectriteKeySword())
 			.setUnlocalizedName("spectrite_key_sword");
+		(MazeTowers.ItemSpectriteSwordSpecial = new ItemSpectriteSwordSpecial())
+			.setUnlocalizedName("spectrite_sword_special");
+		(MazeTowers.ItemSpectriteKeySwordSpecial = new ItemSpectriteKeySwordSpecial())
+			.setUnlocalizedName("spectrite_key_sword_special");
 		(MazeTowers.ItemSpectriteHelmet = new ItemSpectriteArmor(EntityEquipmentSlot.HEAD))
 			.setUnlocalizedName("spectrite_helmet");
 		(MazeTowers.ItemSpectriteChestplate = new ItemSpectriteArmor(EntityEquipmentSlot.CHEST))
@@ -276,8 +299,9 @@ public class CommonProxy {
 		MazeTowers.TileEntityMineralChest = new TileEntityMineralChest();
 		MazeTowers.TileEntitySpecialMobSpawner = new TileEntitySpecialMobSpawner();
 		MazeTowers.TileEntityWebSpiderSpawner = new TileEntityWebSpiderSpawner();
-		MazeTowers.mazeTowers = new WorldGenMazeTowers();
 		MazeTowers.spectrite = new WorldGenSpectrite();
+		MazeTowers.mazeTowers = new WorldGenMazeTowers();
+		MazeTowers.BlockLock.initLockColors();
 		CapabilityManager.INSTANCE.register(IMazeTowerCapability.class,
 			new PlayerMazeTower.DefaultImpl.Storage(),
 			PlayerMazeTower.DefaultImpl.class);

@@ -23,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.etc.UnlistedPropertyCopiedBlock;
 
 /**
@@ -36,7 +36,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 
 	public BlockHiddenPressurePlateWeighted() {
 		super(MazeTowers.solidCircuits, 150);
-		this.setCreativeTab(CreativeTabs.tabRedstone);
+		this.setCreativeTab(CreativeTabs.REDSTONE);
 		this.setTickRandomly(true);
 		this.field_150068_a = 150;
 	}
@@ -69,10 +69,10 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (!this.canBePlacedOn(worldIn, pos.down())) {
-			if (!MTUtils.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
+			if (!MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
 				this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
@@ -87,7 +87,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	@Override
 	protected int computeRedstoneStrength(World worldIn, BlockPos pos)
     {
-		final boolean isInTower = MTUtils.getIsMazeTowerPos(
+		final boolean isInTower = MTHelper.getIsMazeTowerPos(
 			worldIn.provider.getDimension(), pos);
 		final int i, ix = pos.getX() >> 4 << 4, iz = pos.getZ() >> 4 << 4;
 		final AxisAlignedBB towerChunkBounds = isInTower ?
@@ -141,13 +141,13 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 
 	private static IBlockState getBelowState(IBlockAccess world,
 		BlockPos blockPos) {
-		final IBlockState normal = Blocks.quartz_block
+		final IBlockState normal = Blocks.QUARTZ_BLOCK
 			.getDefaultState();
 		IBlockState belowState = null;
 
 		if (blockPos.getY() == 0
 			|| (belowState = world.getBlockState(blockPos
-				.down())) == Blocks.air.getDefaultState())
+				.down())) == Blocks.AIR.getDefaultState())
 			return normal;
 		return belowState;
 	}

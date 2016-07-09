@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.blocks.BlockMineralChest;
-import com.samuel.mazetowers.etc.MTUtils;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.tileentity.TileEntityMineralChest;
 
 @SideOnly(Side.CLIENT)
@@ -108,7 +108,7 @@ public class TileEntityMineralChestRenderer extends TileEntitySpecialRenderer {
 							texture = textureDiamond;
 							break;
 						case 3:
-							texture = textureSpectrite[MTUtils.getCurrentSpectriteFrame(tile.getWorld())];
+							texture = textureSpectrite[MTHelper.getCurrentSpectriteFrame(tile.getWorld())];
 							break;
 						case 4:
 							texture = textureTrappedIron;
@@ -120,7 +120,7 @@ public class TileEntityMineralChestRenderer extends TileEntitySpecialRenderer {
 							texture = textureTrappedDiamond;
 							break;
 						case 7:
-							texture = textureTrappedSpectrite[MTUtils.getCurrentSpectriteFrame(tile.getWorld())];
+							texture = textureTrappedSpectrite[MTHelper.getCurrentSpectriteFrame(tile.getWorld())];
 						default:
 					}
 					this.bindTexture(texture);
@@ -139,7 +139,7 @@ public class TileEntityMineralChestRenderer extends TileEntitySpecialRenderer {
     					textureDouble = textureDoubleDiamond;
     					break;
     				case 3:
-    					textureDouble = textureDoubleSpectrite[MTUtils.getCurrentSpectriteFrame(tile.getWorld())];
+    					textureDouble = textureDoubleSpectrite[MTHelper.getCurrentSpectriteFrame(tile.getWorld())];
     					break;
     				case 4:
     					textureDouble = textureDoubleTrappedIron;
@@ -151,7 +151,7 @@ public class TileEntityMineralChestRenderer extends TileEntitySpecialRenderer {
     					textureDouble = textureDoubleTrappedDiamond;
     					break;
     				case 7:
-    					textureDouble = textureDoubleTrappedSpectrite[MTUtils.getCurrentSpectriteFrame(tile.getWorld())];
+    					textureDouble = textureDoubleTrappedSpectrite[MTHelper.getCurrentSpectriteFrame(tile.getWorld())];
     					break;
     				default:
     			}

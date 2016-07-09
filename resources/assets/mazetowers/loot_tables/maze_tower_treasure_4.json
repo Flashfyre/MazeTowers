@@ -1,6 +1,7 @@
 {
     "pools": [
         {
+			"name": "maze_tower_treasure_4",
             "rolls": {
                 "min": 1,
                 "max": 5

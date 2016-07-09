@@ -1,12 +1,15 @@
 package com.samuel.mazetowers.items;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -21,42 +24,31 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.etc.ISpectriteTool;
 import com.samuel.mazetowers.init.ModSounds;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MiniTower;
 
-public class ItemSpectritePickaxe extends ItemPickaxe {
+public class ItemSpectritePickaxe extends ItemPickaxe implements ISpectriteTool {
 	
-	public ItemSpectritePickaxe() {
-        super(MazeTowers.SPECTRITE_TOOL);
+	public ItemSpectritePickaxe(ToolMaterial material) {
+        super(material);
         this.addPropertyOverride(new ResourceLocation("time"), MazeTowers.ItemPropertyGetterSpectrite);
         attackSpeed = -3.0F;
     }
+	
+	public ItemSpectritePickaxe() {
+		this(MazeTowers.DIAMOND_SPECTRITE_TOOL);
+	}
 	
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		
 		String displayName = super.getItemStackDisplayName(stack);
-		displayName = TextFormatting.LIGHT_PURPLE + displayName;
+		displayName = (stack.getItem() instanceof ItemSpectritePickaxeSpecial ? TextFormatting.RED :
+			TextFormatting.LIGHT_PURPLE) + displayName;
 		return displayName;
 	}
-	
-	@Override
-	/**
-     * Called when a Block is destroyed using this Item. Return true to trigger the "Use Item" statistic.
-     */
-    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState blockIn, BlockPos pos,
-    	EntityLivingBase entityLiving) {
-		if (blockIn.getBlockHardness(worldIn, pos) != 0.0D) {
-			stack.damageItem(1, entityLiving);
-		}
-		
-		if (!worldIn.isRemote) {
-			
-		}
-
-        return true;
-    }
 	
 	@Override
 	/**
@@ -73,16 +65,56 @@ public class ItemSpectritePickaxe extends ItemPickaxe {
     {
     	World worldIn = player.worldObj;
     	if (!worldIn.isRemote) {
-			WorldServer worldServer = (WorldServer) worldIn;
-			Vec3d lookVec = player.getLookVec();
-			EnumFacing facing = EnumFacing.getFacingFromVector((float) lookVec.xCoord,
-				(float) lookVec.yCoord, (float) lookVec.zCoord);
-			Axis axis = facing.getAxis();
-			BlockPos curPos;
+    		WorldServer worldServer = (WorldServer) worldIn;
+    		Iterator<BlockPos> targetBlocks = getPlayerBreakableBlocks(itemstack, pos, player).iterator();
+    		BlockPos curPos;
 			Block curBlock;
 			IBlockState curState;
 			final int posX = pos.getX(), posY = pos.getY(), posZ = pos.getZ();
+			
+			if (targetBlocks.hasNext()) {
+				do {
+					curPos = targetBlocks.next();
+					curState = worldIn.getBlockState(curPos);
+					worldIn.destroyBlock(curPos, true);
+					curState.getBlock().onBlockDestroyedByPlayer(worldIn, curPos, curState);
+				} while (targetBlocks.hasNext());	
+				
+				worldIn.playSound(null, pos, ModSounds.explosion, SoundCategory.PLAYERS, 0.75F,
+						1.0F + (worldIn.rand.nextFloat()) * 0.4F);
+				if (this instanceof ItemSpectritePickaxeSpecial)
+					worldIn.playSound(null, pos, ModSounds.fatality, SoundCategory.PLAYERS, 1.0F,
+						1.0F);
+				
+				worldServer.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE,
+						EnumParticleTypes.EXPLOSION_LARGE.getShouldIgnoreRange(),
+					posX, posY, posZ, 7, worldIn.rand.nextFloat(), worldIn.rand.nextFloat(),
+					worldIn.rand.nextFloat(), 0.0D, new int[0]);
+			}
+    	}
+        return false;
+    }
+	
+	@Override
+	public List<BlockPos> getPlayerBreakableBlocks(ItemStack itemstack, BlockPos pos, EntityPlayer player) {
+		World worldIn = player.worldObj;
+		List<BlockPos> breakableBlocks = new ArrayList<BlockPos>();
+    	if (getStrVsBlock(itemstack,  worldIn.getBlockState(pos)) > 1.0f) {
+			Vec3d lookVec = player.getLookVec();
+			EnumFacing facing = EnumFacing.getFacingFromVector((float) lookVec.xCoord,
+				(float) lookVec.yCoord, (float) lookVec.zCoord);
+			float relYaw = (player.getRotationYawHead() + 360f) % 90;
+			boolean isDiagonalFacing = relYaw >= 22.5f && relYaw < 67.5f;
+			Axis axis = facing.getAxis();
+			BlockPos curPos;
+			Block curBlock;
+			IBlockState centerState = worldIn.getBlockState(pos);
+			IBlockState curState;
+			final int posX = pos.getX(), posY = pos.getY(), posZ = pos.getZ();
 			Iterator<BlockPos> targetBlocks;
+			int blockCount = 0;
+			float strengthVsCenterBlock = getStrVsBlock(itemstack, centerState);
+			float strengthVsCurBlock;
 			
 			if (axis != Axis.Y && posY < player.posY)
 				axis = Axis.Y;
@@ -95,6 +127,13 @@ public class ItemSpectritePickaxe extends ItemPickaxe {
 			while (targetBlocks.hasNext()) {
 				curPos = targetBlocks.next();
 				curState = worldIn.getBlockState(curPos);
+				strengthVsCurBlock = getStrVsBlock(itemstack, curState);
+				blockCount++;
+				if ((!(itemstack.getItem() instanceof ItemSpectritePickaxeSpecial) &&
+					((isDiagonalFacing && (blockCount == 2 || blockCount == 4 || blockCount == 6 || blockCount == 8)) ||
+					(!isDiagonalFacing && (blockCount == 1 || blockCount == 3 || blockCount == 7 || blockCount == 9)))) ||
+					strengthVsCurBlock <= 1.0f || strengthVsCenterBlock < strengthVsCurBlock)
+					continue;
 				curBlock = curState.getBlock();
 				if (curBlock.canHarvestBlock(worldIn, curPos, player)) {
 					curBlock.onBlockHarvested(worldIn, curPos, curState, player);
@@ -128,19 +167,11 @@ public class ItemSpectritePickaxe extends ItemPickaxe {
 						}
 					}
 					
-					worldIn.destroyBlock(curPos, true);
-					curBlock.onBlockDestroyedByPlayer(worldIn, curPos, curState);
+					breakableBlocks.add(curPos);
 				}
-			}	
-			
-			worldIn.playSound(null, pos, ModSounds.fatality, SoundCategory.PLAYERS, 1.0F,
-				1.0F + (worldIn.rand.nextFloat()) * 0.4F);
-			
-			worldServer.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE,
-					EnumParticleTypes.EXPLOSION_LARGE.getShouldIgnoreRange(),
-				posX, posY, posZ, 7, worldIn.rand.nextFloat(), worldIn.rand.nextFloat(),
-				worldIn.rand.nextFloat(), 0.0D, new int[0]);
+			}
     	}
-        return false;
-    }
+    	
+    	return breakableBlocks;
+	}
 }

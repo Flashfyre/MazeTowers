@@ -35,7 +35,7 @@ public class TileEntityItemScanner extends TileEntity implements IInventory {
 	}
 
 	public void generateRandomKeyStack() {
-		keyStack = new ItemStack(Items.diamond);
+		keyStack = new ItemStack(Items.DIAMOND);
 		markDirty();
 	}
 
@@ -145,13 +145,15 @@ public class TileEntityItemScanner extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound) {
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
 		compound.setString("ownerName", ownerName);
 		compound.setInteger("entityId", entityId);
 		if (keyStack != null)
 			compound.setTag("keyStack", keyStack
 				.writeToNBT(new NBTTagCompound()));
+		
+		return compound;
 	}
 
 	@Override

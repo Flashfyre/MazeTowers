@@ -35,8 +35,7 @@ public class TileEntityRedstoneClockRenderer extends TileEntitySpecialRenderer {
 		final EntityItem entity;
 		
 		if (renderManager == null) {
-			final ItemStack stackNormal = new ItemStack(Item.getItemFromBlock(ModBlocks.redstoneClock),
-				ItemBlockRedstoneClock.curFrame),
+			final ItemStack stackNormal = new ItemStack(Item.getItemFromBlock(ModBlocks.redstoneClock)),
 			stackInverted = new ItemStack(Item.getItemFromBlock(ModBlocks.redstoneClockInverted));
 			renderManager = Minecraft.getMinecraft().getRenderManager();
 			entityNormal = new EntityItem(getWorld(), 0.0D, 0.0D, 0.0D, stackNormal);
@@ -49,9 +48,9 @@ public class TileEntityRedstoneClockRenderer extends TileEntitySpecialRenderer {
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(dx, dy, dz);
     	GlStateManager.enableRescaleNormal();
-    	GlStateManager.scale(2.0F, 8.0F, 2.0F);
+    	GlStateManager.scale(2.0F, 4.0F, 2.0F);
     	GlStateManager.rotate(90F, 1.0F, 0.0F, 0.0F);
-    	renderManager.doRenderEntity(entity, 0.25D, -0.25D, 0.0D, 0.0F, 0.0F, false);
+    	renderManager.doRenderEntity(entity, 0.25D, -0.25D, -0.0125D, 0.0F, 0.0F, false);
     	GlStateManager.disableRescaleNormal();
     	GlStateManager.popMatrix();
     	if (blockDamageProgress >= 0) {

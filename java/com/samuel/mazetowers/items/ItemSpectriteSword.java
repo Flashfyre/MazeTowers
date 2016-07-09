@@ -33,23 +33,24 @@ import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.init.ModSounds;
 
 public class ItemSpectriteSword extends ItemSword {
-	private final Item.ToolMaterial material;
-	private double attackDamage;
 	
-	public ItemSpectriteSword() {
-		super(ToolMaterial.DIAMOND);
-		this.setCreativeTab(CreativeTabs.tabCombat);
-		this.material = MazeTowers.SPECTRITE_TOOL;
-		this.attackDamage = 5.0F + material.getDamageVsEntity();
+	public ItemSpectriteSword(ToolMaterial material) {
+		super(material);
+		this.setCreativeTab(CreativeTabs.COMBAT);
 		this.setMaxStackSize(1);
 		this.addPropertyOverride(new ResourceLocation("time"), MazeTowers.ItemPropertyGetterSpectrite);
+	}
+	
+	public ItemSpectriteSword() {
+		this(MazeTowers.DIAMOND_SPECTRITE_TOOL);
 	}
 	
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		
 		String displayName = super.getItemStackDisplayName(stack);
-		displayName = TextFormatting.LIGHT_PURPLE + displayName;
+		displayName = (stack.getItem() instanceof ItemSpectriteSwordSpecial ? TextFormatting.RED :
+			TextFormatting.LIGHT_PURPLE) + displayName;
 		return displayName;
 	}
 	
@@ -76,26 +77,35 @@ public class ItemSpectriteSword extends ItemSword {
 		BlockPos pos = target.getPosition();
 		if (!world.isRemote) {
 			WorldServer worldServer = (WorldServer) world;
-			int power = 4;
+			int power = (stack.getItem() instanceof ItemSpectriteSwordSpecial) ? 4 : 3;
 			
 			List<Entity> surrounding = world.getEntitiesWithinAABBExcludingEntity(attacker,
 				new AxisAlignedBB(pos.north(power - 1).west(power - 1).down(power - 1),
 				pos.south(power - 1).east(power - 1).up(power - 1)));
 		
 			if (target.getMaxHealth() >= 200.0F) {
-				target.attackEntityFrom(DamageSource.causeThornsDamage(attacker), 43.0F);
+				target.attackEntityFrom(DamageSource.causeThornsDamage(attacker), power == 3 ? 34.0F : 43.0F);
 			}
 			EnumParticleTypes particle = null;
 			switch (power) {
+				case 3:
+					particle = EnumParticleTypes.EXPLOSION_LARGE;
+					
+					world.playSound(null, pos, ModSounds.explosion, SoundCategory.PLAYERS, 0.75F,
+						1.0F + (world.rand.nextFloat()) * 0.4F);
+				break;
 				case 4:
 					particle = EnumParticleTypes.EXPLOSION_LARGE;
 					
+					world.playSound(null, pos, ModSounds.explosion, SoundCategory.PLAYERS, 0.75F,
+							1.0F + (world.rand.nextFloat()) * 0.4F);
 					world.playSound(null, pos, ModSounds.fatality, SoundCategory.PLAYERS, 1.0F,
-						1.0F + (world.rand.nextFloat()) * 0.4F);
+						1.0F);
 					break;
 				default:
 					particle = EnumParticleTypes.CRIT_MAGIC;
 			}
+			
 			if (target != null && particle != null) {
 				worldServer.spawnParticle(particle,
 					particle.getShouldIgnoreRange(), target.posX,
@@ -106,11 +116,12 @@ public class ItemSpectriteSword extends ItemSword {
 			
 			for (int e = 0; e < surrounding.size(); e++) {
 				if (surrounding.get(e) instanceof EntityLivingBase &&
-					!((EntityLivingBase) surrounding.get(e)).isOnSameTeam(attacker)) {
+					(!((EntityLivingBase) surrounding.get(e)).isOnSameTeam(attacker) &&
+					(surrounding.get(e).equals(target) || (attacker instanceof EntityPlayer && !(target instanceof EntityPlayer))))) {
 					EntityLivingBase curEntity = ((EntityLivingBase) surrounding.get(e));
 					double distance = curEntity.getDistanceToEntity(target);
-					curEntity.addPotionEffect(new PotionEffect(!curEntity.isEntityUndead() ? MobEffects.harm :
-						MobEffects.heal, 5,
+					curEntity.addPotionEffect(new PotionEffect(!curEntity.isEntityUndead() ? MobEffects.INSTANT_DAMAGE :
+						MobEffects.INSTANT_HEALTH, 5,
 						(int) Math.floor(power - distance)));
 				}
 			}
@@ -138,13 +149,6 @@ public class ItemSpectriteSword extends ItemSword {
     }
     
     @Override
-    @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack stack)
-    {
-        return stack.isItemEnchanted() || stack.getItemDamage() >= 5;
-    }
-    
-    @Override
     /**
      * Returns True is the item is renderer in full 3D when hold.
      */
@@ -168,7 +172,7 @@ public class ItemSpectriteSword extends ItemSword {
      * How long it takes to use or consume an item
      */
     public int getMaxItemUseDuration(ItemStack stack) {
-        return 18000 * (stack.getItemDamage() + 1);
+        return 72000;
     }
     
     /**
@@ -186,25 +190,6 @@ public class ItemSpectriteSword extends ItemSword {
     {
         return false;
     }
-
-    @Override
-    /**
-     * Return the enchantability factor of the item, most of the time is based on material.
-     */
-    public int getItemEnchantability()
-    {
-        return this.material.getEnchantability();
-    }
-
-	@Override
-	/**
-     * Returns the unlocalized name of this item. This version accepts an ItemStack so different stacks can have
-     * different names based on their damage or NBT.
-     */
-    public String getUnlocalizedName(ItemStack stack)
-    {
-        return this.getUnlocalizedName() + ((stack.getItemDamage() > 0) ? "_" + (stack.getItemDamage() + 1) : "");
-    }
 	
 	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
@@ -213,8 +198,6 @@ public class ItemSpectriteSword extends ItemSword {
 
         if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(),
-            	new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", this.attackDamage, 0));
             multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(),
             	new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -1.8D, 0));
         }

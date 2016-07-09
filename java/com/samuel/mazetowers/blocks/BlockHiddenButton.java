@@ -66,8 +66,8 @@ public class BlockHiddenButton extends Block {
 		super(MazeTowers.solidCircuits);
 		IExtendedBlockState state = ((IExtendedBlockState) this.blockState
 			.getBaseState()).withProperty(COPIEDBLOCK,
-			Blocks.quartz_block.getDefaultState());
-		setCreativeTab(CreativeTabs.tabRedstone);
+			Blocks.QUARTZ_BLOCK.getDefaultState());
+		setCreativeTab(CreativeTabs.REDSTONE);
 		setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(POWERED, Boolean.valueOf(false)));
@@ -216,8 +216,8 @@ public class BlockHiddenButton extends Block {
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (this.checkForDrop(worldIn, pos, state)
 			&& !func_181088_a(worldIn, pos,
 				state.getValue(FACING)
@@ -407,14 +407,14 @@ public class BlockHiddenButton extends Block {
 
 	private static IBlockState getConnectedBlockState(
 		IBlockAccess world, BlockPos blockPos) {
-		final IBlockState normal = Blocks.quartz_block
+		final IBlockState normal = Blocks.QUARTZ_BLOCK
 			.getStateFromMeta(3);
 		EnumFacing facing = world.getBlockState(blockPos)
 			.getValue(BlockDirectional.FACING);
 		IBlockState connState = null;
 
 		if ((connState = world.getBlockState(blockPos
-			.offset(facing.getOpposite()))) == Blocks.air
+			.offset(facing.getOpposite()))) == Blocks.AIR
 			.getDefaultState())
 			return normal;
 		return connState;

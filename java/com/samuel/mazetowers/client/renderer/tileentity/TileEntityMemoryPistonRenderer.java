@@ -42,11 +42,11 @@ public class TileEntityMemoryPistonRenderer extends
         IBlockState iblockstate = te.getPistonState();
         Block block = iblockstate.getBlock();
         
-        if (iblockstate.getMaterial() != Material.air && te.getProgress(partialTicks) < 1.0F)
+        if (iblockstate.getMaterial() != Material.AIR && te.getProgress(partialTicks) < 1.0F)
         {
             Tessellator tessellator = Tessellator.getInstance();
             VertexBuffer vertexbuffer = tessellator.getBuffer();
-            this.bindTexture(TextureMap.locationBlocksTexture);
+            this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             GlStateManager.enableBlend();

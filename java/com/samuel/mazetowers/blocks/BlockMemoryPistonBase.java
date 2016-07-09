@@ -22,29 +22,65 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.tileentity.TileEntityMemoryPiston;
 import com.samuel.mazetowers.tileentity.TileEntityMemoryPistonMemory;
 
-public class BlockMemoryPistonBase extends Block implements ITileEntityProvider {
+public class BlockMemoryPistonBase extends BlockDirectional implements ITileEntityProvider {
 
 	public static final PropertyDirection FACING = PropertyDirection
 		.create("facing");
 	public static final PropertyBool EXTENDED = PropertyBool
 		.create("extended");
+	protected static final AxisAlignedBB PISTON_BASE_EAST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.75D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_BASE_WEST_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_BASE_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.75D);
+    protected static final AxisAlignedBB PISTON_BASE_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.25D, 1.0D, 1.0D, 1.0D);
+    protected static final AxisAlignedBB PISTON_BASE_UP_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.75D, 1.0D);
+    protected static final AxisAlignedBB PISTON_BASE_DOWN_AABB = new AxisAlignedBB(0.0D, 0.25D, 0.0D, 1.0D, 1.0D, 1.0D);
 
 	public BlockMemoryPistonBase() {
-		super(Material.piston);
+		super(Material.PISTON);
 		this.setDefaultState(this.blockState.getBaseState()
 			.withProperty(FACING, EnumFacing.NORTH)
 			.withProperty(EXTENDED, Boolean.valueOf(false)));
-		this.setStepSound(SoundType.STONE);
+		this.setSoundType(SoundType.STONE);
 		this.setHardness(0.5F);
 	}
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        if (((Boolean)state.getValue(EXTENDED)).booleanValue())
+        {
+            switch ((EnumFacing)state.getValue(FACING))
+            {
+                case DOWN:
+                    return PISTON_BASE_DOWN_AABB;
+                case UP:
+                default:
+                    return PISTON_BASE_UP_AABB;
+                case NORTH:
+                    return PISTON_BASE_NORTH_AABB;
+                case SOUTH:
+                    return PISTON_BASE_SOUTH_AABB;
+                case WEST:
+                    return PISTON_BASE_WEST_AABB;
+                case EAST:
+                    return PISTON_BASE_EAST_AABB;
+            }
+        }
+        else
+        {
+            return FULL_BLOCK_AABB;
+        }
+    }
 
 	@Override
 	/**
@@ -74,8 +110,8 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 	/**
 	 * Called when a neighboring block changes.
 	 */
-	public void onNeighborBlockChange(World worldIn,
-		BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state,
+		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (!worldIn.isRemote) {
 			this.checkForMove(worldIn, pos, state);
 		}
@@ -170,10 +206,16 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 
 	@Override
 	/**
-	 * Called on both Client and Server when World#addBlockEvent is called
-	 */
-	public boolean onBlockEventReceived(World worldIn,
-		BlockPos pos, IBlockState state, int eventID,
+     * Called on both Client and Server when World#addBlockEvent is called. On the Server, this may perform additional
+     * changes to the world, like pistons replacing the block with an extended base. On the client, the update may
+     * involve replacing tile entities, playing sounds, or performing other visual actions to reflect the server side
+     * changes.
+     *  
+     * @param state The block state retrieved from the block position prior to this method being invoked
+     * @param pos The position of the block event. Can be used to retrieve tile entities.
+     */
+	public boolean eventReceived(IBlockState state,
+		World worldIn, BlockPos pos, int eventID,
 		int eventParam) {
 		EnumFacing enumfacing;
 
@@ -221,7 +263,7 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 				pos.getX() + 0.5D, pos
 					.getY() + 0.5D,
 				pos.getZ() + 0.5D,
-				SoundEvents.block_piston_extend, SoundCategory.BLOCKS,
+				SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS,
 				0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F, true);
 		} else if (eventID == 1) {
 			TileEntity tileentity1 = worldIn
@@ -288,7 +330,7 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 				this.doMove(worldIn, pos, enumfacing, false);
 			}
 
-			worldIn.playSound((EntityPlayer)null, pos, SoundEvents.block_piston_contract,
+			worldIn.playSound((EntityPlayer)null, pos, SoundEvents.BLOCK_PISTON_CONTRACT,
 				SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F);
 		}
 
@@ -337,12 +379,12 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 					.getY() != worldIn.getHeight() - 1)) {
 				Block block = state.getBlock();
 				if (!(block instanceof BlockMemoryPistonBase)
-					&& block != Blocks.piston
-					&& block != Blocks.sticky_piston) {
+					&& block != Blocks.PISTON
+					&& block != Blocks.STICKY_PISTON) {
 					if (state.getMobilityFlag() == EnumPushReaction.BLOCK && pos.getY() < 2) {
 						return false;
 					}
-					if (state.getMobilityFlag() == EnumPushReaction.BLOCK && block != Blocks.bedrock) {
+					if (state.getMobilityFlag() == EnumPushReaction.BLOCK && block != Blocks.BEDROCK) {
 						return false;
 					}
 					
@@ -554,7 +596,7 @@ public class BlockMemoryPistonBase extends Block implements ITileEntityProvider 
 		if (!isExtended) {
 			worldIn.playSound(
 				pos.getX() + 0.5D, pos.getY() + 0.5D,
-				pos.getZ() + 0.5D, SoundEvents.block_stone_pressplate_click_on,
+				pos.getZ() + 0.5D, SoundEvents.BLOCK_STONE_PRESSPLATE_CLICK_ON,
 				SoundCategory.BLOCKS, 0.3F, 0.5F, true);
 			worldIn.setBlockState(pos, offState);
 		}

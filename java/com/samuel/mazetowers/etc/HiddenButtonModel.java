@@ -85,7 +85,7 @@ public class HiddenButtonModel implements IBakedModel {
 	@Override
 	public List<BakedQuad> getQuads(IBlockState iBlockState, EnumFacing side, long rand) {
 		IBakedModel retval = baseBakedModel;
-		IBlockState baseState = Blocks.stone_button
+		IBlockState baseState = Blocks.STONE_BUTTON
 			.getStateFromMeta(MazeTowers.BlockHiddenButton
 				.getMetaFromState(iBlockState));
 

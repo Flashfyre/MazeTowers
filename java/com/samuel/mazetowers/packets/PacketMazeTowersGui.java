@@ -1,5 +1,9 @@
 package com.samuel.mazetowers.packets;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -10,6 +14,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.samuel.mazetowers.etc.IMazeTowerCapability;
+import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.etc.MazeTowerGuiProvider;
 
 public class PacketMazeTowersGui implements IMessage {
@@ -24,13 +29,14 @@ public class PacketMazeTowersGui implements IMessage {
 	public int difficulty;
 	public int rarity;
 	public String towerName;
+	public int[][] mtBounds;
 
 	public PacketMazeTowersGui() {
 	}
 
 	public PacketMazeTowersGui(int chunkX, int baseY,
 		int chunkZ, int floors, int difficulty, int rarity,
-		boolean isUnderground, String towerName) {
+		boolean isUnderground, String towerName, int[][] mtBounds) {
 		this.chunkX = chunkX;
 		this.baseY = baseY;
 		this.chunkZ = chunkZ;
@@ -41,6 +47,7 @@ public class PacketMazeTowersGui implements IMessage {
 		this.difficulty = difficulty;
 		this.rarity = rarity;
 		this.towerName = towerName;
+		this.mtBounds = mtBounds;
 	}
 
 	@Override
@@ -59,6 +66,18 @@ public class PacketMazeTowersGui implements IMessage {
 		difficulty = ByteBufUtils.readVarInt(buf, 1);
 		rarity = ByteBufUtils.readVarInt(buf, 1);
 		towerName = ByteBufUtils.readUTF8String(buf);
+		
+		List<int[]> mtbList = new ArrayList<int[]>();
+		int coord;
+		
+		while (buf.isReadable(6) && (coord = ByteBufUtils.readVarShort(buf)) != 0) {
+			int[] mtb = new int[] { coord - 128, ByteBufUtils.readVarShort(buf),
+				ByteBufUtils.readVarShort(buf) - 128, ByteBufUtils.readVarShort(buf) - 128,
+				ByteBufUtils.readVarShort(buf), ByteBufUtils.readVarShort(buf) - 128 };
+			mtbList.add(mtb);
+		}
+		
+		this.mtBounds = mtbList.toArray(new int[mtbList.size()][6]);
 	}
 
 	@Override
@@ -73,6 +92,12 @@ public class PacketMazeTowersGui implements IMessage {
 		ByteBufUtils.writeVarInt(buf, difficulty, 1);
 		ByteBufUtils.writeVarInt(buf, rarity, 1);
 		ByteBufUtils.writeUTF8String(buf, towerName);
+		
+		for (int[] mtb : mtBounds) {
+			for (int i = 0; i < 6; i++) {
+				ByteBufUtils.writeVarShort(buf, mtb[i] + (i % 3 == 1 ? 0 : 128));
+			}
+		}
 	}
 
 	public static class Handler implements
@@ -107,6 +132,7 @@ public class PacketMazeTowersGui implements IMessage {
 								props
 									.setTowerName(message.towerName);
 								props.setFloor(1);
+								props.setMTBounds(message.mtBounds);
 							}
 						} else if (enabled) {
 							props.setEnabled(false);

@@ -6,6 +6,7 @@ import java.util.Map;
 import net.minecraft.block.BlockPrismarine;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTorch;
+import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -14,6 +15,8 @@ import net.minecraft.util.IStringSerializable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.blocks.BlockMazeTowerThreshold;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTower;
 
 public class MTStateMaps {
@@ -24,32 +27,32 @@ public class MTStateMaps {
 	private static Map<IBlockState, IBlockState[][][][]> rawMaps;
 	private static Map<IBlockState, Map<EnumFacing, IBlockState[][][]>[]> maps;
 	private static final IBlockState[] torch = new IBlockState[] {
-		Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST),
-		Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH),
-		Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST),
-		Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)
+		Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST),
+		Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH),
+		Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST),
+		Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH)
 	};
 	
 	public static void initStateMaps(MazeTower tower) {
 		if (rawMaps != null && rawMaps.containsKey(tower.wallBlock_external)) {
 			final EnumDyeColor[] dyeColors = tower.getDyeColors();
-			final IBlockState air2 = Blocks.air.getDefaultState();
+			final IBlockState air2 = Blocks.AIR.getDefaultState();
 			final IBlockState wall = tower.wallBlock_external;
 			final IBlockState wall2 = tower.wallBlock;
 			final IBlockState c = tower.floorBlock;
-			final IBlockState window = Blocks.glass_pane.getDefaultState();
+			final IBlockState window = Blocks.GLASS_PANE.getDefaultState();
 			final IBlockState[] carpet = new IBlockState[] {
-				tower.getColourBlockState(Blocks.carpet, dyeColors[0]),
-				tower.getColourBlockState(Blocks.carpet, dyeColors[1]),
-				tower.getColourBlockState(Blocks.carpet, dyeColors[2])
+				tower.getColourBlockState(Blocks.CARPET, dyeColors[0]),
+				tower.getColourBlockState(Blocks.CARPET, dyeColors[1]),
+				tower.getColourBlockState(Blocks.CARPET, dyeColors[2])
 			};
 			final IBlockState[] g = new IBlockState[] {
-				tower.getColourBlockState(Blocks.stained_glass, dyeColors[0]),
-				tower.getColourBlockState(Blocks.stained_glass, dyeColors[1]),
-				tower.getColourBlockState(Blocks.stained_glass, dyeColors[2])
+				tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[0]),
+				tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[1]),
+				tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[2])
 			};
-			final IBlockState lamp = Blocks.redstone_lamp.getDefaultState();
-			final IBlockState wire = Blocks.redstone_wire.getDefaultState();
+			final IBlockState lamp = Blocks.REDSTONE_LAMP.getDefaultState();
+			final IBlockState wire = Blocks.REDSTONE_WIRE.getDefaultState();
 			
 			for (EnumFacing dir : dirs) {
 				maps.get(tower.wallBlock_external)[EnumStateMap.MINI_TOWER_CEILING_1.ordinal()]
@@ -82,11 +85,11 @@ public class MTStateMaps {
 						towerMaps[mapIndex].put(dir, towerRawMaps[mapIndex]);
 					else {
 						if (mapIndex != 1)
-							towerMaps[mapIndex].put(dir, MTUtils.getRotatedStateMap(
+							towerMaps[mapIndex].put(dir, MTHelper.getRotatedStateMap(
 								towerRawMaps[mapIndex], checkDir, dir, true));
 						else
-							towerMaps[mapIndex].put(dir, MTUtils.getRotatedStateMap(
-								MTUtils.getStairRotatedStairsMap(towerRawMaps[mapIndex],
+							towerMaps[mapIndex].put(dir, MTHelper.getRotatedStateMap(
+								MTHelper.getStairRotatedStairsMap(towerRawMaps[mapIndex],
 								EnumFacing.SOUTH, dir, tower.stairsBlock, torch),
 								checkDir, dir, true));
 					}
@@ -133,6 +136,7 @@ public class MTStateMaps {
 		int dyeColorIndex, boolean hasShop) {
 		final boolean hasBeacon = !hasShop && mineral != null;
 		IBlockState[][][][] stateMap = new IBlockState[6][][][];
+		EnumFacing pressurePlateDir = null;
 		int index = 0;
 		for (EnumStateMap s : EnumStateMap.values()) {
 			final String mapName = s.name(),
@@ -144,24 +148,31 @@ public class MTStateMaps {
 			final int mapIndex = EnumStateMap.valueOf(mapName).ordinal();
 			final Map<EnumFacing, IBlockState[][][]> map =
 				maps.get(wallBlock_external)[mapIndex];
-			final IBlockState air2 = Blocks.air.getDefaultState(),
-			lever = !hasBeacon ? Blocks.lever.getStateFromMeta(7) :
-				beaconGlass2 != null ? beaconGlass2 : air2,
-			glass = Blocks.glass.getDefaultState(),
-			lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : commonGlass,
-			wire = !hasBeacon ? Blocks.redstone_wire.getDefaultState() : air2;
+			final IBlockState air = Blocks.AIR.getDefaultState(),
+			lever = !hasBeacon ? Blocks.LEVER.getStateFromMeta(7) :
+				beaconGlass2 != null ? beaconGlass2 : air,
+			glass = Blocks.GLASS.getDefaultState(),
+			lamp = !hasBeacon ? Blocks.REDSTONE_LAMP.getDefaultState() : commonGlass,
+			wire = !hasBeacon ? Blocks.REDSTONE_WIRE.getDefaultState() : air;
 			if (mapName.startsWith("MINI_TOWER_TOP"))
-				map.put(dir, !hasShop ? getTopMap(air2, wallBlock_external, carpetBlock,
-					window, floorBlock, lever, mineral) : getTopMapShop(air2,
+				map.put(dir, !hasShop ? getTopMap(air, wallBlock_external, carpetBlock,
+					window, floorBlock, lever, mineral, pressurePlateDir) : getTopMapShop(air,
 					wallBlock_external, carpetBlock, window, fenceBlock, mineral));
 			else if (mapName.startsWith("MINI_TOWER_ROOF")) {
 				if (mapName.equals("MINI_TOWER_ROOF_WIRE"))
-					map.put(dir, getRoofWire(air2, wallBlock_external, wire, beaconGlass3));
+					map.put(dir, getRoofWire(air, wallBlock_external, wire, beaconGlass3));
 				else
 					map.put(dir, getRoof(fenceBlock, glass, commonGlass, topGlass2, topGlass3));
 			} else if (mapName.startsWith("MINI_TOWER_CEILING_"))
-				map.put(dir, getCeiling(air2, wallBlock_external, wallBlock, ceilBlock,
+				map.put(dir, getCeiling(air, wallBlock_external, wallBlock, ceilBlock,
 					commonGlass, lamp));
+			else if (mapName.equals("MINI_TOWER_BASE")) {
+				map.get(dir)[0][4][4] = floorBlock;
+				if (floorBlock.getBlock() instanceof BlockTrapDoor) {
+					pressurePlateDir = floorBlock.getValue(BlockTrapDoor.FACING);
+					floorBlock = MazeTowers.BlockMazeTowerThreshold.getDefaultState();
+				}
+			}
 			stateMap[index++] = map.get(dir);
 		}
 		
@@ -179,17 +190,22 @@ public class MTStateMaps {
 		final Map<EnumFacing, IBlockState[][][]> map =
 			maps.get(wallBlock_external)[mapIndex];
 		final IBlockState[][][] stateMap;
-		final IBlockState air2 = Blocks.air.getDefaultState(),
-		lever = !hasBeacon ? Blocks.lever.getStateFromMeta(7) :
+		final IBlockState air2 = Blocks.AIR.getDefaultState(),
+		lever = !hasBeacon ? Blocks.LEVER.getStateFromMeta(7) :
 			glass2 != null ? glass2 : air2,
-		glass = Blocks.glass.getDefaultState(),
-		lamp = !hasBeacon ? Blocks.redstone_lamp.getDefaultState() : glass1,
-		wire = !hasBeacon ? Blocks.redstone_wire.getDefaultState() : air2;
-		if (mapName.startsWith("MINI_TOWER_TOP"))
+		glass = Blocks.GLASS.getDefaultState(),
+		lamp = !hasBeacon ? Blocks.REDSTONE_LAMP.getDefaultState() : glass1,
+		wire = !hasBeacon ? Blocks.REDSTONE_WIRE.getDefaultState() : air2;
+		if (mapName.startsWith("MINI_TOWER_TOP")) {
+			EnumFacing pressurePlateDir = null;
+			if (floorBlock.getBlock() instanceof BlockTrapDoor) {
+				pressurePlateDir = floorBlock.getValue(BlockTrapDoor.FACING);
+				floorBlock = MazeTowers.BlockMazeTowerThreshold.getDefaultState();
+			}
 			map.put(dir, !hasShop ? getTopMap(air2, wallBlock_external, carpetBlock,
-				window, floorBlock, lever, mineral) : getTopMapShop(air2,
+				window, floorBlock, lever, mineral, pressurePlateDir) : getTopMapShop(air2,
 				wallBlock_external, carpetBlock, window, fenceBlock, mineral));
-		else if (mapName.startsWith("MINI_TOWER_ROOF")) {
+		} else if (mapName.startsWith("MINI_TOWER_ROOF")) {
 			if (mapName.equals("MINI_TOWER_ROOF_WIRE"))
 				map.put(dir, getRoofWire(air2, wallBlock_external, wire, glass3));
 			else
@@ -197,6 +213,9 @@ public class MTStateMaps {
 		} else if (mapName.startsWith("MINI_TOWER_CEILING_"))
 			map.put(dir, getCeiling(air2, wallBlock_external, wallBlock, ceilBlock,
 				glass1, lamp));
+		else if (mapName.equals("MINI_TOWER_BASE")) {
+			map.get(dir)[0][4][4] = floorBlock;
+		}
 				
 		return map.get(dir);
 	}
@@ -204,32 +223,32 @@ public class MTStateMaps {
 	public static IBlockState[][][][] getRawMapsForTower(MazeTower tower) {
 		final EnumDyeColor[] dyeColors = tower.getDyeColors();
 		final IBlockState air = tower.air,
-			air2 = Blocks.air.getDefaultState(),
+			air2 = Blocks.AIR.getDefaultState(),
 			wall = tower.wallBlock_external,
 			wall2 = tower.wallBlock,
 			floor = tower.floorBlock,
 			c = tower.ceilBlock,
 			fence = tower.fenceBlock,
 			floor2 = !(wall.getBlock() instanceof BlockPrismarine) ? floor :
-			Blocks.sea_lantern.getDefaultState();
+			Blocks.SEA_LANTERN.getDefaultState();
 		final IBlockState[] carpet = new IBlockState[] {
-			tower.getColourBlockState(Blocks.carpet, dyeColors[0]),
-			tower.getColourBlockState(Blocks.carpet, dyeColors[1]),
-			tower.getColourBlockState(Blocks.carpet, dyeColors[2])
+			tower.getColourBlockState(Blocks.CARPET, dyeColors[0]),
+			tower.getColourBlockState(Blocks.CARPET, dyeColors[1]),
+			tower.getColourBlockState(Blocks.CARPET, dyeColors[2])
 		},
 		g = new IBlockState[] {
-			tower.getColourBlockState(Blocks.stained_glass, dyeColors[0]),
-			tower.getColourBlockState(Blocks.stained_glass, dyeColors[1]),
-			tower.getColourBlockState(Blocks.stained_glass, dyeColors[2])
+			tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[0]),
+			tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[1]),
+			tower.getColourBlockState(Blocks.STAINED_GLASS, dyeColors[2])
 		},
 		window = new IBlockState[] {
-			tower.getColourBlockState(Blocks.stained_glass_pane, dyeColors[0]),
-			tower.getColourBlockState(Blocks.stained_glass_pane, dyeColors[1]),
-			tower.getColourBlockState(Blocks.stained_glass_pane, dyeColors[2])
+			tower.getColourBlockState(Blocks.STAINED_GLASS_PANE, dyeColors[0]),
+			tower.getColourBlockState(Blocks.STAINED_GLASS_PANE, dyeColors[1]),
+			tower.getColourBlockState(Blocks.STAINED_GLASS_PANE, dyeColors[2])
 		};
-		final IBlockState lever = Blocks.lever.getStateFromMeta(7),
-			lamp = Blocks.redstone_lamp.getDefaultState(),
-			wire = Blocks.redstone_wire.getDefaultState();
+		final IBlockState lever = Blocks.LEVER.getStateFromMeta(7),
+			lamp = Blocks.REDSTONE_LAMP.getDefaultState(),
+			wire = Blocks.REDSTONE_WIRE.getDefaultState();
 		final IBlockState[] stairs = tower.stairsBlock;
 		final IBlockState[][][][] rawMaps = new IBlockState[][][][] {
 			{
@@ -380,10 +399,10 @@ public class MTStateMaps {
 				}
 			},
 			getRoofWire(air2, wall, wire, wire),
-			getRoof(fence, Blocks.glass.getDefaultState(), g[0], g[1], g[2]),
-			getTopMap(air2, wall2, carpet[0], floor, window[0], lever, null),
-			getTopMap(air2, wall2, carpet[1], floor, window[1], lever, null),
-			getTopMap(air2, wall2, carpet[2], floor, window[2], lever, null),
+			getRoof(fence, Blocks.GLASS.getDefaultState(), g[0], g[1], g[2]),
+			getTopMap(air2, wall2, carpet[0], floor, window[0], lever, null, null),
+			getTopMap(air2, wall2, carpet[1], floor, window[1], lever, null, null),
+			getTopMap(air2, wall2, carpet[2], floor, window[2], lever, null, null),
 			getCeiling(air2, wall, wall2, c, g[0], lamp),
 			getCeiling(air2, wall, wall2, c, g[1], lamp),
 			getCeiling(air2, wall, wall2, c, g[2], lamp),/*,
@@ -436,12 +455,12 @@ public class MTStateMaps {
 	
 	private static IBlockState[][][] getTopMap(IBlockState air2, IBlockState wall,
 		IBlockState carpet, IBlockState window, IBlockState floor,
-		IBlockState lever, IBlockState mineral) {
+		IBlockState lever, IBlockState mineral, EnumFacing pressurePlateDir) {
 		if (mineral == null) {
 			mineral = carpet;
 		} else
 			floor = mineral;
-		return new IBlockState[][][] {
+		IBlockState[][][] topMap = new IBlockState[][][] {
 			new IBlockState[][] {
 				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null },
 				new IBlockState[] { null, null, wall, carpet, carpet, carpet, wall, null, null },
@@ -474,6 +493,26 @@ public class MTStateMaps {
 				new IBlockState[] { null, null, null, wall, wall, wall, null, null, null }
 			}
 		};
+		
+		if (pressurePlateDir != null) {
+			IBlockState pressurePlate = MazeTowers.BlockHiddenPressurePlateWeighted.getDefaultState();
+			switch (pressurePlateDir.ordinal()) {
+				case 5:
+					topMap[0][4][5] = pressurePlate;
+					break;
+				case 3:
+					topMap[0][5][4] = pressurePlate;
+					break;
+				case 4:
+					topMap[0][4][3] = pressurePlate;
+					break;
+				case 2:
+					topMap[0][3][4] = pressurePlate;
+					break;
+			}
+		}
+		
+		return topMap;
 	}
 	
 	private static IBlockState[][][] getTopMapShop(IBlockState air2, IBlockState wall,

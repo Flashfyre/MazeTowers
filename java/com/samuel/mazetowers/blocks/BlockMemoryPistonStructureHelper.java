@@ -65,7 +65,7 @@ public class BlockMemoryPistonStructureHelper {
 					.get(i);
 
 				if (this.world.getBlockState(blockpos)
-					.getBlock() == Blocks.slime_block
+					.getBlock() == Blocks.SLIME_BLOCK
 					&& !this.func_177250_b(blockpos,
 						pushCount)) {
 					return false;
@@ -152,7 +152,7 @@ public class BlockMemoryPistonStructureHelper {
 								.get(l);
 
 							if (this.world.getBlockState(
-								blockpos2).getBlock() == Blocks.slime_block
+								blockpos2).getBlock() == Blocks.SLIME_BLOCK
 								&& !this.func_177250_b(
 									blockpos2, pushCount)) {
 								return false;

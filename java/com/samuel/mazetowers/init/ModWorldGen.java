@@ -11,6 +11,5 @@ public class ModWorldGen {
 			MazeTowers.spectrite, 618);
 		GameRegistry.registerWorldGenerator(
 			MazeTowers.mazeTowers, 619);
-	
 	}
 }

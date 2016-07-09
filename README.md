@@ -75,7 +75,10 @@ An item that removes lock blocks. There are 20 colour variants with one unique c
 A rainbow-coloured key that can open every type of door.
 
 ### Diamond Rod
-A stick of diamond that is currently only used to make a Spectrite Pickaxe.
+A stick of diamond that is used in crafting as a diamond handle for Spectrite tools.
+
+### Spectrite Rod
+A stick of Spectrite that is used in crafting as a Spectrite handle for Spectrite tools.
 
 ### RAM Stick
 A material item used in crafting **[RECIPES NOT YET IMPLEMENTED]**.
@@ -104,11 +107,35 @@ A slightly darker Redstone Clock with a power output highest during the night an
 ### Chaotic Sludge Bucket
 A bucket containing Chaotic Sludge. Chaotic Sludge is a custom liquid sometimes found in fall traps in Maze Towers floors with Level tiers of A+ or greater. When submerged in Chaotic Sludge, players will contract bad potion effects that worsen with prolonged exposure.
 
+### Spectrite Shovel
+An extremely efficient shovel made of Spectrite with a diamond handle. When used on a shovel-effective block, a cross of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 5 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
+### Perfect Spectrite Shovel
+A ridiculously efficient shovel made entirely of Spectrite. When used on a shovel-effective block, a square of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 9 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
+### Spectrite Pickaxe
+An extremely efficient pickaxe made of Spectrite with a diamond handle. When used on a pickaxe-effective block, a cross of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 5 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
+### Perfect Spectrite Pickaxe
+A ridiculously efficient pickaxe made entirely of Spectrite. When used on a pickaxe-effective block, a square of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 9 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
+### Spectrite Axe
+An extremely efficient axe made of Spectrite with a diamond handle. When used on an axe-effective block, a cross of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 5 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
+### Perfect Spectrite Axe
+A ridiculously efficient axe made entirely of Spectrite. When used on an axe-effective block, a square of surrounding weaker or equivalent blocks will also be destroyed, resulting in a maximum of 9 blocks destroyed per use. The surrounding blocks that will be destroyed depend on the player's rotation and perspective.
+
 ### Spectrite Sword
-A ridiculously powerful sword made of diamond and spectrite. Creates an explosion when attacking an entity that hits nearby entities but has no affect on blocks nor allies.
+An extremely powerful sword made of Spectrite with a diamond handle. It creates an explosion when attacking an entity that hits nearby entities but has no affect on blocks nor allies.
+
+### Perfect Spectrite Sword
+A ridiculously powerful sword made entirely of Spectrite. This sword's explosion inflicts more damage than the diamond handle version.
 
 ### Spectrite Key Sword
-A Spectrite Sword that doubles as a Spectrite Key and therefore can be used to open all types of Maze Tower doors.
+A Spectrite Sword with a diamond handle that doubles as a Spectrite Key and therefore can be used to open all types of Maze Tower doors.
+
+### Perfect Spectrite Key Sword
+A Spectrite Sword that doubles as a Spectrite Key and therefore can be used to open all types of Maze Tower doors. Only this sword's inflicted damage is affected by the Spectrite handle.
 
 ### Explosive Arrow
 A special arrow that explodes shortly after hitting a block or instantly after hitting an entity. These may only be fired from an Explosive Bow. They can be crafted with a fire charge on top of an arrow on top of gunpowrder. These will probably be dropped by Explosive Creepers eventually but currently are not.
@@ -120,7 +147,7 @@ A special bow that can shoot Explosive Arrows. There is a slim, random chance th
 A wearable head of an Explosive Creeper that provides the same protection as iron and gold helmets but without breakability. When worn, regular arrows fired from an Explosive Bow become Explosive Arrows. These can be obtained as a rare drop from Explosive Creepers.
 
 ### Spectrite Armour (Helmet, Chestplate, Leggings, Boots)
-A set of armour made of spectrite. It's just as protective as diamond but lasts a lot longer.
+A set of armour made of spectrite. It's just as protective as diamond but lasts a lot longer. In addition, when 3 or more pieces of armour are equipped, the player will be given a regeneration effect with level 1 for 3 pieces and level 2 for 4 pieces.
 
 ## Special Purpose Custom Blocks (Not Obtainable without Commands)
 
