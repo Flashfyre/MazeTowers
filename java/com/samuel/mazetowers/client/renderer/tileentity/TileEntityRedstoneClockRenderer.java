@@ -13,7 +13,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.blocks.BlockRedstoneClock;
 import com.samuel.mazetowers.init.ModBlocks;
-import com.samuel.mazetowers.items.ItemBlockRedstoneClock;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityRedstoneClockRenderer extends TileEntitySpecialRenderer {

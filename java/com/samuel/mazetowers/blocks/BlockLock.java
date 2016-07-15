@@ -131,7 +131,7 @@ public class BlockLock extends Block implements IMetaBlockName,
     			final IBlockState doorState = worldIn.getBlockState(doorPos);
     			worldIn.playSound(null, pos, ModSounds.door_unlock,
         			SoundCategory.BLOCKS, 1.0F, 1.0F);
-    			if (!MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
+    			if (!MTHelper.getIsMazeTowerPos(worldIn, pos))
     				this.dropBlockAsItem(worldIn, pos, state, 0);
     			if (worldIn.isBlockPowered(doorPos) || worldIn.isBlockPowered(doorPos.up())) {
     				Block doorBlock = doorState.getBlock();
@@ -211,7 +211,7 @@ public class BlockLock extends Block implements IMetaBlockName,
 
 	private boolean checkForDrop(World worldIn,
 		BlockPos pos, IBlockState state) {
-		return !MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos) &&
+		return !MTHelper.getIsMazeTowerPos(worldIn, pos) &&
 			this.canPlaceBlockAt(worldIn, pos);
 	}
 	

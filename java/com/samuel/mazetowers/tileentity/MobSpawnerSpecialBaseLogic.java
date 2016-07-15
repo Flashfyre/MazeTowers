@@ -200,9 +200,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
                         	POWERED.setAccessible(true);
                         	try {
 								creeper.getDataManager().set((DataParameter<Boolean>) POWERED.get(creeper), true);
-							} catch (IllegalArgumentException e) {
-								e.printStackTrace();
-							} catch (IllegalAccessException e) {
+							} catch (Exception e) {
 								e.printStackTrace();
 							} finally {
 								entityliving.worldObj.spawnEntityInWorld(creeper);

@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockItemScanner;
 import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 import com.samuel.mazetowers.etc.ContainerItemScanner;
 import com.samuel.mazetowers.packets.PacketActivateItemScanner;

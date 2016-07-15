@@ -12,7 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.potion.PotionEffect;
@@ -112,6 +111,7 @@ public class ItemSpectriteSword extends ItemSword {
 					target.getEntityBoundingBox().minY, target.posZ, 7,
 					world.rand.nextGaussian(), world.rand.nextGaussian(),
 					world.rand.nextGaussian(), 0.0D, new int[0]);
+				stack.damageItem(1, attacker);
 			}
 			
 			for (int e = 0; e < surrounding.size(); e++) {

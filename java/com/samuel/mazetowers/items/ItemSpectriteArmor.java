@@ -1,6 +1,9 @@
 package com.samuel.mazetowers.items;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
@@ -11,6 +14,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
+import com.samuel.mazetowers.etc.MTHelper;
 
 public class ItemSpectriteArmor extends ItemArmor {
 
@@ -36,11 +40,25 @@ public class ItemSpectriteArmor extends ItemArmor {
 				ItemStack stack = player.inventory.armorInventory[a];
 				if (stack != null && stack.getItem() instanceof ItemSpectriteArmor)
 					spectriteCount++;
-					
 			}
-			if (spectriteCount >= 3 && player.getActivePotionEffect(MobEffects.REGENERATION) == null &&
-				player.getFoodStats().getFoodLevel() > 0) {
-				player.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 220, spectriteCount - 3));
+			if (player.getFoodStats().getFoodLevel() > 0) {
+				if (player.getActivePotionEffect(MobEffects.ABSORPTION) == null && player.getHealth() == player.getMaxHealth()) {
+					float absorptionHealth = player.getHealth();
+					Field lastHealthScore = MTHelper.findObfuscatedField(EntityPlayerMP.class,
+			    		"lastHealthScore", "field_130068_bO");
+			    	lastHealthScore.setAccessible(true);
+			    	try {
+			    		absorptionHealth = ((Float) lastHealthScore.get(player)).floatValue() - player.getMaxHealth();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					int amplifier = Math.round(absorptionHealth) >> 2;
+						player.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 220,
+							Math.min(amplifier, Math.min(spectriteCount - 1, 2))));
+				}
+				if (spectriteCount == 4 && player.getActivePotionEffect(MobEffects.REGENERATION) == null) {
+					player.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 220, 0));
+				}
 			}
 		}
     }

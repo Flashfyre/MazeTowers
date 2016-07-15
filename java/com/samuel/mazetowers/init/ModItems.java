@@ -4,7 +4,28 @@ import net.minecraft.item.ItemDoor;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.items.*;
+import com.samuel.mazetowers.items.ItemChaoticSludgeBucket;
+import com.samuel.mazetowers.items.ItemColoredKey;
+import com.samuel.mazetowers.items.ItemDiamondRod;
+import com.samuel.mazetowers.items.ItemExplosiveArrow;
+import com.samuel.mazetowers.items.ItemExplosiveBow;
+import com.samuel.mazetowers.items.ItemExplosiveCreeperSkull;
+import com.samuel.mazetowers.items.ItemRAM;
+import com.samuel.mazetowers.items.ItemSpectriteArmor;
+import com.samuel.mazetowers.items.ItemSpectriteAxe;
+import com.samuel.mazetowers.items.ItemSpectriteAxeSpecial;
+import com.samuel.mazetowers.items.ItemSpectriteGem;
+import com.samuel.mazetowers.items.ItemSpectriteKey;
+import com.samuel.mazetowers.items.ItemSpectriteKeySword;
+import com.samuel.mazetowers.items.ItemSpectriteKeySwordSpecial;
+import com.samuel.mazetowers.items.ItemSpectriteOrb;
+import com.samuel.mazetowers.items.ItemSpectritePickaxe;
+import com.samuel.mazetowers.items.ItemSpectritePickaxeSpecial;
+import com.samuel.mazetowers.items.ItemSpectriteRod;
+import com.samuel.mazetowers.items.ItemSpectriteShovel;
+import com.samuel.mazetowers.items.ItemSpectriteShovelSpecial;
+import com.samuel.mazetowers.items.ItemSpectriteSword;
+import com.samuel.mazetowers.items.ItemSpectriteSwordSpecial;
 
 public class ModItems {
 

@@ -120,9 +120,7 @@ public class EntityVillagerVendor extends EntityVillager {
     	buyingList.setAccessible(true);
     	try {
 			buyingList.set(this, getNewRecipeList());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
     }

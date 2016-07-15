@@ -9,8 +9,6 @@ import net.minecraft.util.WeightedSpawnerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import com.samuel.mazetowers.init.ModBlocks;
-
 public class TileEntitySpecialMobSpawner extends TileEntityMobSpawner {
 	
 	private boolean shouldSpawnAbove = false;

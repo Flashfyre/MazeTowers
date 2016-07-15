@@ -3,20 +3,13 @@ package com.samuel.mazetowers.tileentity;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.translation.I18n;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.etc.IMazeTowerCapability;
 import com.samuel.mazetowers.etc.MTHelper;
-import com.samuel.mazetowers.etc.MazeTowerGuiProvider;
-import com.samuel.mazetowers.packets.PacketMazeTowersGui;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTowerBase;
-import com.samuel.mazetowers.world.WorldGenMazeTowers.MiniTower;
 
 public class TileEntityMazeTowerThreshold extends
 	TileEntity implements ITickable {
@@ -43,7 +36,7 @@ public class TileEntityMazeTowerThreshold extends
 					hasTower = false;
 				else if ((tower.chunkX != chunkX ||
 					tower.chunkZ != chunkZ) &&
-					(MTHelper.getMiniTowerAtPos(tower.getMiniTowers(), pos) == null)) {
+					MTHelper.getMiniTowerAtPos(tower.getMiniTowers(), pos) == null) {
 					hasTower = false;
 					tower = null;
 				}

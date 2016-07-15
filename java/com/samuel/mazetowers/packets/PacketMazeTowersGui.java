@@ -1,10 +1,10 @@
 package com.samuel.mazetowers.packets;
 
-import java.nio.ByteBuffer;
+import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.IThreadListener;
@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.samuel.mazetowers.etc.IMazeTowerCapability;
-import com.samuel.mazetowers.etc.MTHelper;
 import com.samuel.mazetowers.etc.MazeTowerGuiProvider;
 
 public class PacketMazeTowersGui implements IMessage {

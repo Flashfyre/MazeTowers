@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockItemScanner;
 import com.samuel.mazetowers.blocks.BlockItemScannerGold;
 
 public class PacketActivateItemScanner implements IMessage {

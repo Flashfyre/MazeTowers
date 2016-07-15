@@ -1,11 +1,11 @@
 package com.samuel.mazetowers.init;
 
-import com.samuel.mazetowers.MazeTowers;
-
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import com.samuel.mazetowers.MazeTowers;
 
 public final class ModCrafting {
 
@@ -85,29 +85,47 @@ public final class ModCrafting {
 			ModItems.spectrite_pickaxe_special), " XX", " YX", "Y  ",
 			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(ModItems.spectrite_rod));
 		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_sword), " X ", " X ", "YYY",
-			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(Items.DIAMOND));
-		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_sword), "  X", "YX ", "YY ",
-			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(Items.DIAMOND));
-		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_key_sword), " XY", " X ", "ZZZ", 'X', new ItemStack(ModItems.spectrite_gem),
-			'Y', new ItemStack(ModItems.key_spectrite), 'Z', new ItemStack(Items.DIAMOND));
-		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_key_sword), "  X", "YXZ", "YY ",
+			ModItems.spectrite_sword), " X ", " X ", "YZY",
 			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(Items.DIAMOND),
-			'Z', new ItemStack(ModItems.key_spectrite));
+			'Z', new ItemStack(ModItems.diamond_rod));
 		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_sword_special), " X ", " X ", "XXX",
+			ModItems.spectrite_sword), "  X", "YX ", "ZY ",
+			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(Items.DIAMOND),
+			'Z', new ItemStack(ModItems.diamond_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_key_sword), " WX", " W ", "YZY", 'W', new ItemStack(ModItems.spectrite_gem),
+			'X', new ItemStack(ModItems.key_spectrite), 'Y', new ItemStack(Items.DIAMOND),
+			'Z', new ItemStack(ModItems.diamond_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_key_sword), "  W", "XWY", "ZX ",
+			'W', new ItemStack(ModItems.spectrite_gem), 'X', new ItemStack(Items.DIAMOND),
+			'Y', new ItemStack(ModItems.key_spectrite), 'Z', new ItemStack(ModItems.diamond_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_sword_special), " X ", " X ", "XYX",
+			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(ModItems.spectrite_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_sword_special), "  X", "XX ", "YX ",
+			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(ModItems.spectrite_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_key_sword_special), " XY", " X ", "XZX",
+			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(ModItems.key_spectrite),
+			'Z', new ItemStack(ModItems.spectrite_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_key_sword_special), "  X", "XXY", "ZX ",
+			'X', new ItemStack(ModItems.spectrite_gem), 'Y', new ItemStack(ModItems.key_spectrite),
+			'Z', new ItemStack(ModItems.spectrite_rod));
+		GameRegistry.addRecipe(new ItemStack(
+			ModItems.spectrite_helmet), "XXX", "X X",
 			'X', new ItemStack(ModItems.spectrite_gem));
 		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_sword_special), "  X", "XX ", "XX ",
+			ModItems.spectrite_chestplate), "X X", "XXX", "XXX",
 			'X', new ItemStack(ModItems.spectrite_gem));
 		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_key_sword_special), " XX", " X ", "XXX",
+			ModItems.spectrite_leggings), "XXX", "X X", "X X",
 			'X', new ItemStack(ModItems.spectrite_gem));
 		GameRegistry.addRecipe(new ItemStack(
-			ModItems.spectrite_key_sword_special), "  X", "XXX", "XX ",
+			ModItems.spectrite_boots), "X X", "X X",
 			'X', new ItemStack(ModItems.spectrite_gem));
+		
 	}
 }

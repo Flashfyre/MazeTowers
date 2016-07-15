@@ -2,7 +2,6 @@ package com.samuel.mazetowers.proxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPressurePlateWeighted;
-import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -30,7 +29,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.samuel.mazetowers.MazeTowers;
 import com.samuel.mazetowers.blocks.BlockExtraSlab;
-import com.samuel.mazetowers.blocks.BlockHiddenPressurePlateWeighted;
 import com.samuel.mazetowers.client.renderer.BlockRenderRegister;
 import com.samuel.mazetowers.client.renderer.EntityRenderRegister;
 import com.samuel.mazetowers.client.renderer.ItemRenderRegister;

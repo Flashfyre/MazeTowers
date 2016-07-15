@@ -1,12 +1,8 @@
 package com.samuel.mazetowers.items;
 
-import com.samuel.mazetowers.blocks.BlockExtraDoubleSlab;
-import com.samuel.mazetowers.blocks.BlockExtraHalfSlab;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSlab;
@@ -20,6 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.samuel.mazetowers.blocks.BlockExtraDoubleSlab;
+import com.samuel.mazetowers.blocks.BlockExtraHalfSlab;
 
 public class ItemBlockExtraSlab extends ItemSlab {
 	

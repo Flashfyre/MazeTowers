@@ -82,11 +82,11 @@ public class MazeTowersData extends WorldSavedData {
 					isGenerated[d][g] = (((NBTTagInt) isGeneratedList
 						.get(g)).getInt()) == 1;
 					if (!isGenerated[d][g])
-						break;
+						continue;
 					spawnPos[d][g] = BlockPos
 						.fromLong((((NBTTagLong) spawnPosList
 							.get(g)).getLong()));
-					isUnderground[d][g] = (((NBTTagInt) isGeneratedList
+					isUnderground[d][g] = (((NBTTagInt) isUndergroundList
 						.get(g)).getInt()) == 1;
 					towerData[d][g] = (((NBTTagIntArray) towerDataList
 						.get(g)).getIntArray());
@@ -101,7 +101,7 @@ public class MazeTowersData extends WorldSavedData {
 								.add((((NBTTagIntArray) towerDataMiniSublist
 									.get(m)).getIntArray()));
 					} catch (ClassCastException e) {
-						e = null;
+						e.printStackTrace();
 					}
 					NBTTagList bbdSublist = ((NBTTagList) bbdList
 						.get(g));
@@ -122,7 +122,7 @@ public class MazeTowersData extends WorldSavedData {
 										.getByteArray());
 						}
 					} catch (Exception e) {
-						e = null;
+						e.printStackTrace();
 					}
 					NBTTagList bbdmSublist = ((NBTTagList) bbdmList
 						.get(g));
@@ -163,7 +163,7 @@ public class MazeTowersData extends WorldSavedData {
 							}
 						}
 					} catch (Exception e) {
-						e = null;
+						e.printStackTrace();
 					}
 				}
 			}
@@ -193,7 +193,7 @@ public class MazeTowersData extends WorldSavedData {
 						.getGenCount(d - 1)); g++) {
 					if (!MazeTowers.mazeTowers
 						.getGenerated(d - 1, g))
-						break;
+						continue;
 					NBTTagLong spawnPosTag;
 					NBTTagInt isGeneratedTag;
 					NBTTagInt isUndergroundTag;
@@ -286,7 +286,7 @@ public class MazeTowersData extends WorldSavedData {
 						}
 						bbdmSublist.appendTag(bbdmTagList);
 					} catch (NullPointerException e) {
-						e = null;
+						e.printStackTrace();
 					}
 				}
 				spawnPosList.appendTag(spawnPosSublist);
@@ -390,8 +390,7 @@ public class MazeTowersData extends WorldSavedData {
 		if (this.towerDataMini[dimId][index] == null)
 			this.towerDataMini[dimId][index] = new ArrayList<int[]>();
 		if (this.towerDataMini[dimId][index].size() == indexMini)
-			this.towerDataMini[dimId][index].add(indexMini,
-				bounds);
+			this.towerDataMini[dimId][index].add(bounds);
 		else
 			this.towerDataMini[dimId][index].set(indexMini,
 				bounds);

@@ -2,6 +2,9 @@
 Thumbs.db
 ehthumbs.db
 
+# Photoshop Documents
+*.psd
+
 # Folder config file
 Desktop.ini
 

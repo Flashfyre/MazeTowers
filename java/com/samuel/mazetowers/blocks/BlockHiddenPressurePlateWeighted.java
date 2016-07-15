@@ -72,7 +72,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	public void neighborChanged(IBlockState state,
 		World worldIn, BlockPos pos, Block neighborBlock) {
 		if (!this.canBePlacedOn(worldIn, pos.down())) {
-			if (!MTHelper.getIsMazeTowerPos(worldIn.provider.getDimension(), pos))
+			if (!MTHelper.getIsMazeTowerPos(worldIn, pos))
 				this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
@@ -87,8 +87,7 @@ public class BlockHiddenPressurePlateWeighted extends BlockPressurePlateWeighted
 	@Override
 	protected int computeRedstoneStrength(World worldIn, BlockPos pos)
     {
-		final boolean isInTower = MTHelper.getIsMazeTowerPos(
-			worldIn.provider.getDimension(), pos);
+		final boolean isInTower = MTHelper.getIsMazeTowerPos(worldIn, pos);
 		final int i, ix = pos.getX() >> 4 << 4, iz = pos.getZ() >> 4 << 4;
 		final AxisAlignedBB towerChunkBounds = isInTower ?
 			new AxisAlignedBB(ix, pos.getY() - 1, iz, ix + 15, pos.getY() + 4, iz + 15) : null;

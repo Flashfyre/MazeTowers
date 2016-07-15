@@ -22,7 +22,6 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockExplosiveCreeperSkull;
 import com.samuel.mazetowers.init.ModBlocks;
 import com.samuel.mazetowers.tileentity.TileEntityExplosiveCreeperSkull;
 
@@ -59,46 +58,39 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn,
     	BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-    	Block skullBlock = ModBlocks.explosiveCreeperSkull;
-    	IBlockState state = worldIn.getBlockState(pos);
-        if (state.getBlock().isReplaceable(worldIn, pos) && side != EnumFacing.DOWN)
-        {
-            side = EnumFacing.UP;
-            pos = pos.down();
-        }
-        if (side == EnumFacing.DOWN)
+		if (side == EnumFacing.DOWN)
         {
             return EnumActionResult.FAIL;
         }
         else
         {
-            Block block = state.getBlock();
-            boolean flag = block.isReplaceable(worldIn, pos);
-
-            if (!flag)
+            if (worldIn.getBlockState(pos).getBlock().isReplaceable(worldIn, pos))
             {
-                if (!state.getBlock().getMaterial(state).isSolid() &&
-                	!worldIn.isSideSolid(pos, side, true))  {
+                side = EnumFacing.UP;
+                pos = pos.down();
+            }
+	    	Block skullBlock = ModBlocks.explosiveCreeperSkull;
+	    	IBlockState state = worldIn.getBlockState(pos);
+	    	boolean flag = skullBlock.isReplaceable(worldIn, pos);
+	    	 
+	    	if (!flag)
+            {
+                if (!worldIn.getBlockState(pos).getMaterial().isSolid() && !worldIn.isSideSolid(pos, side, true))
+                {
                     return EnumActionResult.FAIL;
                 }
 
                 pos = pos.offset(side);
             }
 
-            if (!playerIn.canPlayerEdit(pos, side, stack))
+	    	if (playerIn.canPlayerEdit(pos, side, stack) && skullBlock.canPlaceBlockAt(worldIn, pos))
             {
-                return EnumActionResult.FAIL;
-            }
-            else if (!skullBlock.canPlaceBlockAt(worldIn, pos))
-            {
-                return EnumActionResult.FAIL;
-            }
-            else
-            {
-                if (!worldIn.isRemote)
+                if (worldIn.isRemote)
                 {
-                    if (!skullBlock.canPlaceBlockOnSide(worldIn, pos, side))
-                    	return EnumActionResult.FAIL;
+                    return EnumActionResult.SUCCESS;
+                }
+                else
+                {
                     worldIn.setBlockState(pos, skullBlock.getDefaultState()
                     	.withProperty(BlockSkull.FACING, side), 3);
                     int i = 0;
@@ -121,6 +113,10 @@ public class ItemExplosiveCreeperSkull extends ItemArmor {
                 }
 
                 return EnumActionResult.SUCCESS;
+	        } 
+            else
+            {
+                return EnumActionResult.FAIL;
             }
         }
     }

@@ -9,8 +9,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.entity.RenderArmorStand;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,7 +19,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -51,9 +48,7 @@ public class MazeTowersRenderEventHandler {
 	    		if (rendererClass == LayerBipedArmor.class || rendererClass.getSuperclass() == LayerBipedArmor.class)
 	    			((List) layerRenderers.get(e.getRenderer())).set(0, new LayerSpectriteArmor(e.getRenderer()));
 	    	}
-		} catch (IllegalArgumentException e1) {
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 	}
@@ -74,13 +69,13 @@ public class MazeTowersRenderEventHandler {
 						BitSet[][] blockBreakabilityData = tower.getBlockBreakabilityData();
 						if (coords[1] >= 0 && coords[1] < 16 && coords[2] >= 0 && coords[2] < 16 && coords[0] >= 0 && coords[0] < blockBreakabilityData.length) {
 							try {
-							if (blockBreakabilityData[coords[0]] != null && !blockBreakabilityData[coords[0]][coords[1]].get(coords[2])) {
-								cachedSelPosBreakability = false;
-							} else {
-								cachedSelPosBreakability = true;
-							}
-							} catch (NullPointerException e2) {
-								e2 = null;
+								if (blockBreakabilityData[coords[0]] != null && !blockBreakabilityData[coords[0]][coords[1]].get(coords[2])) {
+									cachedSelPosBreakability = false;
+								} else {
+									cachedSelPosBreakability = true;
+								}
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
 							}
 							cachedSelPos = blockpos;
 						} else {

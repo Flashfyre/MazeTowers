@@ -3,7 +3,6 @@ package com.samuel.mazetowers.blocks;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;

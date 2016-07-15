@@ -1,7 +1,5 @@
 package com.samuel.mazetowers.etc;
 
-import io.netty.buffer.ByteBuf;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -133,27 +131,21 @@ public class MTHelper {
 			return cy > 4 ? cy : y;
 	}
 
-	public static boolean getIsMazeTowerPos(int dimId,
+	public static boolean getIsMazeTowerPos(World worldIn,
 		BlockPos pos) {
-		int chunkX = pos.getX() >> 4, chunkZ = pos.getZ() >> 4, y = pos
-			.getY();
-		BlockPos[] towerPos = MazeTowers.mazeTowers
-			.getSpawnPos(dimId);
+		final int dimId = worldIn.provider.getDimension(),
+			chunkX = pos.getX() >> 4, chunkZ = pos.getZ() >> 4, y = pos.getY();
 
 		/*
 		 * for (MazeTower t : MazeTowers.mazeTowers.getTowers()) { if (chunkX ==
 		 * t.chunkX && chunkZ == t.chunkZ && y >= t.baseY && y <= t.baseY +
 		 * ((t.floors + 1) * 6)) return true; }
 		 */
-		for (int p = 0; p < towerPos.length; p++) {
-			if (towerPos[p] != null
-				&& chunkX == towerPos[p].getX() >> 4
-				&& chunkZ == towerPos[p].getZ() >> 4
-				&& y >= towerPos[p].getY())
-				return true;
-		}
-
-		return false;
+		MazeTowerBase tower = MazeTowers.mazeTowers.getTowerBesideCoords(worldIn, chunkX, chunkZ);
+		return chunkX == tower.chunkX >> 4
+			&& chunkZ == tower.chunkZ >> 4
+			&& y >= tower.baseY && y <= tower.baseY + ((tower.floors + 1) * 6)
+			|| getMiniTowerAtPos(tower.getMiniTowers(), pos) != null;
 	}
 	
 	public static MiniTower getMiniTowerAtPos(List<MiniTower> miniTowers, BlockPos pos) {

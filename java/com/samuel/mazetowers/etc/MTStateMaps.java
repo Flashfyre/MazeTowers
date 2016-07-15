@@ -16,7 +16,6 @@ import net.minecraft.util.IStringSerializable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.samuel.mazetowers.MazeTowers;
-import com.samuel.mazetowers.blocks.BlockMazeTowerThreshold;
 import com.samuel.mazetowers.world.WorldGenMazeTowers.MazeTower;
 
 public class MTStateMaps {
