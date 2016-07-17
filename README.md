@@ -147,7 +147,7 @@ A special bow that can shoot Explosive Arrows. There is a slim, random chance th
 A wearable head of an Explosive Creeper that provides the same protection as iron and gold helmets but without breakability. When worn, regular arrows fired from an Explosive Bow become Explosive Arrows. These can be obtained as a rare drop from Explosive Creepers.
 
 ### Spectrite Armour (Helmet, Chestplate, Leggings, Boots)
-A set of armour made of spectrite. It's just as protective as diamond but lasts a lot longer. In addition, when 3 or more pieces of armour are equipped, the player will be given a regeneration effect with level 1 for 3 pieces and level 2 for 4 pieces.
+A set of armour made of spectrite. It's just as protective as diamond but lasts a lot longer. In addition, for every piece of armour equipped, the player will be provided with 1 level of Absorption (2 hearts) until the last armour piece which will provide Regeneration I instead. The effects last 10 seconds but reapply as long as the player is still wearing the required armour. Also, Absorption is applied 1 level at a time and is only applied if the player's health is full.
 
 ## Special Purpose Custom Blocks (Not Obtainable without Commands)
 

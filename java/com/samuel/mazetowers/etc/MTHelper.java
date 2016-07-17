@@ -142,10 +142,10 @@ public class MTHelper {
 		 * ((t.floors + 1) * 6)) return true; }
 		 */
 		MazeTowerBase tower = MazeTowers.mazeTowers.getTowerBesideCoords(worldIn, chunkX, chunkZ);
-		return chunkX == tower.chunkX >> 4
+		return tower != null && (chunkX == tower.chunkX >> 4
 			&& chunkZ == tower.chunkZ >> 4
 			&& y >= tower.baseY && y <= tower.baseY + ((tower.floors + 1) * 6)
-			|| getMiniTowerAtPos(tower.getMiniTowers(), pos) != null;
+			|| getMiniTowerAtPos(tower.getMiniTowers(), pos) != null);
 	}
 	
 	public static MiniTower getMiniTowerAtPos(List<MiniTower> miniTowers, BlockPos pos) {
