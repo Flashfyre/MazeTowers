@@ -42,38 +42,32 @@ public class MazeTowersGeneralEventHandler {
 
 	@SubscribeEvent
 	public void onHarvestDrops(HarvestDropsEvent e) {
-		if (e.getHarvester() != null) {
-			final int dimId = e.getWorld().provider
-				.getDimension() + 1;
-			BlockPos pos = e.getPos();
-			Chunk chunk = e.getWorld()
-				.getChunkFromBlockCoords(pos);
-			if (MTHelper.getIsMazeTowerPos(e.getWorld(), pos)) {
-				MazeTowerBase tower = MazeTowers.mazeTowers
-					.getTowerAtCoords(e.getWorld(),
-						chunk.xPosition, chunk.zPosition);
-				if (tower != null) {
-					BitSet[][] blockBreakabilityData = tower
-						.getBlockBreakabilityData();
-					try {
-						int[] coords = tower
-							.getCoordsFromPos(pos);
-						if (coords[0] == -6)
-							coords[0] = blockBreakabilityData.length - 1;
-						if (coords[0] >= 0
-							&& coords[0] < blockBreakabilityData.length
-							&& !blockBreakabilityData[coords[0]][coords[1]]
-								.get(coords[2]))
-							e.getDrops().clear();
-					} catch (ArrayIndexOutOfBoundsException e1) {
-						e1.printStackTrace();
-					}
-				} else if ((tower = MazeTowers.mazeTowers.getTowerBesideCoords(e.getWorld(),
-						chunk.xPosition, chunk.zPosition)) != null) {
-					MiniTower mt = MTHelper.getMiniTowerAtPos(tower.getMiniTowers(), pos);
-					if (!mt.getPosBreakability(pos))
-						e.getDrops().clear();
-				}
+		final int dimId = e.getWorld().provider
+			.getDimension() + 1;
+		BlockPos pos = e.getPos();
+		Chunk chunk = e.getWorld()
+			.getChunkFromBlockCoords(pos);
+		if (MTHelper.getIsMazeTowerPos(e.getWorld(), pos)) {
+			MazeTowerBase tower = MazeTowers.mazeTowers
+				.getTowerAtCoords(e.getWorld(),
+					chunk.xPosition, chunk.zPosition);
+			if (tower != null) {
+				BitSet[][] blockBreakabilityData = tower
+					.getBlockBreakabilityData();
+				int[] coords = tower
+					.getCoordsFromPos(pos);
+				if (coords[0] == -6)
+					coords[0] = blockBreakabilityData.length - 1;
+				if (coords[0] >= 0
+					&& coords[0] < blockBreakabilityData.length
+					&& !blockBreakabilityData[coords[0]][coords[1]]
+						.get(coords[2]))
+					e.getDrops().clear();
+			} else if ((tower = MazeTowers.mazeTowers.getTowerBesideCoords(e.getWorld(),
+					chunk.xPosition, chunk.zPosition)) != null) {
+				MiniTower mt = MTHelper.getMiniTowerAtPos(tower.getMiniTowers(), pos);
+				if (!mt.getPosBreakability(pos))
+					e.getDrops().clear();
 			}
 		}
 	}

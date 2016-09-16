@@ -5,6 +5,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +67,13 @@ public class BlockChaoticSludge extends BlockFluidClassic
 		if (!worldIn.isRemote) {
 	    	if (state.getBlock() == MazeTowers.BlockChaoticSludge) {
 	    		if (entityIn instanceof EntityLivingBase) {
-	    			((EntityLivingBase) entityIn).attackEntityFrom(damageSource, (float) (16.0F - state.getValue(BlockChaoticSludge.LEVEL)));
+	    			if (((EntityLivingBase) entityIn).attackEntityFrom(damageSource, (float) (16.0F - state.getValue(BlockChaoticSludge.LEVEL)))) {
+	    				entityIn.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, worldIn.rand.nextFloat() * 0.4F);
+	    			}
+	    		} else if (entityIn instanceof EntityItem) {
+	    			entityIn.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, worldIn.rand.nextFloat() * 0.4F);
+	    			entityIn.attackEntityFrom(damageSource, 4.0F);
+	    			entityIn.setFire(15);
 	    		}
 	    	}
 		}

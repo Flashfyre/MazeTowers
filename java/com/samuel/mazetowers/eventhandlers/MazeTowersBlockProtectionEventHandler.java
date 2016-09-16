@@ -130,9 +130,9 @@ public class MazeTowersBlockProtectionEventHandler {
 								&& !blockBreakabilityData[coords[0]][coords[1]].get(coords[2]))
 								toRemove.add(pos);
 						} catch (ArrayIndexOutOfBoundsException e1) {
-							e1 = null;
+							e1.printStackTrace();
 						} catch (NullPointerException e1) {
-							e1 = null;
+							e1.printStackTrace();
 						}
 					}
 				} else if ((tower = mazeTowers

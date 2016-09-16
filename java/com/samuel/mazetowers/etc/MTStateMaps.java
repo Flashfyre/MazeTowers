@@ -89,7 +89,7 @@ public class MTStateMaps {
 						else
 							towerMaps[mapIndex].put(dir, MTHelper.getRotatedStateMap(
 								MTHelper.getStairRotatedStairsMap(towerRawMaps[mapIndex],
-								EnumFacing.SOUTH, dir, tower.stairsBlock, torch),
+								EnumFacing.SOUTH, dir, tower.stairsBlock, !tower.getIsUnderwater() ? torch : null),
 								checkDir, dir, true));
 					}
 				}

@@ -147,7 +147,7 @@ public abstract class MobSpawnerSpecialBaseLogic extends MobSpawnerBaseLogic {
                     World world = this.getSpawnerWorld();
                     int j = nbttaglist.tagCount();
                     double d0 = j >= 1 ? nbttaglist.getDoubleAt(0) : blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * this.spawnRange + 0.5D;
-                    double d1 = j >= 2 ? nbttaglist.getDoubleAt(1) : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
+                    double d1 = j >= 2 ? nbttaglist.getDoubleAt(1) : shouldSpawnAbove ? getSpawnerPosition().getY() + 2 : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
                     double d2 = j >= 3 ? nbttaglist.getDoubleAt(2) : blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * this.spawnRange + 0.5D;
                     Entity entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, world, d0, d1, d2, false);
 

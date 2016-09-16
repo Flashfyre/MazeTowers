@@ -100,7 +100,7 @@ import com.samuel.mazetowers.world.WorldGenSpectrite;
 public class MazeTowers {
 	public static final String MODNAME = "mazetowers";
 	public static final String MODID = "mazetowers";
-	public static final String VERSION = "0.8.2";
+	public static final String VERSION = "0.8.3";
 
 	@Mod.Instance
 	public static MazeTowers instance = new MazeTowers();
@@ -210,7 +210,7 @@ public class MazeTowers {
 	
 	public static ArmorMaterial SPECTRITE = new EnumHelper()
 		.addArmorMaterial("spectrite", "mazetowers:spectrite_armor",
-		0, new int[]{3, 6, 8, 3}, 25, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 3);
+		72, new int[]{3, 6, 8, 3}, 25, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 3);
 	public static ToolMaterial DIAMOND_SPECTRITE_TOOL = new EnumHelper()
 		.addToolMaterial("diamond_spectrite_tool", 3, 2400, 10.0F, 4.0F, 16);
 	public static ToolMaterial SPECTRITE_TOOL = new EnumHelper()

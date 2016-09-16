@@ -8,6 +8,9 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
@@ -46,15 +49,21 @@ public class ItemSpectriteArmor extends ItemArmor {
 					float absorptionHealth = player.getHealth();
 					Field lastHealthScore = MTHelper.findObfuscatedField(EntityPlayerMP.class,
 			    		"lastHealthScore", "field_130068_bO");
+					Field ABSORPTION = MTHelper.findObfuscatedField(EntityPlayer.class,
+				    		"ABSORPTION", "field_184829_a");
 			    	lastHealthScore.setAccessible(true);
+			    	ABSORPTION.setAccessible(true);
 			    	try {
-			    		absorptionHealth = ((Float) lastHealthScore.get(player)).floatValue() - player.getMaxHealth();
+			    		absorptionHealth = Math.min(((Float) lastHealthScore.get(player)).floatValue() - player.getMaxHealth(), spectriteCount << 1);
+			    		if (player.getDataManager().get((DataParameter<Float>) ABSORPTION.get(player)).floatValue() > (float) (spectriteCount << 1)) {
+			    			player.getDataManager().set((DataParameter<Float>) ABSORPTION.get(player), (float) (spectriteCount << 1));
+			    		}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					int amplifier = Math.round(absorptionHealth) >> 2;
-						player.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 220,
-							Math.min(amplifier, Math.min(spectriteCount - 1, 2))));
+					player.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 220,
+						Math.min(amplifier, Math.min(spectriteCount - 1, 2))));
 				}
 				if (spectriteCount == 4 && player.getActivePotionEffect(MobEffects.REGENERATION) == null) {
 					player.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 220, 0));

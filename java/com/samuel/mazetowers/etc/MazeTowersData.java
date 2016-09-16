@@ -390,7 +390,7 @@ public class MazeTowersData extends WorldSavedData {
 		if (this.towerDataMini[dimId][index] == null)
 			this.towerDataMini[dimId][index] = new ArrayList<int[]>();
 		if (this.towerDataMini[dimId][index].size() == indexMini)
-			this.towerDataMini[dimId][index].add(bounds);
+			this.towerDataMini[dimId][index].add(indexMini, bounds);
 		else
 			this.towerDataMini[dimId][index].set(indexMini,
 				bounds);

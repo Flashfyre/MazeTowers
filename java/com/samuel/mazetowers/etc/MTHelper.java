@@ -142,9 +142,8 @@ public class MTHelper {
 		 * ((t.floors + 1) * 6)) return true; }
 		 */
 		MazeTowerBase tower = MazeTowers.mazeTowers.getTowerBesideCoords(worldIn, chunkX, chunkZ);
-		return tower != null && (chunkX == tower.chunkX >> 4
-			&& chunkZ == tower.chunkZ >> 4
-			&& y >= tower.baseY && y <= tower.baseY + ((tower.floors + 1) * 6)
+		return tower != null && ((chunkX == tower.chunkX && chunkZ == tower.chunkZ
+			&& y >= tower.baseY && y <= tower.baseY + ((tower.floors + 1) * 6))
 			|| getMiniTowerAtPos(tower.getMiniTowers(), pos) != null);
 	}
 	
@@ -357,20 +356,22 @@ public class MTHelper {
 		if (fromDir != toDir) {
 			newMap[0][5][2] = stairsBlocks[dirMap[2]];
 			newMap[1][4][2] = stairsBlocks[dirMap[2]];
-			newMap[1][6][2] = torch[dirMap[3]];
 			newMap[2][3][2] = stairsBlocks[dirMap[2]];
 			newMap[3][2][3] = stairsBlocks[dirMap[3]];
 			newMap[4][2][4] = stairsBlocks[dirMap[3]];
-			newMap[4][2][2] = torch[dirMap[0]];
 			newMap[5][2][5] = stairsBlocks[dirMap[3]];
 			newMap[6][3][6] = stairsBlocks[dirMap[0]];
 			newMap[7][4][6] = stairsBlocks[dirMap[0]];
-			newMap[7][2][6] = torch[dirMap[1]];
 			newMap[8][5][6] = stairsBlocks[dirMap[0]];
 			newMap[9][6][5] = stairsBlocks[dirMap[1]];
 			newMap[10][6][4] = stairsBlocks[dirMap[1]];
-			newMap[10][6][6] = torch[dirMap[2]];
 			newMap[11][6][3] = stairsBlocks[dirMap[1]];
+			if (torch != null) {
+				newMap[1][6][2] = torch[dirMap[3]];
+				newMap[4][2][2] = torch[dirMap[0]];
+				newMap[7][2][6] = torch[dirMap[1]];
+				newMap[10][6][6] = torch[dirMap[2]];
+			}
 		}
 
 		return newMap;

@@ -302,17 +302,17 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		switch (dimId) {
 			case 0:
 				chunkGroupTowerCoords[dimId].put(
-						new ChunkPos(chunkX >> 3, chunkZ >> 3),
+						new ChunkPos(chunkX >> 5, chunkZ >> 5),
 						new ChunkPos(chunkX, chunkZ));
 				break;
 			case 1:
 				chunkGroupTowerCoords[dimId].put(
-						new ChunkPos(chunkX >> 4, chunkZ >> 4),
+						new ChunkPos(chunkX >> 6, chunkZ >> 6),
 						new ChunkPos(chunkX, chunkZ));
 				break;
 			case 2:
 				chunkGroupTowerCoords[dimId].put(
-						new ChunkPos(chunkX >> 2, chunkZ >> 2),
+						new ChunkPos(chunkX >> 4, chunkZ >> 4),
 						new ChunkPos(chunkX, chunkZ));
 				break;
 		}
@@ -361,13 +361,13 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				for (int m = 0; m < mts.size(); m++) {
 					mtBounds[m] = mts.get(m).getBounds();
 				}
-			} else if (thresholdPos != null && !props.getEnabled() &&
+			}/* else if (thresholdPos != null && !props.getEnabled() &&
 				(player.getBedLocation(player.worldObj.provider.getDimension()) == null ||
 				!player.getBedLocation().equals(thresholdPos.up()))) {
-				player.setSpawnPoint(thresholdPos.up(), true);
+				//player.setSpawnPoint(thresholdPos.up(), true);
 				player.addChatMessage(new TextComponentString(
 					I18n.translateToLocal("gui.spawn_point")));
-			}
+			}*/
 			MazeTowers.network.sendTo(
 				new PacketMazeTowersGui(chunkX,
 					baseY, chunkZ, floors,
@@ -662,12 +662,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			isUnderwater = biomeName.equals("Deep Ocean");
 			
 			if (towerType == null || isUnderground == null) {
-				final int typeChance = (dimId == 0) ? !isUnderwater ? rand.nextInt(128) : 32
-					: (dimId == -1) ? 16 + rand.nextInt(64) : 27 + rand.nextInt(32);
+				final int typeChance = (dimId == 0) ? !isUnderwater ? rand.nextInt(64) : 16
+					: (dimId == -1) ? 8 + rand.nextInt(48) : 8 + rand.nextInt(32);
 				final boolean nullType = towerType == null,
 					nullUnderground = isUnderground == null;
-				if (typeChance < 32) {
-					if (typeChance < 16) {
+				if (typeChance < 16) {
+					if (typeChance < 8) {
 						if (biomeName.indexOf("Taiga") != -1) {
 							wallBlock_external = Blocks.STONEBRICK.getStateFromMeta(1);
 							fenceBlock = MazeTowers.BlockMossyStoneBrickWall
@@ -677,12 +677,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 							isUnderground = rand.nextInt(3) == 0;
 						if (nullType)
 							towerType = EnumTowerType.STONE_BRICK;
-					} else if (typeChance < 27) {
-						if (nullUnderground)
-							isUnderground = rand.nextInt(3) == 0;
-						if (nullType)
-							towerType = EnumTowerType.QUARTZ;
-					} else if (typeChance < 31) {
+					} else if (typeChance < 15) {
 						if (nullUnderground)
 							isUnderground = rand.nextInt(3) != 0;
 						if (nullType)
@@ -759,8 +754,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 								towerType = EnumTowerType.COBBLESTONE;
 						}
 					} else if (dimId == -1) {
-						if (nullType)
-							towerType = EnumTowerType.NETHER_BRICK;
+						if (nullType) {
+							towerType = rand.nextInt(8) != 0 ? EnumTowerType.NETHER_BRICK : EnumTowerType.QUARTZ;
+						}
 					} else {
 						if (nullType) {
 							if (rand.nextInt(3) != 0) {
@@ -1251,8 +1247,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private final EnumDyeColor[] dyeColors, beaconGlassColors;
 		private int entranceMinX;
 		private int entranceMinZ;
-		private final boolean hasOddX, hasOddZ, isUnderwater,
-				isMushroomTower;
+		private final boolean hasOddX, hasOddZ, isUnderwater, isMushroomTower;
 		private int chestCount, beaconMiniTowerIndex, locksmithMiniTowerIndex,
 				floorHighestDepthLevel[], floorHighestMazeDepthLevel[],
 				pathMap[][][], dataMap[][][];
@@ -1757,6 +1752,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			Map<BlockPos, Tuple<Integer, Integer>> floorScannerPos = null;
 			boolean addCircuitBreaker = false;
 			int floor = 0;
+			blockBreakabilityData = MTHelper.getBlockBreakabilityData(blockData);
 			removeEntities(worldIn);
 			for (int y = 0; y <= yLimit + 7; y++) {
 				if (isUnderwater && y == yLimit)
@@ -1796,6 +1792,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 										&& state == air) {
 									state = blockData[y][z][x] = wallBlock;
 									block = wallBlock.getBlock();
+								} else if (isUnderwater && y % 6 == 3 && block == Blocks.WATER) {
+									block = Blocks.AIR;
+									state = blockData[y][z][x] = block.getDefaultState();
 								}
 								worldIn.setBlockState(pos, state, 2);
 								if (block == Blocks.DISPENSER) {
@@ -1825,6 +1824,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 														getEntityNameForSpawn(
 																floor,
 																isUnderwater));
+										spawner.setShouldSpawnAbove(true);
 									} catch (NullPointerException e) {
 										e.printStackTrace();
 									}
@@ -1985,7 +1985,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			String infoString = getInfoString();
 			BlockPos entrancePos = new BlockPos(ix + (entrancePath.ix),
 					baseY + 3, iz + (entrancePath.iz)), signPos = entrancePos
-					.offset(entrancePath.getDir().getOpposite(), 2);
+					.offset(entrancePath.getDir().getOpposite());
 			BlockPos thresholdPos;
 			if (!isUnderground) {
 				worldIn.setBlockState(entrancePos.down(),
@@ -2047,8 +2047,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 			if (setData)
 				mazeTowersData.setBlockBreakabilityData(
-						blockBreakabilityData = MTHelper
-								.getBlockBreakabilityData(blockData), dimId,
+						blockBreakabilityData, dimId,
 						towerIndex);
 
 			for (MiniTower mt : miniTowers)
@@ -2076,7 +2075,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			}
 
 			if (MazeTowers.debugMode) {
-				MTDebugHelper.validateMiniTowerBounds(miniTowers);
+				//MTDebugHelper.validateMiniTowerBounds(miniTowers);
 				if (keyChestPos != null)
 					MazeTowers.network.sendToDimension(new PacketDebugMessage(
 						"Key in chest at " + keyChestPos.toString()),
@@ -2176,15 +2175,21 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 
 				if (isFirstStair) {
 					worldIn.setBlockState(pos2.up(2), fenceBlock, 2);
+					worldIn.setBlockState(pos2.up(2).offset(dir.getOpposite()), fenceBlock, 2);
 					if (this.isUnderwater && this.isUnderground)
 						worldIn.setBlockState(pos2.up(2).offset(sideDirR),
 								Blocks.WATER.getDefaultState());
 					worldIn.setBlockState(pos2.up(2).offset(sideDirR, 2),
 							fenceBlock, 2);
-					worldIn.setBlockState(pos2.up(3), fenceBlock, 2);
-					worldIn.setBlockState(pos2.up(3).offset(sideDirR),
+					worldIn.setBlockState(pos2.up(2).offset(sideDirR, 2).offset(dir.getOpposite()),
+							fenceBlock, 2);
+					worldIn.setBlockState(pos2.up(3), wallBlock_external, 2);
+					worldIn.setBlockState(pos2.up(3).offset(dir.getOpposite()), fenceBlock, 2);
+					worldIn.setBlockState(pos2.up(3).offset(sideDirR).offset(dir.getOpposite()),
 							wallBlock_external, 2);
 					worldIn.setBlockState(pos2.up(3).offset(sideDirR, 2),
+							wallBlock_external, 2);
+					worldIn.setBlockState(pos2.up(3).offset(sideDirR, 2).offset(dir.getOpposite()),
 							fenceBlock, 2);
 					isFirstStair = false;
 				}
@@ -2942,6 +2947,10 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			}
 
 		}
+		
+		public boolean getIsUnderwater() {
+			return isUnderwater;
+		}
 
 		private ItemStack getRandomItemFrameStack(World worldIn, int floor) {
 			int rareIndex = Math.min(getRarity(floor), 9);
@@ -3474,7 +3483,6 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 										.getDefaultState());
 						TileEntitySpecialMobSpawner spawner = (TileEntitySpecialMobSpawner) worldIn
 								.getTileEntity(spawnerPos);
-						spawner.setShouldSpawnAbove(true);
 						spawner.getSpawnerBaseLogic().setEntityName(
 								tower.getEntityNameForSpawn(floor,
 										tower.isUnderwater));
@@ -3523,7 +3531,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 										- 6 + y, // C
 										iz + minZ + fenceZCoords[i][f]);
 								stateMap[height - 6 + y][fenceZCoords[i][f]][fenceXCoords[i][f]] = state; // C
-								worldIn.setBlockState(pos, state, 2);
+								worldIn.setBlockState(pos, state, 3);
 							}
 						}
 
@@ -4103,7 +4111,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						: !posInBridgeCBounds ? blockBreakabilityDataSupport
 						: blockBreakabilityDataBridgeC;
 				try {
-					return data[y][z].get(x);
+					return data == null || data[y][z].get(x);
 				} catch (ArrayIndexOutOfBoundsException e) {
 					e.printStackTrace();
 				}
@@ -4959,7 +4967,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		}
 
 		protected void setPathWithOffset(int dist, int addY) {
-			IBlockState torch = !tower.isUnderwater ? Blocks.TORCH
+			final IBlockState torch = !tower.isUnderwater ? Blocks.TORCH
 					.getDefaultState().withProperty(BlockTorch.FACING,
 							dir.rotateYCCW()) : Blocks.SEA_LANTERN
 					.getDefaultState();
@@ -5065,8 +5073,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 						z);
 				break;
 			case 2:
-				mtp = new MTPArrowGauntlet(tower, fromPath, this, dir,
-						distance, x, y, z);
+				mtp = rand.nextBoolean() ? new MTPArrowGauntlet(tower, fromPath, this, dir,
+						distance, x, y, z) : null;
 				break;
 			case 3:
 				if ((!tower.isUnderground && floor != 1)
@@ -5106,7 +5114,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				}
 				break;
 			case 5:
-				if (difficulty > 5) {
+				if (difficulty > 5 && !tower.isUnderwater) {
 					if ((!tower.isUnderground && floor != 1) || (tower.isUnderground && floor != tower.floors))
 						mtp = new MTPGauntlet(tower, fromPath, this, dir, distance, x, y, z);
 					else {
@@ -5120,7 +5128,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				mtp = new MTPDoor(tower, fromPath, this, dir, distance, x, y, z);
 				break;
 			case 8:
-				if (difficulty > 3) {
+				if (difficulty > 3 && rand.nextBoolean()) {
 					boolean isLeft = rand.nextBoolean();
 					boolean switchDir = false;
 					boolean useMtp = true;
