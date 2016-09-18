@@ -43,6 +43,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -119,6 +120,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 	private Map<Integer, Map<Integer, IBlockState>> chunkData = null;
 	private Multimap<Integer, ArrayDeque<Integer>> chunkChest = null;
 	private List<MazeTowerBase>[] towers = new List[3];
+	private final int[] chunksPerTower = new int[] { 32, 24, 16 };
 	private final int[] genCount = new int[] { 128, 128, 128 };
 	private int[] chunksGenerated = new int[] { 0, 0, 0 };
 	private World curWorld;
@@ -182,11 +184,12 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 	public void generate(Random random, int chunkX, int chunkZ, World world,
 			IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		int genCount, chunkIndex, dimId = world.provider.getDimension();
-		
-		if ((chunkIndex = chunkGroupTowerCoords.length) < (genCount = getGenCount(dimId))) {
-			if (((chunkX % 16 + (chunkX < 0 ? 16 : 0)) == towerChunkCoord &&
-				(chunkZ % 16 + (chunkZ < 0 ? 16 : 0)) == towerChunkCoord) &&
-				(dimId != 1 || (chunkX != 0 && chunkX != -1) || (chunkZ != 0 && chunkZ != -1))) {
+		if ((dimId == 0 || dimId == -1 || dimId == 1) &&
+			(chunkIndex = chunkGroupTowerCoords.length) < (genCount = getGenCount(dimId))) {
+			final int chunksPerTower = this.chunksPerTower[dimId + 1];
+			if (((chunkX % chunksPerTower + (chunkX < 0 ? chunksPerTower : 0)) == towerChunkCoord &&
+				(chunkZ % chunksPerTower + (chunkZ < 0 ? chunksPerTower : 0)) == towerChunkCoord) &&
+				(dimId != 1 || Math.abs(chunkX) > 10 || Math.abs(chunkZ) > 10)) {
 				if (getIsValidChunkCoord(world, chunkX, chunkZ)) {
 					BlockPos spawnPos = new BlockPos(
 						chunkX << 4, 49, chunkZ << 4);
@@ -322,15 +325,15 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		switch (dimId) {
 			case 0:
 				chunkGroupTowerCoords[dimId].remove(
-					new ChunkPos(chunkX >> 3, chunkZ >> 3));
+					new ChunkPos(chunkX >> 5, chunkZ >> 5));
 				break;
 			case 1:
 				chunkGroupTowerCoords[dimId].remove(
-					new ChunkPos(chunkX >> 4, chunkZ >> 4));
+					new ChunkPos(chunkX >> 6, chunkZ >> 6));
 				break;
 			case 2:
 				chunkGroupTowerCoords[dimId].remove(
-					new ChunkPos(chunkX >> 2, chunkZ >> 2));
+					new ChunkPos(chunkX >> 4, chunkZ >> 4));
 				break;
 		}
 	}
@@ -632,7 +635,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		protected Stack<MiniTower> miniTowers;
 		protected final boolean hasXEntrance;
 		protected final boolean hasPosEntrance;
-		protected boolean isNetherTower;
+		protected boolean isNetherTower, isEndTower;
 		protected static final String[] mobList = new String[] { "Zombie",
 				"Skeleton", "Spider", "Silverfish", "Creeper", "Endermite",
 				"CaveSpider", "Witch", "ChargedCreeper", "Blaze",
@@ -791,6 +794,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					Math.min(getTowerFloors(towerType,
 					this.isUnderground),
 					((int) Math.floor((125 - y) / 6)) - 1);
+				this.isEndTower = dimId == 1;
 			} else {
 				this.floors = floors.intValue();
 			}
@@ -1788,13 +1792,22 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 								} else if (block == Blocks.PUMPKIN) {
 									state = air;
 									block = air.getBlock();
-								} else if (y % 6 == 5 && y < yLimit
-										&& state == air) {
-									state = blockData[y][z][x] = wallBlock;
-									block = wallBlock.getBlock();
-								} else if (isUnderwater && y % 6 == 3 && block == Blocks.WATER) {
-									block = Blocks.AIR;
-									state = blockData[y][z][x] = block.getDefaultState();
+								} else {
+									final int floorY = y % 6;
+									if (floorY == 5 && y < yLimit && state == air) {
+										state = blockData[y][z][x] = wallBlock;
+										block = wallBlock.getBlock();
+										blockBreakabilityData[y][z].clear(x);
+									} else if (!isUnderwater) {
+										if (floorY == 2 && block == Blocks.TORCH) {
+											EnumFacing facing;
+											if ((facing = state.getValue(BlockTorch.FACING)).getAxisDirection() == AxisDirection.NEGATIVE)
+												worldIn.setBlockState(pos.offset(facing.getOpposite()), wallBlock, 0);
+										}
+									} else if (floorY == 3 && block == Blocks.WATER) {
+										block = Blocks.AIR;
+										state = blockData[y][z][x] = block.getDefaultState();
+									}
 								}
 								worldIn.setBlockState(pos, state, 2);
 								if (block == Blocks.DISPENSER) {
@@ -2816,6 +2829,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 												+ rand.nextInt(3) + 1,
 										indexPart)) + (diffIndex >> 1),
 						mobList.length - 1)];
+				if (isEndTower && entityName == "Silverfish")
+					entityName = "Endermite";
 			}
 
 			return entityName;
@@ -3044,6 +3059,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 		private final boolean connLadder;
 		private final boolean isConnDownward;
 		private final boolean hasItemFrame[];
+		private final boolean hasPainting[];
 		private final boolean hasFenceWall[];
 		private final boolean hasFenceWallExtended[];
 		private final boolean hasBookShelf[][];
@@ -3157,6 +3173,9 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					connYDiff = y2 - y1;
 				}
 				conn.dirC = EnumFacing.values()[connData[1]];
+				if (conn.hasPainting[connData[1] - 2]) {
+					conn.hasPainting[connData[1] - 2] = false;
+				}
 				dirC = conn.dirC.getOpposite();
 				connLadder = (baseY + height) != (conn.baseY + conn.height);// distC
 																			// <
@@ -3215,7 +3234,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				offsetZSupport = offsetSupport[1];
 			}
 			
-			isExit = !tower.isUnderground && floors == 1 && (mtBelow == null || !mtBelow.hasShop);
+			isExit = !tower.isUnderground && floors == 1 && ((mtBelow == null && !tower.isEndTower) || (mtBelow != null && !mtBelow.hasShop));
 
 			ix = tower.chunkX << 4;
 			iz = tower.chunkZ << 4;
@@ -3245,6 +3264,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			}
 
 			hasItemFrame = new boolean[4];
+			hasPainting = new boolean[4];
 			hasFenceWall = new boolean[4];
 			hasFenceWallExtended = new boolean[4];
 			hasBookShelf = new boolean[4][3];
@@ -3261,9 +3281,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 							.nextInt(24) : 4;
 					hasItemFrame[d] = rand.nextInt(itemFrameChance) == 0;
 					hasFenceWall[d] = hasFullFenceWall || fenceWallChance < 3;
-					hasFenceWallExtended[d] = hasFullFenceWallExtended
-							|| fenceWallChance == 0;
-					if (rand.nextInt(4) == 0) {
+					hasFenceWallExtended[d] = hasFullFenceWallExtended || fenceWallChance == 0;
+					if (rand.nextInt(8) == 0) {
 						int s = 0;
 						if (rand.nextInt(4) != 0) {
 							for (; s < 3; s++) {
@@ -3278,6 +3297,8 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 										.nextInt(4) == 0 : false;
 							}
 						}
+					} else if ((conn == null || dirs[d + 2] != dirC) && !hasItemFrame[d] && !hasFenceWall[d] && !hasFenceWallExtended[d]) {
+						hasPainting[d] = rand.nextInt(8) == 0;
 					}
 				}
 			}
@@ -3338,6 +3359,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 			mtBelow = null;
 			dyeColorIndex = 0;
 			hasItemFrame = null;
+			hasPainting = null;
 			hasFenceWall = null;
 			hasFenceWallExtended = null;
 			hasBookShelf = null;
@@ -3452,15 +3474,19 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 							if (state != null) {
 								curBlock = state.getBlock();
 
-								if (!tower.isUnderwater && y % 3 == 1) {
-									EnumFacing facing;
-									if (curBlock == Blocks.TORCH
-											&& (facing = state
-													.getValue(BlockTorch.FACING))
-													.getAxisDirection() == AxisDirection.NEGATIVE)
-										worldIn.setBlockState(pos.offset(facing
-												.getOpposite()),
-												tower.wallBlock, 0);
+								if (y % 3 == 2) {
+									if (!tower.isUnderwater) {
+										EnumFacing facing;
+										if (curBlock == Blocks.TORCH
+												&& (facing = state
+														.getValue(BlockTorch.FACING))
+														.getAxisDirection() == AxisDirection.NEGATIVE)
+											worldIn.setBlockState(pos.offset(facing
+													.getOpposite()),
+													tower.wallBlock, 0);
+									} else if (curBlock == Blocks.TORCH) {
+										state = stateMap[y][z][x] = Blocks.WATER.getDefaultState();
+									}
 								}
 
 								worldIn.setBlockState(pos, state, 2);
@@ -3517,6 +3543,19 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 							e.printStackTrace();
 						}
 						worldIn.spawnEntityInWorld(frame);
+					} else if (hasPainting[i]) {
+						final BlockPos pos = new BlockPos(ix + frameXCoords[i],
+								baseY + height - 5, iz + frameZCoords[i]);
+						EntityPainting painting =  null;
+						int paintingWidth, paintingHeight, failCount = -1;
+						do {
+							failCount++;
+							painting = new EntityPainting(worldIn, pos, EnumFacing.values()[i + 2]);
+							paintingWidth = painting.getWidthPixels();
+							paintingHeight = painting.getHeightPixels();
+						} while (failCount < 10 && paintingWidth != 16 && paintingWidth != 48);
+						
+						worldIn.spawnEntityInWorld(painting);
 					}
 
 					if (hasFenceWall[i]) {
@@ -3835,11 +3874,19 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 				}
 			}
 			
-			if (isExit)
+			if (isExit) {
 				worldIn.setBlockState(new BlockPos(ix + minXSupport + 2,
 					baseYSupport - 1, iz + minZSupport + 2),
 					mtBelow == null ? MazeTowers.BlockMazeTowerThreshold.getDefaultState() :
 					tower.air, 2);
+				if (mtBelow != null && (minX != mtBelow.minX || minZ != mtBelow.minZ)) {
+					worldIn.setBlockState(new BlockPos(ix + minXSupport + 2,
+							baseYSupport - 2, iz + minZSupport + 2),
+							mtBelow == null ? MazeTowers.BlockMazeTowerThreshold.getDefaultState() :
+							tower.air, 2);
+				}
+			}
+				
 		}
 
 		private int[] getMTOffsets() {
@@ -4971,7 +5018,6 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 					.getDefaultState().withProperty(BlockTorch.FACING,
 							dir.rotateYCCW()) : Blocks.SEA_LANTERN
 					.getDefaultState();
-			// for (int s = -1; s < 2; s++)
 			if (!isTowerEntrance || (dist != 0 && dist != 2) || addY != 3) {
 				if (!tower.isUnderwater || addY != 2
 						|| (dist != 1 && dist != distance - 1)) {
@@ -5193,15 +5239,6 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 												.getAxisDirection() == AxisDirection.NEGATIVE ? -2
 												: 2
 												: 0))));
-			/*
-			 * (path = getPathWithOffset(tower, this, facing, 2, (x = x +
-			 * (facing.getAxis() == Axis.X ? facing.getAxisDirection() ==
-			 * AxisDirection.NEGATIVE ? -2 : 2 : 0)), y, (z = z +
-			 * (facing.getAxis() == Axis.Z ? facing.getAxisDirection() ==
-			 * AxisDirection.NEGATIVE ? -2 : 2 : 0)))) != null && (path.hasMtp
-			 * || path.parent == this || path.getMazeDepth() > mazeDepth)) ||
-			 * !isPosValid(tower, x, y, z)));
-			 */
 			return facing;
 		}
 	}
@@ -6021,7 +6058,7 @@ public class WorldGenMazeTowers implements IWorldGenerator {
 													leverPathCoords[0],
 													leverPathCoords[1] + 1,
 													tower.stairsBlock[3]);
-										state = tower.wallBlock;
+										state = !tower.isUnderwater ? tower.wallBlock : Blocks.REDSTONE_WIRE.getDefaultState();
 									}
 									if (Path.getStateAt(tower, xCoord, yCoord,
 											zCoord) == tower.air)

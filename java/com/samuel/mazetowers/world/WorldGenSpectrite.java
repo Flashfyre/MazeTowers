@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.pattern.BlockMatcher;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -11,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -65,8 +67,7 @@ public class WorldGenSpectrite implements IWorldGenerator {
 	}
 
 	private void generateSurface(World world, Random random, int chunkX, int chunkZ) {
-		if (random.nextInt(4) == 0)
-			generateOre(ModBlocks.spectriteOre, world, random, chunkX, chunkZ, 1, 0, 16);
+		generateOre(ModBlocks.spectriteOre, world, random, chunkX, chunkZ, 1, 0, 16);
 	}
 
 	private void generateNether(World world, Random random, int chunkX, int chunkZ) {
@@ -89,39 +90,10 @@ public class WorldGenSpectrite implements IWorldGenerator {
 	    	final boolean isSurface = world.provider.getDimension() == 0,
 	    	isNether = world.provider.getDimension() == -1,
 	    	isEnd = world.provider.getDimension() == 1;
-	    	final int veinTier = rand.nextInt(isSurface ? 7 : isNether ? 5 : 3) == 0 ?
-	    		rand.nextInt(isSurface ? 7 : isNether ? 5 : 3) == 0 ? 2 : 1 : 0;
-	    	final IBlockState state = world.getBlockState(pos),
-	    	oreState = isSurface ? stateSurface : isNether ? stateNether : stateEnd;
-	    	if ((isSurface || isNether || isEnd) && state.getBlock()
-	    		.isReplaceableOreGen(state, world, pos, isSurface ? targetSurface : isNether ? targetNether : targetEnd)) {
-	    		final int veinSize = rand.nextBoolean() ? 1 : rand.nextInt(veinTier == 0 ? 3 : veinTier == 1 ? 7 : 15) + 1;
-	    		boolean offsetX = rand.nextBoolean(), offsetY = rand.nextBoolean(), offsetZ = rand.nextBoolean();
-	    		if (!offsetX && !offsetZ && !offsetY) {
-	    			final int offsetChance = rand.nextInt(3);
-	    			if (offsetChance == 0)
-	    				offsetX = true;
-	    			else if (offsetChance == 1)
-	    				offsetY = true;
-	    			else
-	    				offsetZ = true;
-	    		}
-	    		world.setBlockState(pos, oreState);
-	    		for (int o = 0; o < veinSize - 1; o++) {
-	    			BlockPos offsetPos;
-	    			IBlockState curState;
-	    			do {
-	    				offsetPos = (offsetX ? pos.offset(EnumFacing.EAST, (rand.nextInt(3) + 1) *
-    	    				(rand.nextBoolean() ? 1 : -1)) : pos).offset(EnumFacing.UP, offsetY ? (rand.nextInt(3) + 1) *
-    	    	    		(rand.nextBoolean() ? 1 : -1) : 0).offset(EnumFacing.SOUTH, offsetZ ?
-    	    	    		(rand.nextInt(3) + 1) * (rand.nextBoolean() ? 1 : -1) : 0);
-	    				curState = world.getBlockState(offsetPos);
-	    			} while ((isSurface && offsetPos.getY() <= 0) || (isNether && offsetPos.getY() >= 127));
-	    			if (curState.getBlock().isReplaceableOreGen(curState, world, offsetPos,
-	    				isSurface ? targetSurface : isNether ? targetNether : targetEnd))
-	    				world.setBlockState(offsetPos, oreState);
-	    		}
-	    	}
+	    	final Block matchBlock = isSurface ? Blocks.STONE : isNether ? Blocks.NETHERRACK : Blocks.END_STONE;
+	    	final IBlockState oreState = isSurface ? stateSurface : isNether ? stateNether : stateEnd;
+    		final int veinSize = rand.nextInt(rand.nextInt(rand.nextInt(isSurface ? 4 : isNether ? 6 : 10) + 1) + 1) + 1;
+    		new WorldGenMinable(oreState, veinSize, BlockMatcher.forBlock(matchBlock)).generate(world, rand, pos);
     	    return true;
 	    }
 	}

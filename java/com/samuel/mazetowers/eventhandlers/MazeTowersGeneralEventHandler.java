@@ -2,6 +2,7 @@ package com.samuel.mazetowers.eventhandlers;
 
 import java.util.BitSet;
 
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,13 +61,13 @@ public class MazeTowersGeneralEventHandler {
 					coords[0] = blockBreakabilityData.length - 1;
 				if (coords[0] >= 0
 					&& coords[0] < blockBreakabilityData.length
-					&& !blockBreakabilityData[coords[0]][coords[1]]
-						.get(coords[2]))
+					&& (!blockBreakabilityData[coords[0]][coords[1]]
+						.get(coords[2]) || e.getState().getBlock() instanceof BlockChest))
 					e.getDrops().clear();
 			} else if ((tower = MazeTowers.mazeTowers.getTowerBesideCoords(e.getWorld(),
 					chunk.xPosition, chunk.zPosition)) != null) {
 				MiniTower mt = MTHelper.getMiniTowerAtPos(tower.getMiniTowers(), pos);
-				if (!mt.getPosBreakability(pos))
+				if (!mt.getPosBreakability(pos) || e.getState().getBlock() instanceof BlockChest)
 					e.getDrops().clear();
 			}
 		}
